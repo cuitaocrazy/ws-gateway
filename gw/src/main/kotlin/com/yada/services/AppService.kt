@@ -13,6 +13,8 @@ interface IAppService {
     fun addRes(id: String, resources: Set<Res>): Mono<Void>
     fun removeRes(id: String, resources: Set<Res>): Mono<Void>
     fun changeId(oldId: String, newId: String): Mono<Void>
+    fun exist(id: String): Mono<Boolean>
+    fun getRoleIds(id: String): Flux<String>
 }
 
 class AppService {

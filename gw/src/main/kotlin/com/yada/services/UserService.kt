@@ -14,6 +14,7 @@ interface IUserService {
     fun getRoleIds(id: String): Flux<Role>
     fun addRole(id: String, roleId: String): Mono<Void>
     fun removeRole(id: String, roleId: String): Mono<Void>
+    fun exist(id: String): Mono<Boolean>
 }
 
 abstract class UserService : IUserService {

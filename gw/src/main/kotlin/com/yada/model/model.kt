@@ -19,7 +19,8 @@ data class User(
         val id: String,
         val pwd: String,
         @Column("org_id")
-        val org: Org
+        val org: Org,
+        val roles: Set<Role>
 )
 
 @Table

@@ -8,7 +8,6 @@ import reactor.core.publisher.Mono
 interface IRoleService {
     fun create(appId: String, id: String): Mono<String?>
     fun get(appId: String, id: String): Mono<Role?>
-    fun changeResources(appId: String, id: String, res: Array<ResWithSvc>): Mono<Void>
     fun delete(appId: String, id: String): Mono<Void>
     fun getRoleIds(appId: String): Flux<String>
     fun exist(appId: String, id: String): Mono<Boolean>

@@ -11,7 +11,7 @@ interface IUserService {
     fun create(id: String, pwd: String, orgId: String): Mono<User?>
     fun changePwd(id: String, pwd: String): Mono<Void>
     fun delete(id: String): Mono<Void>
-    fun getRoleIds(id: String): Flux<Role>
+    fun getRoleIds(id: String): Flux<String>
     fun addRole(id: String, roleId: String): Mono<Void>
     fun removeRole(id: String, roleId: String): Mono<Void>
     fun exist(id: String): Mono<Boolean>

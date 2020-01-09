@@ -26,7 +26,7 @@ data class User(
 data class App(
         @Id
         val id: String,
-        val resources: Set<Res>
+        val resources: Set<ResWithSvc>
 )
 
 @Table
@@ -37,8 +37,9 @@ data class Svc(
 )
 
 data class Role(
+        val appId: String,
         val id: String,
-        val name: String
+        val resources: Set<ResWithSvc>
 )
 
 enum class Operator(val op: String) {

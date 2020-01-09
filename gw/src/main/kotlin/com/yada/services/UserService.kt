@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono
 interface IUserService {
     fun get(id: String): Mono<User?>
     fun getPwd(id: String): Mono<String?>
-    fun create(id: String, pwd: String): Mono<User?>
+    fun create(id: String, pwd: String, orgId: String): Mono<User?>
     fun changePwd(id: String, pwd: String): Mono<Void>
     fun delete(id: String): Mono<Void>
     fun getRoleIds(id: String): Flux<Role>

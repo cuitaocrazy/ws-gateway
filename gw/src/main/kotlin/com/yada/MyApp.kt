@@ -1,34 +1,32 @@
 package com.yada
 
-import io.r2dbc.h2.H2ConnectionConfiguration
-import io.r2dbc.h2.H2ConnectionFactory
-import io.r2dbc.spi.ConnectionFactory
-import org.springframework.boot.SpringApplication
+import com.mongodb.reactivestreams.client.MongoClient
+import com.mongodb.reactivestreams.client.MongoClients
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.data.r2dbc.config.AbstractR2dbcConfiguration
-import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories
-import reactor.core.publisher.Mono
+import org.springframework.data.mongodb.config.AbstractReactiveMongoConfiguration
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate
+import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories
 
 @SpringBootApplication
 open class MyApp
 
-//@Configuration
-//@EnableR2dbcRepositories
-//open class R2dbcConfiguration : AbstractR2dbcConfiguration() {
-//    @Bean
-//    override fun connectionFactory() =
-//        H2ConnectionFactory(
-//            H2ConnectionConfiguration.builder()
-//                .url("mem:testdb;DB_CLOSE_DELAY=-1;TRACE_LEVEL_FILE=4")
-//                .username("sa")
-//                .build()
-//        )
-//}
+@Configuration
+@EnableReactiveMongoRepositories
+open class MongoConfig : AbstractReactiveMongoConfiguration() {
+    override fun reactiveMongoClient() = mongoClient()
+
+    override fun getDatabaseName() = "test"
+
+    override fun reactiveMongoTemplate() = ReactiveMongoTemplate(mongoClient(), databaseName)
+
+    @Bean
+    open fun mongoClient(): MongoClient = MongoClients.create()
+
+}
 
 fun main(args: Array<String>) {
-//    SpringApplication.run(MyApp::class.java, *args)
     runApplication<MyApp>(*args)
 }

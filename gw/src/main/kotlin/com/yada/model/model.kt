@@ -1,47 +1,7 @@
 package com.yada.model
 
 import org.springframework.data.annotation.Id
-import org.springframework.data.relational.core.mapping.Column
-import org.springframework.data.relational.core.mapping.MappedCollection
-import org.springframework.data.relational.core.mapping.Table
-
-@Table
-data class Org(
-        @Id val id: String,
-        val name: String,
-        @MappedCollection
-        val users: Set<User>
-)
-
-@Table
-data class User(
-        @Id
-        val id: String,
-        val pwd: String,
-        @Column("org_id")
-        val org: Org,
-        val roles: Set<Role>
-)
-
-@Table
-data class App(
-        @Id
-        val id: String,
-        val resources: Set<ResWithSvc>
-)
-
-@Table
-data class Svc(
-        @Id
-        val id: String,
-        val resources: Set<Res>
-)
-
-data class Role(
-        val appId: String,
-        val id: String,
-        val resources: Set<ResWithSvc>
-)
+import org.springframework.data.mongodb.core.mapping.Document
 
 enum class Operator(val op: String) {
     READ("READ"),
@@ -50,8 +10,38 @@ enum class Operator(val op: String) {
     DELETE("DELETE")
 }
 
+data class RoleId(val appId: String, val roleName: String)
+
+@Document
+data class Org(
+        @Id
+        val id: String,
+        val name: String
+)
+
+data class User(
+        val id: String,
+        val pwd: String,
+        val orgId: String,
+        val roles: Set<RoleId>
+)
+
 data class Res(val uri: String, val ops: Set<Operator>)
 
-data class ResWithSvc(val svcId: String, val res: Res) {
-    fun getUri() = "/" + this.svcId + this.res.uri
-}
+
+data class Svc(val svcId: String, val resources: Set<Res>)
+
+typealias SvcRes = Svc
+
+data class Role(
+        val id: RoleId,
+        val resources: Set<SvcRes>
+)
+
+data class App(
+        val id: String,
+        val resources: Set<SvcRes>,
+        val roles: Set<Role>
+)
+
+

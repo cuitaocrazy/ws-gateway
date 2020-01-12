@@ -17,4 +17,7 @@ interface UserRepository : ReactiveCrudRepository<User, String>
 
 interface SvcRepository : ReactiveCrudRepository<Svc, String>
 
-interface  AppRepository : ReactiveCrudRepository<App, String>
+interface  AppRepository : ReactiveCrudRepository<App, String> {
+    @Query("{}", sort ="{'id': 1}", fields = "{'id': 1}")
+    fun findAllIds(): Flux<String>
+}

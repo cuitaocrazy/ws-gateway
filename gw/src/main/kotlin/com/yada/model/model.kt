@@ -34,7 +34,7 @@ data class Svc(val svcId: String, val resources: Set<Res>)
 typealias SvcRes = Svc
 
 data class Role(
-        val id: RoleId,
+        val name: String,
         val resources: Set<SvcRes>
 )
 

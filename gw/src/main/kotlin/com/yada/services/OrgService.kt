@@ -43,7 +43,7 @@ private fun makeTree(orgs: List<Org>): List<OrgTree> {
 class OrgService @Autowired constructor(private val repo: OrgRepository) : IOrgService {
     override fun getTree(orgId: String?): Flux<OrgTree> =
             repo.findByRegexId("^${orgId ?: ""}.*")
-                    .reduceWith({ emptyList<Org>() }) { s, e -> s + e }
+                    .collectList()
                     .map(::makeTree)
                     .flatMapMany { Flux.fromIterable(it) }
 

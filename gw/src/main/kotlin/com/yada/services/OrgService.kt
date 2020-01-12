@@ -11,11 +11,9 @@ data class OrgTree(val org: Org, val children: Set<OrgTree>?)
 
 interface IOrgService {
     fun getTree(orgId: String?): Flux<OrgTree>
-    fun getChildren(orgId: String?): Flux<Org>
-    fun create(id: String, name: String): Mono<Org?>
-    fun changeName(id: String, name: String): Mono<Org?>
+    fun createOrUpdate(org: Org): Mono<Org>
     fun delete(id: String): Mono<Void>
-    fun get(id: String): Mono<Org?>
+    fun get(id: String): Mono<Org>
     fun exist(id: String): Mono<Boolean>
 }
 
@@ -26,12 +24,12 @@ fun Org.isMyOffspring(org: Org) = org.id.startsWith(this.id)
 //    return listOf(org) + (children?.toList() ?: listOf())
 //}
 
-fun makeTree(orgs: List<Org>): List<OrgTree> {
+private fun makeTree(orgs: List<Org>): List<OrgTree> {
     val ret = ArrayList<OrgTree>()
     var tmp = orgs
     while (tmp.isNotEmpty()) {
         val o = tmp.first()
-        val childrenOrgTree = tmp.drop(1).partition { o.isMyOffspring(it) }.run {
+        val childrenOrgTree = tmp.drop(1).partition(o::isMyOffspring).run {
             tmp = second
             if (first.isEmpty()) null else makeTree(first).toSet()
         }
@@ -49,28 +47,12 @@ class OrgService @Autowired constructor(private val repo: OrgRepository) : IOrgS
                     .map(::makeTree)
                     .flatMapMany { Flux.fromIterable(it) }
 
-    override fun getChildren(orgId: String?): Flux<Org> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun createOrUpdate(org: Org): Mono<Org> = repo.save(org)
 
-    override fun create(id: String, name: String): Mono<Org?> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun delete(id: String): Mono<Void> = repo.deleteById(id)
 
-    override fun changeName(id: String, name: String): Mono<Org?> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun get(id: String): Mono<Org> = repo.findById(id)
 
-    override fun delete(id: String): Mono<Void> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun get(id: String): Mono<Org?> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun exist(id: String): Mono<Boolean> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun exist(id: String): Mono<Boolean> = repo.existsById(id)
 
 }

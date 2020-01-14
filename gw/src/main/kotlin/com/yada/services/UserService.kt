@@ -37,15 +37,9 @@ class UserService @Autowired constructor(private val userRepo: UserRepository, p
 
     override fun exist(id: String): Mono<Boolean> = userRepo.existsById(id)
 
-    override fun getPwd(id: String): Mono<String> {
-        val query = Query(Criteria.where("_id").`is`(id)).apply {
-            fields().include("pwd")
-            fields().exclude("_id")
-        }
-        return reactiveMongoTemplate.findOne<String>(query, "user").map {
-            val objectMapper = ObjectMapper()
-            objectMapper.readTree(it)["pwd"].asText()
-        }
+    override fun getPwd(id: String): Mono<String> = userRepo.fundOnPwd(id).map {
+        val objectMapper = ObjectMapper()
+        objectMapper.readTree(it)["pwd"].asText()
     }
 
     override fun changePwd(id: String, pwd: String): Mono<Void> {

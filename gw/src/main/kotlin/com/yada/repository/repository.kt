@@ -7,6 +7,7 @@ import com.yada.model.User
 import org.springframework.data.mongodb.repository.Query
 import org.springframework.data.repository.reactive.ReactiveCrudRepository
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 
 interface OrgRepository : ReactiveCrudRepository<Org, String> {
     @Query("{'id': { \$regex: ?0 }}", sort = "{'id': 1}")
@@ -16,6 +17,8 @@ interface OrgRepository : ReactiveCrudRepository<Org, String> {
 interface UserRepository : ReactiveCrudRepository<User, String> {
     @Query("{'orgId': ?0}")
     fun findByOrgId(orgId: String): Flux<User>
+    @Query("{'id': ?0}", fields = "{'pwd': 1, '_id': 0}")
+    fun fundOnPwd(id: String): Mono<String>
 }
 
 interface SvcRepository : ReactiveCrudRepository<Svc, String> {

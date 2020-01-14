@@ -14,7 +14,7 @@ import reactor.core.publisher.Flux
 @RequestMapping("/user")
 class UserController @Autowired constructor(private val userService: IUserService, private val repo: UserRepository) {
     @GetMapping
-    fun get() = userService.getByOrgId("00")
+    fun get() = userService.getPwd("cuitao")
     @GetMapping("save")
     fun save(): Flux<User> = repo.saveAll(listOf(
             User("cuitao", "00", setOf(

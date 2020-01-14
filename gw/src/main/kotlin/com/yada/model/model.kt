@@ -1,8 +1,5 @@
 package com.yada.model
 
-import org.springframework.data.annotation.Id
-import org.springframework.data.mongodb.core.mapping.Document
-
 enum class Operator(val op: String) {
     READ("READ"),
     CREATE("CREATE"),
@@ -12,9 +9,7 @@ enum class Operator(val op: String) {
 
 data class RoleId(val appId: String, val roleName: String)
 
-@Document
 data class Org(
-        @Id
         val id: String,
         val name: String
 )

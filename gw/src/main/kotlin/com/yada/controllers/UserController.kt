@@ -26,5 +26,5 @@ class UserController @Autowired constructor(private val userService: IUserServic
             ))
     ))
     @GetMapping("changePwd")
-    fun changePwd() = userService.changePwd("cuitao", "cuitaopwd123")
+    fun changePwd() = userService.changePwd("cuitao", "ctpwd1111")
 }

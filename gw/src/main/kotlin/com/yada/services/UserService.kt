@@ -26,7 +26,7 @@ interface IUserService {
 }
 
 @Service
-class UserService @Autowired constructor(private val userRepo: UserRepository, private val reactiveMongoTemplate: ReactiveMongoTemplate) : IUserService {
+class UserService @Autowired constructor(private val userRepo: UserRepository) : IUserService {
     override fun get(id: String): Mono<User> = userRepo.findById(id)
 
     override fun getByOrgId(orgId: String): Flux<User> = userRepo.findByOrgId(orgId)
@@ -39,9 +39,5 @@ class UserService @Autowired constructor(private val userRepo: UserRepository, p
 
     override fun getPwd(id: String): Mono<String> = userRepo.fundOnPwd(id).map { ObjectMapper().readTree(it)["pwd"]?.asText() }
 
-    override fun changePwd(id: String, pwd: String): Mono<Void> {
-        val query = Query(Criteria.where("id").`is`(id))
-        val update = Update().set("pwd", pwd)
-        return reactiveMongoTemplate.updateFirst(query, update, User::class.java).then(Mono.create<Void> { it.success() })
-    }
+    override fun changePwd(id: String, pwd: String): Mono<Void> = userRepo.changePwd(id, pwd)
 }

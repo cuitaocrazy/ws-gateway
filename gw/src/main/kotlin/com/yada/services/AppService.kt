@@ -16,10 +16,7 @@ interface IAppService {
 
 @Service
 class AppService constructor(private val appRepository: AppRepository) : IAppService {
-    override fun getAllIds(): Flux<String> = appRepository.findAllIds().map {
-        val objectMapper = ObjectMapper()
-        objectMapper.readTree(it)["_id"].asText()
-    }
+    override fun getAllIds(): Flux<String> = appRepository.findAllIds().map { ObjectMapper().readTree(it)["_id"].asText() }
 
     override fun get(id: String): Mono<App> = appRepository.findById(id)
 

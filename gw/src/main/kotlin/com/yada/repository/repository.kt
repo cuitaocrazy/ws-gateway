@@ -13,7 +13,10 @@ interface OrgRepository : ReactiveCrudRepository<Org, String> {
     fun findByRegexId(regex: String): Flux<Org>
 }
 
-interface UserRepository : ReactiveCrudRepository<User, String>
+interface UserRepository : ReactiveCrudRepository<User, String> {
+    @Query("{'orgId': ?0}")
+    fun findByOrgId(orgId: String): Flux<User>
+}
 
 interface SvcRepository : ReactiveCrudRepository<Svc, String> {
     @Query("{}", sort ="{'id': 1}", fields = "{'id': 1}")

@@ -1,8 +1,6 @@
 package com.yada.services
 
-import com.yada.model.Res
 import com.yada.model.Svc
-import com.yada.model.SvcRes
 import com.yada.repository.SvcRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service

@@ -21,7 +21,6 @@ data class Org(
 
 data class User(
         val id: String,
-        val pwd: String,
         val orgId: String,
         val roles: Set<RoleId>
 )

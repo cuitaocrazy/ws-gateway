@@ -37,12 +37,6 @@ interface UserRepository : IUserRepository, ReactiveCrudRepository<User, String>
     fun fundOnPwd(id: String): Mono<String>
 }
 
-interface SvcRepository : ReactiveCrudRepository<Svc, String> {
-    @Query("{}", sort ="{'id': 1}", fields = "{'id': 1}")
-    fun findAllIds(): Flux<String>
-}
+interface SvcRepository : ReactiveCrudRepository<Svc, String>
 
-interface  AppRepository : ReactiveCrudRepository<App, String> {
-    @Query("{}", sort ="{'id': 1}", fields = "{'id': 1}")
-    fun findAllIds(): Flux<String>
-}
+interface  AppRepository : ReactiveCrudRepository<App, String>

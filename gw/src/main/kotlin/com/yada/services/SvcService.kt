@@ -8,7 +8,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 interface ISvcService {
-    fun getAllIds(): Flux<String>
+    fun getAll(): Flux<Svc>
     fun get(id: String): Mono<Svc>
     fun createOrUpdate(svc: Svc): Mono<Svc>
     fun changeId(oldId: String, newId: String): Mono<Svc>
@@ -17,7 +17,7 @@ interface ISvcService {
 
 @Service
 class SvcService @Autowired constructor(private val repo: SvcRepository) : ISvcService {
-    override fun getAllIds(): Flux<String> = repo.findAllIds()
+    override fun getAll(): Flux<Svc> = repo.findAll()
 
     override fun get(id: String): Mono<Svc> = repo.findById(id)
 

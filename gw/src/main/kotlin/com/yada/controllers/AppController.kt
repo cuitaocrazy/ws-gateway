@@ -7,16 +7,16 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import reactor.core.publisher.Mono
+import reactor.core.publisher.Flux
 
 @RestController
 @RequestMapping("/app")
 class AppController @Autowired constructor(private val repo: AppRepository, private val app: IAppService) {
     @GetMapping
-    fun get(): Mono<List<String>> = app.getAllIds().collectList()
+    fun get(): Flux<App> = app.getAll()
 
     @GetMapping("save")
-    fun save() = repo.saveAll(listOf(
+    fun save(): Flux<App> = repo.saveAll(listOf(
             App(
                     "app1",
                     setOf(

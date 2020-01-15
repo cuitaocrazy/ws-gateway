@@ -8,7 +8,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 interface IAppService {
-    fun getAllIds(): Flux<String>
+    fun getAll(): Flux<App>
     fun get(id: String): Mono<App>
     fun createOrUpdate(app: App): Mono<App>
     fun exist(id: String): Mono<Boolean>
@@ -16,7 +16,7 @@ interface IAppService {
 
 @Service
 class AppService constructor(private val appRepository: AppRepository) : IAppService {
-    override fun getAllIds(): Flux<String> = appRepository.findAllIds().map { ObjectMapper().readTree(it)["_id"]?.asText() }
+    override fun getAll(): Flux<App> = appRepository.findAll()
 
     override fun get(id: String): Mono<App> = appRepository.findById(id)
 

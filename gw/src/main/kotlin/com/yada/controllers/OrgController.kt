@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import reactor.core.publisher.Flux
 
 @RestController
 @RequestMapping("/org")
@@ -15,7 +16,7 @@ class OrgController @Autowired constructor(private val repo: OrgRepository, priv
     fun getAll() = svc.getTree(null)
 
     @GetMapping("save")
-    fun save() = repo.saveAll(listOf(
+    fun save(): Flux<Org> = repo.saveAll(listOf(
             Org("00", "org 00"),
             Org("0000", "org 0000"),
             Org("000000", "org 000000"),

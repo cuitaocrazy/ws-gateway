@@ -22,7 +22,6 @@ data class User(
 
 data class Res(val uri: String, val ops: Set<Operator>)
 
-
 data class Svc(val id: String, val resources: Set<Res>)
 
 typealias SvcRes = Svc
@@ -37,5 +36,3 @@ data class App(
         val resources: Set<SvcRes>,
         val roles: Set<Role>
 )
-
-

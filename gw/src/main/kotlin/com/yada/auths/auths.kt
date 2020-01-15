@@ -63,7 +63,7 @@ class AuthorizationService @Autowired constructor(private val appService: AppSer
             }.reduce { s, e -> if (s) s else e }.defaultIfEmpty(false)
 
     /***
-     * 判断roleName, uri, opt在app中是否有权限
+     * 判断roleName, uri, opt在app权限bool列表，没有做reduce聚合，配合authorize方法聚合
      */
     private fun permit(roleName: String, uri: String, opt: Operator, app: App) = app.roles.first { r -> r.name == roleName }.let { role ->
         role.resources.flatMap { svcRes -> svcRes.resources.map { svcUri(svcRes.id, it.uri) == uri && opt in it.ops } }

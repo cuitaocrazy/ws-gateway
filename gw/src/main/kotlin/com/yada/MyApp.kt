@@ -4,6 +4,8 @@ import com.mongodb.reactivestreams.client.MongoClient
 import com.mongodb.reactivestreams.client.MongoClients
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.cloud.gateway.route.RouteLocator
+import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.mongodb.config.AbstractReactiveMongoConfiguration
@@ -28,6 +30,10 @@ open class MongoConfig : AbstractReactiveMongoConfiguration() {
 
     @Bean
     open fun mongoClient(): MongoClient = MongoClients.create()
+
+    @Bean
+    open fun myRoutes(builder: RouteLocatorBuilder): RouteLocator = builder.routes().route{ it.path("/get").filters{ it.addRequestHeader("Hello", "World")}.uri("http://httpbin.org:80")}.build()
+
 }
 
 fun main(args: Array<String>) {

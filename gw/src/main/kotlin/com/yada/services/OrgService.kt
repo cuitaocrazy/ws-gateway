@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono
 data class OrgTree(val org: Org, val children: Set<OrgTree>?)
 
 interface IOrgService {
-    fun getTree(orgId: String?): Flux<OrgTree>
+    fun getTree(orgIdPrefix: String?): Flux<OrgTree>
     fun createOrUpdate(org: Org): Mono<Org>
     fun delete(id: String): Mono<Void>
     fun get(id: String): Mono<Org>
@@ -41,8 +41,8 @@ private fun makeTree(orgs: List<Org>): List<OrgTree> {
 
 @Service
 class OrgService @Autowired constructor(private val repo: OrgRepository) : IOrgService {
-    override fun getTree(orgId: String?): Flux<OrgTree> =
-            repo.findByRegexId("^${orgId ?: ""}.*")
+    override fun getTree(orgIdPrefix: String?): Flux<OrgTree> =
+            repo.findByRegexId("^${orgIdPrefix ?: ""}.*")
                     .collectList()
                     .map(::makeTree)
                     .flatMapMany { Flux.fromIterable(it) }

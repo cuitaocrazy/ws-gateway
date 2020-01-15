@@ -11,6 +11,7 @@ interface IAppService {
     fun get(id: String): Mono<App>
     fun createOrUpdate(app: App): Mono<App>
     fun exist(id: String): Mono<Boolean>
+    fun delete(id: String): Mono<Void>
 }
 
 @Service
@@ -22,4 +23,6 @@ class AppService constructor(private val appRepository: AppRepository) : IAppSer
     override fun createOrUpdate(app: App): Mono<App> = appRepository.save(app)
 
     override fun exist(id: String): Mono<Boolean> = appRepository.existsById(id)
+
+    override fun delete(id: String): Mono<Void> = appRepository.deleteById(id)
 }

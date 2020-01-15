@@ -9,6 +9,10 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.data.mongodb.config.AbstractReactiveMongoConfiguration
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories
+import org.springframework.http.ResponseEntity
+import reactor.core.publisher.Mono
+
+fun <T> withNotFound(m: Mono<T>): Mono<ResponseEntity<T>> = m.map { ResponseEntity.ok().body(it) }.defaultIfEmpty(ResponseEntity.notFound().build())
 
 @SpringBootApplication
 open class MyApp
@@ -24,7 +28,6 @@ open class MongoConfig : AbstractReactiveMongoConfiguration() {
 
     @Bean
     open fun mongoClient(): MongoClient = MongoClients.create()
-
 }
 
 fun main(args: Array<String>) {

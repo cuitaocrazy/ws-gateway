@@ -1,6 +1,5 @@
 package com.yada.services
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.yada.model.App
 import com.yada.repository.AppRepository
 import org.springframework.stereotype.Service

@@ -24,8 +24,7 @@ class SvcService @Autowired constructor(private val repo: SvcRepository) : ISvcS
     override fun createOrUpdate(svc: Svc): Mono<Svc> = repo.save(svc)
 
     override fun changeId(oldId: String, newId: String): Mono<Svc> =
-            repo.findById(oldId).flatMap { repo.save(it.copy(id = newId)) }.
-                    flatMap { repo.deleteById(oldId).then(Mono.just(it)) }
+            repo.findById(oldId).flatMap { repo.save(it.copy(id = newId)) }.flatMap { repo.deleteById(oldId).then(Mono.just(it)) }
 
     override fun delete(id: String): Mono<Void> = repo.deleteById(id)
 }

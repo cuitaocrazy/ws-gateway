@@ -24,7 +24,7 @@ class UserController @Autowired constructor(private val userService: IUserServic
     fun deleteUser(@PathVariable("id") id: String) = userService.delete(id)
 
     @GetMapping("{id}/exist")
-    fun existUser(@PathVariable("id") id: String): Mono<ResponseEntity<Boolean>> = withNotFound(userService.exist(id))
+    fun existUser(@PathVariable("id") id: String): Mono<Boolean> = userService.exist(id)
 }
 
 

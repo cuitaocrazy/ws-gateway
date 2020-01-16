@@ -11,7 +11,7 @@ import java.lang.RuntimeException
 
 //@DataMongoTest
 @SpringBootTest
-class MyTest @Autowired constructor(private val orgSvc: IOrgService) {
+class MyTest2 @Autowired constructor(private val orgSvc: IOrgService) {
 
     @Test
     fun t() {

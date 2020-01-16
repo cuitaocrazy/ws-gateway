@@ -17,7 +17,7 @@ interface ISvcService {
 
 @Service
 class SvcService @Autowired constructor(private val repo: SvcRepository) : ISvcService {
-    override fun getAll(): Flux<Svc> = repo.findAll()
+    override fun getAll(): Flux<Svc> = repo.findAllByOrderByIdAsc()
 
     override fun get(id: String): Mono<Svc> = repo.findById(id)
 

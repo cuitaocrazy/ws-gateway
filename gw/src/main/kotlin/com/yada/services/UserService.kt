@@ -29,7 +29,7 @@ interface IUserService {
 class UserService @Autowired constructor(private val userRepo: UserRepository) : IUserService {
     override fun get(id: String): Mono<User> = userRepo.findById(id)
 
-    override fun getByOrgId(orgId: String): Flux<User> = userRepo.findByOrgId(orgId)
+    override fun getByOrgId(orgId: String): Flux<User> = userRepo.findByOrgIdOrderByIdAsc(orgId)
 
     override fun createOrUpdate(user: User): Mono<User> = userRepo.save(user)
 

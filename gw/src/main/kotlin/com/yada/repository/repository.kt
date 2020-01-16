@@ -26,17 +26,19 @@ class UserRepositoryImpl @Autowired constructor(private val reactiveMongoTemplat
 }
 
 interface OrgRepository : ReactiveCrudRepository<Org, String> {
-    @Query("{'id': { \$regex: ?0 }}", sort = "{'id': 1}")
-    fun findByRegexId(regex: String): Flux<Org>
+    fun findByIdStartingWithOrderByIdAsc(regex: String): Flux<Org>
 }
 
 interface UserRepository : IUserRepository, ReactiveCrudRepository<User, String> {
-    @Query("{'orgId': ?0}")
-    fun findByOrgId(orgId: String): Flux<User>
+    fun findByOrgIdOrderByIdAsc(orgId: String): Flux<User>
     @Query("{'id': ?0}", fields = "{'pwd': 1, '_id': 0}")
     fun fundOnPwd(id: String): Mono<String>
 }
 
-interface SvcRepository : ReactiveCrudRepository<Svc, String>
+interface SvcRepository : ReactiveCrudRepository<Svc, String> {
+    fun findAllByOrderByIdAsc(): Flux<Svc>
+}
 
-interface  AppRepository : ReactiveCrudRepository<App, String>
+interface  AppRepository : ReactiveCrudRepository<App, String> {
+    fun findAllByOrderByIdAsc(): Flux<App>
+}

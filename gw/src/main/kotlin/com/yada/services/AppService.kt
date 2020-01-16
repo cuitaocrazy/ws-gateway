@@ -16,7 +16,7 @@ interface IAppService {
 
 @Service
 class AppService constructor(private val appRepository: AppRepository) : IAppService {
-    override fun getAll(): Flux<App> = appRepository.findAll()
+    override fun getAll(): Flux<App> = appRepository.findAllByOrderByIdAsc()
 
     override fun get(id: String): Mono<App> = appRepository.findById(id)
 

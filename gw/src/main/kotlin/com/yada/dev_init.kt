@@ -17,19 +17,317 @@ import com.yada.model.Svc
 import com.yada.model.User
 
 private val orgJson = """
-
+[
+  {
+    "id": "00",
+    "name": "总机构"
+  },
+  {
+    "id": "001",
+    "name": "机构一"
+  },
+  {
+    "id": "001001",
+    "name": "机构一1"
+  },
+  {
+    "id": "002",
+    "name": "机构二"
+  },
+  {
+    "id": "003",
+    "name": "机构三"
+  },
+  {
+    "id": "004",
+    "name": "机构四"
+  },
+  {
+    "id": "005",
+    "name": "机构五"
+  }
+]
 """.trimIndent()
 
 private val userJson = """
-
+[
+  {
+    "id": "admin",
+    "pwd": "123456",
+    "orgId": "00",
+    "roles": [
+      {
+        "appId": "app-1",
+        "roleName": "admin"
+      },
+      {
+        "appId": "app-1",
+        "roleName": "user"
+      },
+      {
+        "appId": "app-2",
+        "roleName": "admin"
+      }
+    ]
+  }
+]
 """.trimIndent()
 
 private val appJson = """
-    
+[
+  {
+    "id": "app-1",
+    "resources": [
+      {
+        "id": "service-1",
+        "resources": [
+          {
+            "uri": "/merchant",
+            "ops": [
+              "READ",
+              "CREATE",
+              "UPDATE",
+              "DELETE"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "service-1",
+        "resources": [
+          {
+            "uri": "/terminal",
+            "ops": [
+              "READ"
+            ]
+          }
+        ]
+      }
+    ],
+    "roles": [
+      {
+        "name": "admin",
+        "resources": [
+          {
+            "id": "service-1",
+            "resources": [
+              {
+                "uri": "/merchant",
+                "ops": [
+                  "READ"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "user",
+        "resources": [
+          {
+            "id": "service-1",
+            "resources": [
+              {
+                "uri": "/merchant",
+                "ops": [
+                  "READ"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "anon",
+        "resources": [
+          {
+            "id": "service-1",
+            "resources": [
+              {
+                "uri": "/merchant",
+                "ops": [
+                  "READ"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "app-2",
+    "resources": [
+      {
+        "id": "service-1",
+        "resources": [
+          {
+            "uri": "/merchant",
+            "ops": [
+              "READ",
+              "CREATE",
+              "UPDATE",
+              "DELETE"
+            ]
+          }
+        ]
+      }
+    ],
+    "roles": [
+      {
+        "name": "admin",
+        "resources": [
+          {
+            "id": "service-1",
+            "resources": [
+              {
+                "uri": "/merchant",
+                "ops": [
+                  "READ"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "user",
+        "resources": [
+          {
+            "id": "service-1",
+            "resources": [
+              {
+                "uri": "/merchant",
+                "ops": [
+                  "READ"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "anon",
+        "resources": [
+          {
+            "id": "service-1",
+            "resources": [
+              {
+                "uri": "/merchant",
+                "ops": [
+                  "READ"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
 """.trimIndent()
 
 private val svcJson = """
-    
+[
+  {
+    "id": "service-1",
+    "resources": [
+      {
+        "uri": "/merchant",
+        "ops": [
+          "READ",
+          "CREATE",
+          "UPDATE",
+          "DELETE"
+        ]
+      },
+      {
+        "uri": "/terminal",
+        "ops": [
+          "READ",
+          "CREATE",
+          "UPDATE",
+          "DELETE"
+        ]
+      },
+      {
+        "uri": "/trans",
+        "ops": [
+          "READ"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "service-2",
+    "resources": [
+      {
+        "uri": "/merchant",
+        "ops": [
+          "READ"
+        ]
+      },
+      {
+        "uri": "/terminal",
+        "ops": [
+          "READ"
+        ]
+      },
+      {
+        "uri": "/trans",
+        "ops": [
+          "READ"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "service-3",
+    "resources": [
+      {
+        "uri": "/merchant",
+        "ops": [
+          "CREATE"
+        ]
+      },
+      {
+        "uri": "/terminal",
+        "ops": [
+          "CREATE"
+        ]
+      },
+      {
+        "uri": "/trans",
+        "ops": [
+          "READ"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "service-4",
+    "resources": [
+      {
+        "uri": "/merchant",
+        "ops": [
+          "UPDATE"
+        ]
+      },
+      {
+        "uri": "/terminal",
+        "ops": [
+          "UPDATE"
+        ]
+      },
+      {
+        "uri": "/trans",
+        "ops": [
+          "READ"
+        ]
+      }
+    ]
+  }
+]
 """.trimIndent()
 
 @Profile("dev")

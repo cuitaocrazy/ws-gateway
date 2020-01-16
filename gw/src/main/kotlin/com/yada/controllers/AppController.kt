@@ -14,16 +14,16 @@ class AppController @Autowired constructor(private val appService: IAppService) 
     fun getAll(): Flux<App> = appService.getAll()
 
     @PutMapping
-    fun createOrUpdate(app: App) = appService.createOrUpdate(app)
+    fun createOrUpdate(@RequestBody app: App) = appService.createOrUpdate(app)
 
     @GetMapping("{id}")
-    fun getOrg(@PathVariable("id") id: String) = withNotFound(appService.get(id))
+    fun getApp(@PathVariable("id") id: String) = withNotFound(appService.get(id))
 
     @GetMapping("{id}/exist")
-    fun existOrg(@PathVariable("id") id: String) = appService.exist(id)
+    fun exist(@PathVariable("id") id: String) = appService.exist(id)
 
     @DeleteMapping("{id}")
-    fun deleteOrg(@PathVariable("id") id: String) = appService.delete(id)
+    fun delete(@PathVariable("id") id: String) = appService.delete(id)
 
 //    @GetMapping("save")
 //    fun save(): Flux<App> = repo.saveAll(listOf(

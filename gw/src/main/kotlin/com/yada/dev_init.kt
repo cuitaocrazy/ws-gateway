@@ -53,7 +53,6 @@ private val userJson = """
 [
   {
     "id": "admin",
-    "pwd": "123456",
     "orgId": "00",
     "roles": [
       {
@@ -344,9 +343,9 @@ class InitDevDataRunner @Autowired constructor(
         val apps = jacksonObjectMapper().readValue<List<App>>(appJson)
         val svcs = jacksonObjectMapper().readValue<List<Svc>>(svcJson)
 
-        orgs.forEach { orgSvc.createOrUpdate(it) }
-        usrs.forEach { usrSvc.createOrUpdate(it) }
-        apps.forEach { appSvc.createOrUpdate(it) }
-        svcs.forEach { svcSvc.createOrUpdate(it) }
+        orgs.forEach { orgSvc.createOrUpdate(it).subscribe() }
+        usrs.forEach { usrSvc.createOrUpdate(it).subscribe() }
+        apps.forEach { appSvc.createOrUpdate(it).subscribe() }
+        svcs.forEach { svcSvc.createOrUpdate(it).subscribe() }
     }
 }

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/org")
 class OrgController @Autowired constructor(private val orgService: IOrgService) {
     @GetMapping
-    fun getTree(@RequestParam("id_prefix") idPrefix: String) = orgService.getTree(idPrefix)
+    fun getTree(@RequestParam("id_prefix") idPrefix: String?) = orgService.getTree(idPrefix)
 
     @GetMapping("{id}")
     fun getOrg(@PathVariable("id") id: String) = withNotFound(orgService.get(id))

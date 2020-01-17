@@ -13,5 +13,5 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("test")
 class TestController @Autowired constructor(private val auth: IAuthorizationService) {
     @GetMapping
-    fun get() = auth.authorize(User("cuitao", "00", setOf(RoleId("app1", "role4"))), "/svc1/api/test1", Operator.CREATE)
+    fun get() = auth.authorize(User("admin", "00", setOf(RoleId("app-1", "admin"))), "/service-1/merchant", Operator.READ)
 }

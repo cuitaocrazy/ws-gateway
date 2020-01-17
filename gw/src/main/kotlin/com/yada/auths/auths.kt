@@ -58,14 +58,13 @@ private fun svcUri(svcId: String, uri: String) = "/${svcId}${uri}"
 class AuthorizationService @Autowired constructor(private val appService: AppService) : IAuthorizationService {
     override fun authorize(user: User, uri: String, opt: Operator): Mono<Boolean> =
             Flux.fromIterable(user.roles).flatMap { roleId ->
-                appService.get(roleId.appId)
-                        .map { permit(roleId.roleName, uri, opt, it) }.flatMapMany { Flux.fromIterable(it) }
-            }.reduce { s, e -> if (s) s else e }.defaultIfEmpty(false)
+                appService.get(roleId.appId).map { permit(roleId.roleName, uri, opt, it) }
+            }.any { it }.defaultIfEmpty(false)
 
     /***
-     * 判断roleName, uri, opt在app权限bool列表，没有做reduce聚合，配合authorize方法聚合
+     * 判断roleName, uri, opt在app是否有权限
      */
     private fun permit(roleName: String, uri: String, opt: Operator, app: App) = app.roles.firstOrNull { r -> r.name == roleName }?.run {
-        resources.flatMap { svcRes -> svcRes.resources.map { svcUri(svcRes.id, it.uri) == uri && opt in it.ops } }
-    } ?: listOf()
+        resources.map { svcRes -> svcRes.resources.any { res -> svcUri(svcRes.id, res.uri) == uri && opt in res.ops } }
+    }?.any { it } ?: false
 }

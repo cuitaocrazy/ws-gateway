@@ -1,3 +1,9 @@
+yada:
+  db:
+    mongo:
+      url: "mongodb://localhost"
+
+
 spring:
   data:
     mongodb:

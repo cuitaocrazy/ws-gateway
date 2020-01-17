@@ -1,6 +1,11 @@
 package com.yada
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
+import com.yada.model.App
+import com.yada.model.Org
+import com.yada.model.Svc
+import com.yada.model.User
 import com.yada.services.IAppService
 import com.yada.services.IOrgService
 import com.yada.services.ISvcService
@@ -10,11 +15,6 @@ import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
-import com.fasterxml.jackson.module.kotlin.*
-import com.yada.model.App
-import com.yada.model.Org
-import com.yada.model.Svc
-import com.yada.model.User
 
 private val orgJson = """
 [

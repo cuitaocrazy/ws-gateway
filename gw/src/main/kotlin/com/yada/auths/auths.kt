@@ -66,10 +66,12 @@ class AuthorizationService @Autowired constructor(private val appService: AppSer
     override fun getUserResList(appId: String, user: User): Flux<Res> {
         val userRoles = user.roles.filter { it.appId == appId }.map { it.roleName }
         return appService.get(appId).map { app ->
+            // 角色名列表
             val roles = app.roles.filter { it.name in userRoles }
+            // Res列表
             val reses = roles.flatMap { it.resources.flatMap { svc -> svc.resources.map { res -> Res(svcUri(svc.id, res.uri), res.ops) } } }
+            // 合并相同uri的ops
             reses.groupBy { it.uri }.map { entry ->
-
                 Res(entry.key, entry.value.flatMap { it.ops }.toSet())
             }
         }.flatMapMany { Flux.fromIterable(it) }

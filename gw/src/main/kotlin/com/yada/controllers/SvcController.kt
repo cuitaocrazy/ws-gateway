@@ -13,11 +13,11 @@ class SvcController @Autowired constructor(private val svcService: SvcService) {
     fun getTree() = svcService.getAll()
 
     @GetMapping("{id}")
-    fun getOrg(@PathVariable("id") id: String) = withNotFound(svcService.get(id))
+    fun getSvc(@PathVariable("id") id: String) = withNotFound(svcService.get(id))
 
     @PutMapping
     fun createOrUpdate(@RequestBody svc: Svc) = svcService.createOrUpdate(svc)
 
     @DeleteMapping("{id}")
-    fun deleteOrg(@PathVariable("id") id: String) = svcService.delete(id)
+    fun delete(@PathVariable("id") id: String) = svcService.delete(id)
 }

@@ -10,3 +10,4 @@ build
 .classpath
 *.iml
 out
+lombok.config

@@ -2,6 +2,7 @@ package com.yada
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.mongodb.reactivestreams.client.MongoClient
 import com.yada.model.App
 import com.yada.model.Org
 import com.yada.model.Svc
@@ -11,10 +12,13 @@ import com.yada.services.IOrgService
 import com.yada.services.ISvcService
 import com.yada.services.IUserService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 
 private val orgJson = """
 [
@@ -101,6 +105,17 @@ private val appJson = """
             ]
           }
         ]
+      },
+      {
+        "id": "service-2",
+        "resources": [
+          {
+            "uri": "/trans",
+            "ops": [
+              "READ"
+            ]
+          }
+        ]
       }
     ],
     "roles": [
@@ -112,6 +127,17 @@ private val appJson = """
             "resources": [
               {
                 "uri": "/merchant",
+                "ops": [
+                  "READ"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "service-2",
+            "resources": [
+              {
+                "uri": "/trans",
                 "ops": [
                   "READ"
                 ]
@@ -331,21 +357,35 @@ private val svcJson = """
 
 @Profile("dev")
 @Component
-class InitDevDataRunner @Autowired constructor(
+open class InitDevDataRunner @Autowired constructor(
         private val orgSvc: IOrgService,
         private val usrSvc: IUserService,
         private val appSvc: IAppService,
-        private val svcSvc: ISvcService
+        private val svcSvc: ISvcService,
+        private val client: MongoClient,
+        @Value("\${yada.db.mongo.db:yada_auth}")
+        private val dbName: String
 ) : ApplicationRunner {
     override fun run(args: ApplicationArguments?) {
-        val orgs = jacksonObjectMapper().readValue<List<Org>>(orgJson)
-        val usrs = jacksonObjectMapper().readValue<List<User>>(userJson)
-        val apps = jacksonObjectMapper().readValue<List<App>>(appJson)
-        val svcs = jacksonObjectMapper().readValue<List<Svc>>(svcJson)
 
-        orgs.forEach { orgSvc.createOrUpdate(it).subscribe() }
-        usrs.forEach { usrSvc.createOrUpdate(it).subscribe() }
-        apps.forEach { appSvc.createOrUpdate(it).subscribe() }
-        svcs.forEach { svcSvc.createOrUpdate(it).subscribe() }
+        val orgs = jacksonObjectMapper().readValue<List<Org>>(orgJson)
+        val svcs = jacksonObjectMapper().readValue<List<Svc>>(svcJson)
+        val apps = jacksonObjectMapper().readValue<List<App>>(appJson)
+        val usrs = jacksonObjectMapper().readValue<List<User>>(userJson)
+
+        Mono.from(client.getDatabase(dbName).drop()).
+                thenMany(Flux.mergeSequential(orgs.map { orgSvc.createOrUpdate(it) })).
+                thenMany(Flux.mergeSequential(svcs.map { svcSvc.createOrUpdate(it) })).
+                thenMany(Flux.mergeSequential(apps.map { appSvc.createOrUpdate(it) })).
+                thenMany(Flux.mergeSequential(usrs.map { usrSvc.createOrUpdate(it) })).
+                subscribe()
+
+//        Mono.from(client.startSession()).flatMap { session->
+//            session.startTransaction()
+//            session.close()
+//            client.getDatabase("").drop()
+//            null
+//        }
+
     }
 }

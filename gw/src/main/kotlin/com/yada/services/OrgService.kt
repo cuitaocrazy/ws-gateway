@@ -4,6 +4,7 @@ import com.yada.model.Org
 import com.yada.repository.OrgRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
@@ -40,15 +41,17 @@ private fun makeTree(orgs: List<Org>): List<OrgTree> {
 }
 
 @Service
-class OrgService @Autowired constructor(private val repo: OrgRepository) : IOrgService {
+open class OrgService @Autowired constructor(private val repo: OrgRepository) : IOrgService {
     override fun getTree(orgIdPrefix: String?): Flux<OrgTree> =
             repo.findByIdStartingWithOrderByIdAsc(orgIdPrefix ?: "")//("^${orgIdPrefix ?: ""}.*")
                     .collectList()
                     .map(::makeTree)
                     .flatMapMany { Flux.fromIterable(it) }
 
+    @Transactional
     override fun createOrUpdate(org: Org): Mono<Org> = repo.save(org)
 
+    @Transactional
     override fun delete(id: String): Mono<Void> = repo.deleteById(id)
 
     override fun get(id: String): Mono<Org> = repo.findById(id)

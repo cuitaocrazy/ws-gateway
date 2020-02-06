@@ -2,6 +2,7 @@ package com.yada.auths
 
 import com.yada.model.App
 import com.yada.model.Operator
+import com.yada.model.Res
 import com.yada.model.User
 import com.yada.services.AppService
 import com.yada.services.IUserService
@@ -27,6 +28,7 @@ interface IAuthenticationService {
  */
 interface IAuthorizationService {
     fun authorize(user: User, uri: String, opt: Operator): Mono<Boolean>
+    fun getUserResList(appId: String, user: User): Flux<Res>
 }
 
 @Service
@@ -60,6 +62,18 @@ class AuthorizationService @Autowired constructor(private val appService: AppSer
             Flux.fromIterable(user.roles).flatMap { roleId ->
                 appService.get(roleId.appId).map { permit(roleId.roleName, uri, opt, it) }
             }.any { it }.defaultIfEmpty(false)
+
+    override fun getUserResList(appId: String, user: User): Flux<Res> {
+        val userRoles = user.roles.filter { it.appId == appId }.map { it.roleName }
+        return appService.get(appId).map { app ->
+            val roles = app.roles.filter { it.name in userRoles }
+            val reses = roles.flatMap { it.resources.flatMap { svc -> svc.resources.map { res -> Res(svcUri(svc.id, res.uri), res.ops) } } }
+            reses.groupBy { it.uri }.map { entry ->
+
+                Res(entry.key, entry.value.flatMap { it.ops }.toSet())
+            }
+        }.flatMapMany { Flux.fromIterable(it) }
+    }
 
     /***
      * 判断roleName, uri, opt在app是否有权限

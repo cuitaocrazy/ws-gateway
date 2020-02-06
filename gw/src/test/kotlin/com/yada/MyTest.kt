@@ -1,18 +1,27 @@
 package com.yada
 
+import com.yada.model.Org
 import com.yada.services.IOrgService
+import com.yada.services.OrgTree
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import reactor.test.StepVerifier
 
-//@DataMongoTest
 @SpringBootTest
 class MyTest @Autowired constructor(private val orgSvc: IOrgService) {
+    private val logger by LoggerDelegate()
 
     @Test
     fun t() {
-        val tree = orgSvc.getTree("")
-        tree.subscribe(::println)
-        tree.blockLast()
+        val tree = orgSvc.getTree("").doOnComplete {
+            logger.info("lfh")
+        }
+        StepVerifier.create(tree).expectNextCount(0).verifyComplete()
+
+        val m = orgSvc.createOrUpdate(Org("00", "org 00"))
+        StepVerifier.create(m).expectNext(Org("00", "org 00")).verifyComplete()
+        StepVerifier.create(orgSvc.getTree(null))
+                .expectNext(OrgTree(Org("00", "org 00"), null)).verifyComplete()
     }
 }

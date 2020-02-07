@@ -4,7 +4,6 @@ import com.yada.model.User
 import com.yada.services.IUserService
 import com.yada.withNotFound
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Mono
 
@@ -18,7 +17,7 @@ class UserController @Autowired constructor(private val userService: IUserServic
     fun createOrUpdate(@RequestBody user: User) = userService.createOrUpdate(user)
 
     @GetMapping("{id}")
-    fun getUser(@PathVariable("id") id: String): Mono<ResponseEntity<User>> = withNotFound(userService.get(id))
+    fun getUser(@PathVariable("id") id: String) = withNotFound(userService.get(id))
 
     @DeleteMapping("{id}")
     fun deleteUser(@PathVariable("id") id: String) = userService.delete(id)

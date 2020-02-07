@@ -6,3 +6,6 @@ logging:
           mongodb:
             core:
               ReactiveMongoTemplate: DEBUG
+server:
+  error:
+    includeStacktrace: ALWAYS

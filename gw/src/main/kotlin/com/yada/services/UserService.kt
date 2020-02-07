@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import java.util.*
 
 interface IUserService {
     fun get(id: String): Mono<User>
@@ -21,13 +22,19 @@ interface IUserService {
 }
 
 @Service
-open class UserService @Autowired constructor(private val userRepo: UserRepository) : IUserService {
+open class UserService @Autowired constructor(private val userRepo: UserRepository, private val pwdDigestService: IPwdDigestService) : IUserService {
     override fun get(id: String): Mono<User> = userRepo.findById(id)
 
     override fun getByOrgId(orgId: String): Flux<User> = userRepo.findByOrgIdOrderByIdAsc(orgId)
 
     @Transactional
-    override fun createOrUpdate(user: User): Mono<User> = userRepo.save(user)
+    override fun createOrUpdate(user: User): Mono<User> = userRepo.findById(user.id).map { Optional.of(it) }.defaultIfEmpty(Optional.empty())
+            .flatMap { u ->
+                if (u.isPresent)
+                    userRepo.save(user)
+                else
+                    userRepo.save(user).flatMap { userRepo.changePwd(it.id, pwdDigestService.getDefaultPwdDigest(it.id)).then(Mono.just(it)) }
+            }
 
     @Transactional
     override fun delete(id: String): Mono<Void> = userRepo.deleteById(id)

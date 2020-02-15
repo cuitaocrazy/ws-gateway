@@ -38,7 +38,7 @@ class AdminAuthController @Autowired constructor(private val authSvc: IAdminAuth
 //        if(token != null && jwtUtil.validateToken(token)) {
 //
 //        }
-        exchange.response.addCookie(ResponseCookie.from("token", "").path("/admin").maxAge(0).build())
+        exchange.response.addCookie(jwtUtil.getEmptyCookie(true))
     }
 
     @PostMapping("apis/change_pwd")

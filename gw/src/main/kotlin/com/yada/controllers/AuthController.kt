@@ -51,7 +51,7 @@ class AuthController @Autowired constructor(private val jwtUtil: JwtTokenUtil, p
 
     @GetMapping("logout")
     fun logout(exchange: ServerWebExchange) {
-        exchange.response.addCookie(ResponseCookie.from("token", "").maxAge(0).build())
+        exchange.response.addCookie(jwtUtil.getEmptyCookie())
     }
 
     @PutMapping("change_pwd")

@@ -2,13 +2,15 @@ package com.yada.auths
 
 import com.yada.JwtEntity
 import com.yada.JwtTokenUtil
-import com.yada.model.*
+import com.yada.model.App
+import com.yada.model.Operator
+import com.yada.model.Res
+import com.yada.model.User
 import com.yada.services.AppService
 import com.yada.services.IPwdDigestService
 import com.yada.services.IUserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseCookie
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
@@ -111,7 +113,7 @@ class AuthSiteFilter @Autowired constructor(private val jwtUtil: JwtTokenUtil) :
         val token = getToken(exchange)
         val entity = token?.run { jwtUtil.getEntity(this) }
 
-        return if(entity != null && entity.isAdmin as Boolean) {
+        return if (entity != null && entity.isAdmin as Boolean) {
             exchange.response.addCookie(jwtUtil.renewCookie(token))
             chain.filter(exchange)
         } else {

@@ -69,7 +69,7 @@ class JwtTokenUtil @Autowired constructor(@Value("\${jwt.secret:yadajwt}") val s
     private val emptyCookie = ResponseCookie.from("token", "").path(getPath(false)).maxAge(0).build()
     private val adminEmptyCookie = ResponseCookie.from("token", "").path(getPath(true)).maxAge(0).build()
 
-    fun getEmptyCookie(isAdmin: Boolean? = false): ResponseCookie = if(isAdmin == true) adminEmptyCookie else emptyCookie
+    fun getEmptyCookie(isAdmin: Boolean? = false): ResponseCookie = if (isAdmin == true) adminEmptyCookie else emptyCookie
 
     fun getEntity(token: String) =
             try {

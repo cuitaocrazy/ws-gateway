@@ -28,8 +28,8 @@ class AdminAuthController @Autowired constructor(private val authSvc: IAdminAuth
     @PostMapping("login")
     fun login(@RequestBody loginForm: LoginForm, exchange: ServerWebExchange): Mono<String> =
             authSvc.login(loginForm.username!!, loginForm.password!!)
-            .map { token -> exchange.response.addCookie(jwtUtil.generateCookie(token)).run { token } }
-            .switchIfEmpty(Mono.error(ResponseStatusException(HttpStatus.CONFLICT, "登录失败")))
+                    .map { token -> exchange.response.addCookie(jwtUtil.generateCookie(token)).run { token } }
+                    .switchIfEmpty(Mono.error(ResponseStatusException(HttpStatus.CONFLICT, "登录失败")))
 
     @PostMapping("logout")
     fun logout(exchange: ServerWebExchange) {

@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/org")
+@RequestMapping("/admin/apis/org")
 class OrgController @Autowired constructor(private val orgService: IOrgService) {
     @GetMapping
     fun getTree(@RequestParam("id_prefix") idPrefix: String?) = orgService.getTree(idPrefix)

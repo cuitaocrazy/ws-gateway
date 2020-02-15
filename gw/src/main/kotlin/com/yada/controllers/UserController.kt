@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Mono
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/admin/apis/user")
 class UserController @Autowired constructor(private val userService: IUserService) {
     @GetMapping
     fun getUsersBy(@RequestParam("org_id") orgId: String?) = userService.getByOrgId(orgId ?: "")

@@ -30,8 +30,8 @@ open class SvcService @Autowired constructor(private val repo: SvcRepository, pr
             repo.findById(oldId).flatMap { repo.save(it.copy(id = newId)) }.flatMap { repo.deleteById(oldId).then(Mono.just(it)) }
 
     @Transactional
-    override fun delete(id: String): Mono<Void> = appSvc.getAll().flatMap {app ->
+    override fun delete(id: String): Mono<Void> = appSvc.getAll().flatMap { app ->
         val set = app.resources.filter { it.id != id }.toSet()
-        if(set.size != app.resources.size) appSvc.createOrUpdate(app.copy(resources = set)) else Mono.empty()
+        if (set.size != app.resources.size) appSvc.createOrUpdate(app.copy(resources = set)) else Mono.empty()
     }.then(repo.deleteById(id))
 }

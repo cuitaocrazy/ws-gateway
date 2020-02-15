@@ -1,3 +1,6 @@
 server:
   error:
     includeStacktrace: NEVER
+
+jwt:
+  secret: yadajwt

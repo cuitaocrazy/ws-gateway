@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/svc")
+@RequestMapping("/admin/apis/svc")
 class SvcController @Autowired constructor(private val svcService: SvcService) {
     @GetMapping
     fun getTree() = svcService.getAll()

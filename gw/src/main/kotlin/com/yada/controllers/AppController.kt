@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
 
 @RestController
-@RequestMapping("/app")
+@RequestMapping("/admin/apis/app")
 class AppController @Autowired constructor(private val appService: IAppService) {
     @GetMapping
     fun getAll(): Flux<App> = appService.getAll()

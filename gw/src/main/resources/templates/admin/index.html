@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script>
+      function click1() {
+        fetch("/admin/login", {
+          method: "POST",
+          body: JSON.stringify({ username: "admin", password: "changepwd" }),
+          headers: {
+            'content-type': 'application/json'
+          }
+        }).then(res => {
+          console.log(res);
+        });
+      }
+
+      function click2() {
+        fetch("/admin/logout", { method: "POST"}).then(console.log)
+      }
+
+      function click3() {
+        fetch("/admin/apis/change_pwd", {
+            method: "POST",
+            body: JSON.stringify({ oldPwd: "changepwd", newPwd: "changepwd" }),
+            headers: {
+                'content-type': 'application/json'
+            }
+        }).then(console.log)
+      }
+    </script>
+</head>
+<body>
+admin application
+<div>
+    <button onclick="click1()">login</button>
+    <button onclick="click2()">logout</button>
+    <button onclick="click3()">change password</button>
+</div>
+</body>
+</html>

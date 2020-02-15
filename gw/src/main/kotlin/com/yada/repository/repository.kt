@@ -6,10 +6,12 @@ import com.yada.model.Svc
 import com.yada.model.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
+import org.springframework.data.mongodb.core.findOne
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Update
 import org.springframework.data.mongodb.repository.Query
 import org.springframework.data.repository.reactive.ReactiveCrudRepository
+import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
@@ -39,6 +41,28 @@ interface SvcRepository : ReactiveCrudRepository<Svc, String> {
     fun findAllByOrderByIdAsc(): Flux<Svc>
 }
 
-interface  AppRepository : ReactiveCrudRepository<App, String> {
+interface AppRepository : ReactiveCrudRepository<App, String> {
     fun findAllByOrderByIdAsc(): Flux<App>
+}
+
+data class AdminUser(val id: String, val pwd: String)
+
+interface IAdminUserRepository {
+    fun changePwd(pwd: String): Mono<Void>
+    fun getAdminUser(): Mono<AdminUser>
+}
+
+@Component
+class AdminUserRepositoryImpl @Autowired constructor(private val reactiveMongoTemplate: ReactiveMongoTemplate) : IAdminUserRepository {
+    private val collectionName = "admin"
+
+    override fun changePwd(pwd: String): Mono<Void> {
+        return reactiveMongoTemplate.save(AdminUser("admin", pwd), collectionName).then()
+    }
+
+    override fun getAdminUser(): Mono<AdminUser> {
+        val query = org.springframework.data.mongodb.core.query.Query(Criteria.where("id").`is`("admin"))
+        return reactiveMongoTemplate.findOne(query, collectionName)
+    }
+
 }

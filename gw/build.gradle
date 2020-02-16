@@ -37,6 +37,8 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
     implementation 'commons-codec:commons-codec:1.14'
+    implementation 'jakarta.xml.bind:jakarta.xml.bind-api'
+    implementation 'org.glassfish.jaxb:jaxb-runtime'
     runtimeOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

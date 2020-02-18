@@ -63,7 +63,7 @@ class TimeUtil {
 }
 
 @Component
-class JwtTokenUtil @Autowired constructor(@Value("\${jwt.secret:yadajwt}") val secret: String, val timeUtil: TimeUtil) {
+class JwtTokenUtil @Autowired constructor(private @Value("\${jwt.secret:yadajwt}") val secret: String, private val timeUtil: TimeUtil) {
     private fun Date.getExpirationDate() = Date(this.time + TOKEN_EXPIRE_INTERVAL * 1000)
     private fun JwtBuilder.generateToken() = this.signWith(SignatureAlgorithm.HS512, secret).compact()
     private val emptyCookie = ResponseCookie.from("token", "").path(getPath(false)).maxAge(0).build()

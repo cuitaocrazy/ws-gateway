@@ -75,7 +75,6 @@ export default {
   history: 'hash',
   base: '/admin/',
   publicPath: '/admin/',
-  // outputPath: '../gw/src/main/resources/static/admin',÷
   // umi routes: https://umijs.org/zh/guide/router.html
   routes: [
     {

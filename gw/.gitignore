@@ -11,3 +11,5 @@ build
 *.iml
 out
 lombok.config
+src/main/resources/static/admin
+src/main/resources/templates/admin/index.html

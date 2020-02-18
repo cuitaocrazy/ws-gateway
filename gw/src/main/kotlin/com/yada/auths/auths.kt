@@ -94,8 +94,39 @@ class AuthorizationService @Autowired constructor(
     private fun mergeRes(resList: List<Res>) = resList.groupBy { it.uri }.map { entry -> Res(entry.key, entry.value.flatMap { it.ops }.toSet()) }
 }
 
-/***
+/**
  * 授权认证过滤器
+ *
+ * 存在的问题：
+ * [ServerWebExchange]规定是不可变的，当一个链的[ServerWebExchange]改变是需要调用[ServerWebExchange.mutate]方法产生一个[ServerWebExchange.Builder]，
+ * 使用这个builder去构建一个新的[ServerWebExchange]，然后传入[WebFilterChain.filter]进行向下传递。
+ *
+ * 但是有时避免向下传递抛出异常，并需要清除cookies，要是build一个新的[ServerWebExchange]也是一个无效引用，虽然通过改老的[ServerWebExchange.getResponse]
+ * 在实际过程中有效，但是他违反了自己的不可变原则。
+ *
+ * ```kotlin
+ * fun(exchange: ServerWebExchange, chain:WebFilterChain): Mono<Void> {
+ *   return if(condition) {
+ *     val response = exchange.response
+ *     // 修改response
+ *     chain(exchange.mutate().setResponse(response).build())
+ *   } else {
+ *     exchange.response.addCookie(jwtUtil.getEmptyCookie(true))
+ *     Mono.empty()
+ *   }
+ *
+ * }
+ * ```
+ *
+ * 此处可能是spring的设计缺陷或有一个合理的方法没有找到如何使用。倾向于后者。
+ *
+ * 找到一些资料也没有对这个可变性怎么处理，处理方式和我现在的方式一样：
+ * [资料](https://stackoverflow.com/questions/49045670/spring-webflux-redirect-http-to-https)
+ *
+ * [这个是著名的spring学习网址](https://www.baeldung.com/spring-webflux-filters)，对于webflux的filter，并没有使用[ServerWebExchange.mutate]产生新的传到下一个链，因此可能[ServerWebExchange]本站点的上下文
+ * 并没有做什么可变性操作，因此可以这么认为，一个请求链接里多个关于http上下文对于上下文A和B可以产生C（A的请求和B的响应重新组合），这种猜测正确的可能性很大，
+ * 因为这符合"Exchange"的意思，但是目前无法想象一个请求如何或为何出现两个[ServerWebExchange]:
+ *
  */
 @Component
 class AuthSiteFilter @Autowired constructor(private val jwtUtil: JwtTokenUtil) : WebFilter {
@@ -148,6 +179,7 @@ class AuthSiteFilter @Autowired constructor(private val jwtUtil: JwtTokenUtil) :
             rejectProcess(exchange, chain)
         }
     }
+
 
     private fun getToken(exchange: ServerWebExchange) = exchange.request.cookies["token"]?.run { this[0]?.value }
 }

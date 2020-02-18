@@ -61,3 +61,41 @@ test {
         events "passed", "skipped", "failed"
     }
 }
+
+tasks.register("copyAdmin") {
+    group("build")
+    description("拷贝admin webapp")
+    doLast {
+        copy {
+            from '../admin/dist'
+            into 'src/main/resources/static/admin'
+            exclude("index.html")
+        }
+    }
+    doLast {
+        copy {
+            from '../admin/dist/index.html'
+            into 'src/main/resources/templates/admin'
+        }
+    }
+}
+
+tasks.register("deleteAdmin") {
+    group("build")
+    description("清理admin webapp")
+    doLast {
+        delete "src/main/resources/static/admin"
+    }
+}
+
+task("buildAdmin", type: Exec) {
+    workingDir("../admin")
+    commandLine "npm", "run", "build"
+}
+
+task("buildAll") {
+    buildAdmin.mustRunAfter("deleteAdmin")
+    copyAdmin.mustRunAfter("buildAdmin")
+    bootJar.mustRunAfter("clean")
+    bootJar.mustRunAfter("copyAdmin")
+}.dependsOn("clean", "deleteAdmin", "bootJar", "buildAdmin", "copyAdmin")

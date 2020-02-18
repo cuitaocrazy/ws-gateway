@@ -26,7 +26,8 @@
     "test:all": "node ./tests/run-tests.js",
     "test:component": "umi test ./src/components",
     "tsc": "tsc",
-    "ui": "umi ui"
+    "ui": "umi ui",
+    "clean": "rm -rf dist"
   },
   "husky": {
     "hooks": {

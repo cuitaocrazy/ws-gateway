@@ -1,0 +1,32 @@
+[
+  {
+    "id": "admin",
+    "name": "管理员角色",
+    "remark": "管理员角色具有所有权限"
+  },
+  {
+    "id": "user",
+    "name": "用户角色",
+    "remark": "用户角色只有部分权限"
+  },
+  {
+    "id": "test",
+    "name": "测试角色",
+    "remark": "测试角色具有测试权限"
+  },
+  {
+    "id": "abc",
+    "name": "abc角色",
+    "remark": "abc角色只有部分权限"
+  },
+  {
+    "id": "def",
+    "name": "def角色",
+    "remark": "def角色具有所有权限"
+  },
+  {
+    "id": "ghl",
+    "name": "ghl角色",
+    "remark": "ghl角色只有部分权限"
+  }
+]

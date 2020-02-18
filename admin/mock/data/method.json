@@ -1,0 +1,22 @@
+[
+  {
+    "id": "GET",
+    "name": "HTTP GET",
+    "remark": "http的get方法"
+  },
+  {
+    "id": "POST",
+    "name": "HTTP POST",
+    "remark": "http的post方法"
+  },
+  {
+    "id": "PUT",
+    "name": "HTTP PUT",
+    "remark": "http的put方法"
+  },
+  {
+    "id": "DELETE",
+    "name": "HTTP DELETE",
+    "remark": "http的delete方法"
+  }
+]

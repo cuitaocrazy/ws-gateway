@@ -11,5 +11,5 @@ export default {
   'menu.exception.500': '500',
   'menu.svc': '服务',
   'menu.app': '应用',
-  'menu.org': '机构',
+  'menu.org': '用户',
 };

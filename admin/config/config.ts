@@ -104,24 +104,24 @@ export default {
             {
               path: '/welcome',
               name: 'welcome',
-              icon: 'smile',
+              icon: 'home',
               component: './Welcome',
             },
             {
               name: 'svc',
-              icon: 'smile',
+              icon: 'database',
               path: '/svc',
               component: './svc',
             },
             {
               name: 'app',
-              icon: 'smile',
+              icon: 'appstore',
               path: '/app',
               component: './app',
             },
             {
               name: 'org',
-              icon: 'smile',
+              icon: 'user',
               path: '/org',
               component: './org',
             },

@@ -43,13 +43,16 @@ const Model: LoginModelType = {
           let { redirect } = params as { redirect: string };
           if (redirect) {
             const redirectUrlParams = new URL(redirect);
-            if (redirectUrlParams.origin === urlParams.origin) {
-              redirect = redirect.substr(urlParams.origin.length);
+            // 退出重登陆跳转问题 https://github.com/ant-design/ant-design-pro/issues/3607
+            if (redirectUrlParams.hash === '' && redirectUrlParams.origin === urlParams.origin) {
+              redirect = redirect
+                .substr(urlParams.origin.length)
+                .substr(urlParams.pathname.replace('/user/login', '').length);
               if (redirect.match(/^\/.*#/)) {
                 redirect = redirect.substr(redirect.indexOf('#') + 1);
               }
             } else {
-              window.location.href = '/';
+              window.location.href = redirect;
               return;
             }
           }

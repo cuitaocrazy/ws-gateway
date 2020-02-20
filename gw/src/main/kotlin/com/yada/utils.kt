@@ -1,9 +1,6 @@
 package com.yada
 
-import com.yada.model.Res
-import com.yada.model.User
 import io.jsonwebtoken.*
-import io.jsonwebtoken.impl.DefaultClaims
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -11,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseCookie
 import org.springframework.stereotype.Component
+import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.server.ResponseStatusException
 import reactor.core.publisher.Mono
 import java.time.Duration
@@ -69,30 +67,29 @@ class JwtTokenUtil @Autowired constructor(private @Value("\${jwt.secret:yadajwt}
     private val emptyCookie = ResponseCookie.from("token", "").path(getPath(false)).maxAge(0).build()
     private val adminEmptyCookie = ResponseCookie.from("token", "").path(getPath(true)).maxAge(0).build()
 
-    fun getEmptyCookie(isAdmin: Boolean? = false): ResponseCookie = if (isAdmin == true) adminEmptyCookie else emptyCookie
+    fun getEmptyCookie(entity: AuthInfo): ResponseCookie = if (entity.isAdmin == true) adminEmptyCookie else emptyCookie
 
     fun getEntity(token: String) =
             try {
-                JwtEntity(Jwts.parser().setSigningKey(secret).parseClaimsJws(token).body)
+                AuthInfo(Jwts.parser().setSigningKey(secret).parseClaimsJws(token).body)
             } catch (_: SignatureException) {
                 null
             } catch (_: ExpiredJwtException) {
                 null
             }
 
-    fun generateToken(entity: JwtEntity, currentDate: Date = timeUtil.getCurrentDate()): String =
+    fun generateToken(entity: AuthInfo, currentDate: Date = timeUtil.getCurrentDate()): String =
             Jwts.builder().setClaims(entity).setIssuedAt(currentDate).setExpiration(currentDate.getExpirationDate()).generateToken()
 
-    fun generateCookie(token: String, currentDate: Date = timeUtil.getCurrentDate()): ResponseCookie {
-        val entity = getEntity(token)!!
+    fun generateCookie(entity: AuthInfo, currentDate: Date = timeUtil.getCurrentDate()): ResponseCookie {
+        val token = generateToken(entity, currentDate)
         return generateCookie(token, Duration.ofMillis(entity.expiration.time - currentDate.time), getPath(entity.isAdmin))
     }
 
-    fun renewCookie(token: String, currentDate: Date = timeUtil.getCurrentDate()): ResponseCookie {
-        val entity = getEntity(token)!!
-        val newToken = Jwts.builder().setClaims(entity).setExpiration(currentDate.getExpirationDate()).generateToken()
-        return generateCookie(newToken, Duration.ofMillis(TOKEN_EXPIRE_INTERVAL * 1000), getPath(entity.isAdmin))
-    }
+    fun renewCookie(entity: AuthInfo, currentDate: Date = timeUtil.getCurrentDate()): ResponseCookie = generateCookie(
+            Jwts.builder().setClaims(entity).setIssuedAt(currentDate).setExpiration(currentDate.getExpirationDate()).generateToken(),
+            Duration.ofMillis(TOKEN_EXPIRE_INTERVAL * 1000),
+            getPath(entity.isAdmin))
 
     private fun generateCookie(token: String, maxAge: Duration, path: String) = ResponseCookie.from("token", token)
             .maxAge(maxAge)
@@ -104,30 +101,11 @@ class JwtTokenUtil @Autowired constructor(private @Value("\${jwt.secret:yadajwt}
 
 }
 
-class JwtEntity(private val claims: Claims) : Claims by claims {
-    constructor() : this(DefaultClaims())
+var ServerRequest.authInfo: AuthInfo
+    get() = this.attributes()["authInfo"]!! as AuthInfo
+    set(value) {
+        this.attributes()["authInfo"] = value
+    }
 
-    var isAdmin: Boolean?
-        get() = this["isAdmin"] as Boolean?
-        set(value) {
-            this["isAdmin"] = value
-        }
-
-    var user: User?
-        get() = this["userInfo", User::class.java]
-        set(value) {
-            this["userInfo"] = value
-        }
-
-    var resList: List<Res>?
-        get() = this["resList", List::class.java] as List<Res>
-        set(value) {
-            this["resList"] = value
-        }
-
-    var username: String?
-        get() = this.subject
-        set(value) {
-            this.subject = value
-        }
-}
+val ServerRequest.token: String?
+    get() = this.cookies()["token"]?.run { this[0]?.value }

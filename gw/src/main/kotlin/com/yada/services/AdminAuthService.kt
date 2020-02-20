@@ -1,6 +1,6 @@
 package com.yada.services
 
-import com.yada.JwtEntity
+import com.yada.AuthInfo
 import com.yada.JwtTokenUtil
 import com.yada.model.Operator
 import com.yada.repository.IAdminUserRepository
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 
 interface IAdminAuthService {
-    fun login(username: String, password: String): Mono<String>
+    fun login(username: String, password: String): Mono<AuthInfo>
     fun logout(token: String): Mono<Void>
     fun changePassword(username: String, oldPassword: String, newPassword: String): Mono<Boolean>
     fun authorize(token: String, uri: String, opt: Operator): Mono<Boolean>
@@ -17,7 +17,7 @@ interface IAdminAuthService {
 
 @Service
 class AdminAuthService @Autowired constructor(private val adminUserRepo: IAdminUserRepository, private val pwdDigestService: IPwdDigestService, private val jwtUtil: JwtTokenUtil) : IAdminAuthService {
-    override fun login(username: String, password: String): Mono<String> = Mono.just(username == "admin")
+    override fun login(username: String, password: String): Mono<AuthInfo> = Mono.just(username == "admin")
             .filter { it }
             .map { pwdDigestService.getPwdDigest("admin", password) }
             .flatMap { pwdDigest ->
@@ -25,7 +25,7 @@ class AdminAuthService @Autowired constructor(private val adminUserRepo: IAdminU
                         .map { pwdDigest == it.pwd }
                         .defaultIfEmpty(pwdDigestService.getDefaultPwdDigest("admin") == pwdDigest)
                         .filter { it }
-                        .map { jwtUtil.generateToken(JwtEntity().apply { isAdmin = true; this.username = "admin" }) }
+                        .map { AuthInfo.create() }
             }
 
     override fun logout(token: String): Mono<Void> = Mono.empty()

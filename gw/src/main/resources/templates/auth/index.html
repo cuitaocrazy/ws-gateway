@@ -78,18 +78,52 @@
             border-color: #007fff;
         }
     </style>
+    <script th:src="@{/js/jquery-3.1.1.js}"></script>
+    <script th:src="@{/static/js/jquery.validate-1.19.1.js}"></script>
+    <script>
+        $(document).ready(function() {
+            $("#loginForm").validate({
+                rules: {
+                    username: {
+                        required: true,
+                    },
+                    password: {
+                        required: true,
+                    },
+                },
+                messages: {
+                    username: {
+                        required: "用户名不能为空！"
+                    },
+                    password: {
+                        required: "密码不能为空！"
+                    },
+                },
+                errorElement: 'span',
+                highlight: function (element) {
+                    $(element).closest('.form-input').addClass('alert-error');
+                },
+                unhighlight: function (element) {
+                    $(element).closest('.form-input').removeClass('alert-error');
+                },
+                submitHandler: function (form) {
+                    form.submit();
+                },
+            });
+        });
+    </script>
 </head>
 <body>
-<form method="post" class="wrap" th:object="${loginForm}">
+<form id="loginForm" method="post" class="wrap" th:object="${loginForm}">
     <div class="container">
         <h2>登录</h2>
         <p class="alert-error-box" th:if="${#fields.hasErrors('global')}" th:errors="*{global}"></p>
         <div class="input-box username">
-            <input type="text" th:field="*{username}" th:class="${#fields.hasErrors('username')} ? 'form-input alert-error' : 'form-input'" placeholder="请输入用户名">
+            <input type="text" id="username" th:field="*{username}" class="form-input" placeholder="请输入用户名">
             <span th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></span>
         </div>
         <div class="input-box pwd">
-            <input type="password" th:field="*{password}" th:class="${#fields.hasErrors('username')} ? 'form-input alert-error' : 'form-input'" placeholder="请输入密码">
+            <input type="password" id="password" th:field="*{password}" class="form-input" placeholder="请输入密码">
             <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
         </div>
         <div class="login-btn">
@@ -97,19 +131,5 @@
         </div>
     </div>
 </form>
-<script>
-    window.onload = function () {
-        var inputBox = document.querySelectorAll('.input-box');
-        inputBox.forEach((elem,index)=>{
-            var formInput = elem.querySelector('.form-input');
-            formInput.onblur = function () {
-                var val = formInput.value;
-                if(val !== ''){
-                    this.classList.remove('alert-error');
-                }
-            }
-        })
-    }
-</script>
 </body>
 </html>

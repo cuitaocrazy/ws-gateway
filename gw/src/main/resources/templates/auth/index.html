@@ -2,23 +2,114 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, .3);
+        }
+
+        .container {
+            font-size: 12px;
+            position: relative;
+            padding: 2rem;
+            width: 26.5rem;
+            max-width: 80%;
+            box-sizing: border-box;
+            background-color: #fff;
+            border-radius: 6px;
+        }
+
+        h2 {
+            margin: 0 0 2rem;
+            text-align: center;
+        }
+        .alert-error-box{
+            margin-bottom: 10px;
+            padding: 4px 10px;
+            background-color: #fff4f0;
+            color: #fd5300;
+            border: 1px solid #ffc0a2;
+        }
+
+        .input-box {
+            margin-bottom: .8rem;
+        }
+
+        .form-input {
+            padding: 10px;
+            width: 100%;
+            border: 1px solid #e9e9e9;
+            border-radius: 2px;
+            outline: none;
+            box-sizing: border-box;
+            transition: .5s;
+        }
+        .form-input+span{
+            display: inline-block;
+            padding-top: 10px;
+            color: red;
+        }
+        .form-input.alert-error{
+            border-color:red;
+        }
+        .form-btn {
+            background: #007fff;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .form-btn:hover {
+            background: #0371e0;
+        }
+
+        .input-box:focus-within input {
+            border-color: #007fff;
+        }
+    </style>
 </head>
 <body>
-<form method="post" th:object="${loginForm}">
-    <p th:if="${#fields.hasErrors('global')}" th:errors="*{global}"></p>
-    <div>
-        <label th:text="#{login.username}"></label>
-        <input type="text" th:field="*{username}"/>
-        <span th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></span>
-    </div>
-    <div>
-        <label th:text="#{login.password}"></label>
-        <input type="password" th:field="*{password}"/>
-        <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
-    </div>
-    <div>
-        <input type="submit" th:value="#{login.submit}"/>
+<form method="post" class="wrap" th:object="${loginForm}">
+    <div class="container">
+        <h2>登录</h2>
+        <p class="alert-error-box" th:if="${#fields.hasErrors('global')}" th:errors="*{global}"></p>
+        <div class="input-box username">
+            <input type="text" th:field="*{username}" th:class="${#fields.hasErrors('username')} ? 'form-input alert-error' : 'form-input'" placeholder="请输入用户名">
+            <span th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></span>
+        </div>
+        <div class="input-box pwd">
+            <input type="password" th:field="*{password}" th:class="${#fields.hasErrors('username')} ? 'form-input alert-error' : 'form-input'" placeholder="请输入密码">
+            <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+        </div>
+        <div class="login-btn">
+            <input type="submit" class="form-input form-btn" th:value="#{login.submit}">
+        </div>
     </div>
 </form>
+<script>
+    window.onload = function () {
+        var inputBox = document.querySelectorAll('.input-box');
+        inputBox.forEach((elem,index)=>{
+            var formInput = elem.querySelector('.form-input');
+            formInput.onblur = function () {
+                var val = formInput.value;
+                if(val !== ''){
+                    this.classList.remove('alert-error');
+                }
+            }
+        })
+    }
+</script>
 </body>
 </html>

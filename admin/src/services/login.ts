@@ -13,7 +13,7 @@ export async function fakeAccountLogin(params: LoginParamsType) {
 }
 
 export async function fakeAccountLogout() {
-  return request('/admin/logout', {
+  return request('/admin/apis/logout', {
     method: 'POST',
   });
 }

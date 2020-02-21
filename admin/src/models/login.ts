@@ -31,33 +31,31 @@ const Model: LoginModelType = {
   effects: {
     *login({ payload }, { call, put }) {
       try {
-        const response = yield call(fakeAccountLogin, payload);
+        yield call(fakeAccountLogin, payload);
         // Login successfully
-        if (response) {
-          yield put({
-            type: 'changeLoginStatus',
-            payload: 'ok',
-          });
-          const urlParams = new URL(window.location.href);
-          const params = getPageQuery();
-          let { redirect } = params as { redirect: string };
-          if (redirect) {
-            const redirectUrlParams = new URL(redirect);
-            // 退出重登陆跳转问题 https://github.com/ant-design/ant-design-pro/issues/3607
-            if (redirectUrlParams.hash === '' && redirectUrlParams.origin === urlParams.origin) {
-              redirect = redirect
-                .substr(urlParams.origin.length)
-                .substr(urlParams.pathname.replace('/user/login', '').length);
-              if (redirect.match(/^\/.*#/)) {
-                redirect = redirect.substr(redirect.indexOf('#') + 1);
-              }
-            } else {
-              window.location.href = redirect;
-              return;
+        yield put({
+          type: 'changeLoginStatus',
+          payload: 'ok',
+        });
+        const urlParams = new URL(window.location.href);
+        const params = getPageQuery();
+        let { redirect } = params as { redirect: string };
+        if (redirect) {
+          const redirectUrlParams = new URL(redirect);
+          // 退出重登陆跳转问题 https://github.com/ant-design/ant-design-pro/issues/3607
+          if (redirectUrlParams.hash === '' && redirectUrlParams.origin === urlParams.origin) {
+            redirect = redirect
+              .substr(urlParams.origin.length)
+              .substr(urlParams.pathname.replace('/user/login', '').length);
+            if (redirect.match(/^\/.*#/)) {
+              redirect = redirect.substr(redirect.indexOf('#') + 1);
             }
+          } else {
+            window.location.href = redirect;
+            return;
           }
-          router.replace(redirect || '/');
         }
+        router.replace(redirect || '/');
       } catch (error) {
         yield put({
           type: 'changeLoginStatus',

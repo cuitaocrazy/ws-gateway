@@ -12,6 +12,7 @@ import reactor.core.publisher.Mono
 
 @Component
 class SvcHandler @Autowired constructor(private val svcService: SvcService) {
+    @Suppress("UNUSED_PARAMETER")
     fun getAll(req: ServerRequest): Mono<ServerResponse> = ok().body(svcService.getAll())
     fun get(req: ServerRequest): Mono<ServerResponse> = withNotFound(svcService.get(req.pathVariable("id")))
     fun createOrUpdate(req: ServerRequest): Mono<ServerResponse> = ok().body(req.bodyToMono(Svc::class.java).flatMap(svcService::createOrUpdate))

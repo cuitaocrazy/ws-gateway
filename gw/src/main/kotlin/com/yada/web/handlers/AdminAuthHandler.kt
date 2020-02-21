@@ -15,6 +15,7 @@ import reactor.core.publisher.Mono
 @Component
 class AdminAuthHandler @Autowired constructor(private val authSvc: IAdminAuthService, private val jwtUtil: JwtTokenUtil) {
 
+    @Suppress("UNUSED_PARAMETER")
     fun index(req: ServerRequest): Mono<ServerResponse> = ServerResponse.ok().render("/admin/index")
 
     fun login(req: ServerRequest): Mono<ServerResponse> {

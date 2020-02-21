@@ -12,6 +12,7 @@ import reactor.core.publisher.Mono
 
 @Component
 class AppHandler @Autowired constructor(private val appService: IAppService) {
+    @Suppress("UNUSED_PARAMETER")
     fun getAll(req: ServerRequest): Mono<ServerResponse> = ok().body(appService.getAll())
     fun get(req: ServerRequest): Mono<ServerResponse> = withNotFound(appService.get(req.pathVariable("id")))
     fun exist(req: ServerRequest): Mono<ServerResponse> = ok().body(appService.exist(req.pathVariable("id")))

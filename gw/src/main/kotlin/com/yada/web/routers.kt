@@ -29,11 +29,11 @@ open class AuthRouterConfig @Autowired constructor(private val authHandler: Auth
             GET("/") { _ ->
                 ServerResponse.ok().render("/index")
             }
-            GET("/logout", authHandler::logout)
             filter { request, next -> authFilter.filter(request, next) }
         }
 
         "".nest {
+            GET("/logout", authHandler::logout)
             POST("/change_pwd", authHandler::changePwd)
             GET("/refresh_token", authHandler::refreshToken)
             filter { request, next -> authApiFilter.filter(request, next) }
@@ -51,7 +51,7 @@ open class AdminAuthRouterConfig @Autowired constructor(private val adminAuthHan
         }
 
         "/admin".nest {
-            POST("/logout", adminAuthHandler::logout)
+            POST("/apis/logout", adminAuthHandler::logout)
             POST("/apis/change_pwd", adminAuthHandler::changePwd)
             GET("/apis/refresh_token", adminAuthHandler::refreshToken)
             filter { request, next -> authApiFilter.filter(request, next) }

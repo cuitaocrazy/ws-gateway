@@ -33,6 +33,7 @@ class AuthInfo(private val claims: Claims) : Claims by claims, Principal {
         }
 
     var resList: List<Res>?
+        @Suppress("UNCHECKED_CAST")
         get() = this["resList", List::class.java] as List<Res>
         set(value) {
             this["resList"] = value

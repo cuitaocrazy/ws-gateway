@@ -20,6 +20,7 @@ import java.net.URI
 class AuthHandler @Autowired constructor(private val jwtUtil: JwtTokenUtil, private val authService: IAuthenticationService) {
     private val formBeanName = "loginForm"
 
+    @Suppress("UNUSED_PARAMETER")
     fun getLoginForm(req: ServerRequest): Mono<ServerResponse> =
             ServerResponse.ok().render("/auth/index", mapOf(formBeanName to LoginData("", "")))
 

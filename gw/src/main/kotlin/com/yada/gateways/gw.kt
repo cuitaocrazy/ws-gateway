@@ -1,6 +1,8 @@
 package com.yada.gateways
 
 import com.yada.JwtTokenUtil
+import com.yada.model.Operator
+import com.yada.model.Res
 import com.yada.token
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.gateway.filter.GatewayFilter
@@ -8,6 +10,7 @@ import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFac
 import org.springframework.cloud.gateway.handler.predicate.AbstractRoutePredicateFactory
 import org.springframework.cloud.gateway.handler.predicate.GatewayPredicate
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.server.PathContainer
 import org.springframework.stereotype.Component
@@ -17,41 +20,28 @@ import org.springframework.web.util.pattern.PathPatternParser
 import reactor.core.publisher.Mono
 import java.util.function.Predicate
 
-//@Configuration
-//open class AuthGateway {
-//    @Bean
-//    open fun authGatewayRouter(builder: RouteLocatorBuilder): RouteLocator {
-//        TODO()
-//    }
-//}
-
 private val pathPatternParser = PathPatternParser()
 
 @Component
 class AppRoutePredicateFactory : AbstractRoutePredicateFactory<AppRoutePredicateFactory.Config>(Config::class.java) {
 
-    override fun shortcutFieldOrder(): MutableList<String> = mutableListOf("subUri", "appName")
+    override fun shortcutFieldOrder(): MutableList<String> = mutableListOf("path")
 
     override fun apply(config: Config): Predicate<ServerWebExchange> {
-        val uri = UriComponentsBuilder.fromPath(config.subUri).path(config.appName).encode().build().toUriString()
-        val pathPattern = pathPatternParser.parse("$uri/**")
+        val pathPrefix = config.path
+        val pathPattern = pathPatternParser.parse("$pathPrefix/**")
 
         return GatewayPredicate {
             val path = PathContainer.parsePath(it.request.uri.rawPath)
             if (pathPattern.matches(path)) {
-                it.attributes["index"] = uri
+                it.attributes["index"] = pathPrefix
                 true
             } else false
         }
     }
 
     class Config {
-        var subUri: String = ""
-        var appName: String = ""
-
-        override fun toString(): String {
-            return "subUri=${subUri}, appName=${appName}"
-        }
+        var path: String = ""
     }
 }
 
@@ -93,3 +83,74 @@ class AuthGatewayFilterFactory @Autowired constructor(private val jwtTokenUtil: 
     class Config
 }
 
+@Component
+class SvcRoutePredicateFactory : AbstractRoutePredicateFactory<SvcRoutePredicateFactory.Config>(Config::class.java) {
+
+    override fun shortcutFieldOrder(): MutableList<String> = mutableListOf("pathPrefix", "svcId")
+
+    override fun apply(config: Config): Predicate<ServerWebExchange> {
+        val pathPrefix = UriComponentsBuilder.fromPath(config.pathPrefix).pathSegment(config.svcId).encode().build().toUriString()
+        val pathPattern = pathPatternParser.parse("$pathPrefix/**")
+
+        return GatewayPredicate {
+            val path = PathContainer.parsePath(it.request.uri.rawPath)
+            if (pathPattern.matches(path)) {
+                it.attributes["pathPrefix"] = config.pathPrefix
+                it.attributes["svcId"] = config.svcId
+                true
+            } else false
+        }
+    }
+
+    class Config {
+        var pathPrefix: String = ""
+        var svcId: String = ""
+    }
+}
+
+@Component
+class AuthApiGatewayFilterFactory @Autowired constructor(private val jwtTokenUtil: JwtTokenUtil)
+    : AbstractGatewayFilterFactory<AuthApiGatewayFilterFactory.Config>(Config::class.java) {
+
+    override fun apply(config: Config): GatewayFilter {
+        return GatewayFilter { exchange, chain ->
+            val authInfo = exchange.token?.run {
+                jwtTokenUtil.getEntity(this)
+            }
+
+            if (!exchange.response.isCommitted) {
+                val op = convertOp(exchange.request.method!!)
+                val subUri = exchange.request.uri.path.removePrefix(exchange.attributes["pathPrefix"] as String)
+                if (authInfo == null || !hasPower(authInfo.resList!!, op, subUri)) {
+                    val res = exchange.response
+                    res.statusCode = HttpStatus.UNAUTHORIZED
+                    exchange.response.setComplete()
+                } else {
+                    val req = exchange.request.mutate()
+                            .header("X-YADA-ORG-ID", authInfo.user?.orgId)
+                            .header("X-YADA-USER-ID", authInfo.user?.id)
+                            .header("COOKIE", null)
+                            .build()
+                    chain.filter(exchange.mutate().request(req).build())
+                }
+            } else {
+                Mono.empty()
+            }
+
+        }
+    }
+
+    private fun hasPower(resList: List<Res>, op: Operator, uri: String): Boolean = resList.any {
+        pathPatternParser.parse(it.uri).matches(PathContainer.parsePath(uri)) && op in it.ops
+    }
+
+    private fun convertOp(method: HttpMethod): Operator = when (method) {
+        HttpMethod.GET -> Operator.READ
+        HttpMethod.POST -> Operator.CREATE
+        HttpMethod.PUT -> Operator.UPDATE
+        HttpMethod.DELETE -> Operator.DELETE
+        else -> throw Error("不支持${method}")
+    }
+
+    class Config
+}

@@ -3,9 +3,13 @@ server.error.includeStacktrace: NEVER
 jwt.secret: yadajwt
 
 spring.cloud.gateway.routes:
-  - id: app1
-    uri: http://localhost:3000
+  - uri: http://localhost:3000
     predicates:
-      - App=/,app1
+      - App=/app1
     filters:
       - Auth
+  - uri: http://localhost:3000
+    predicates:
+      - Svc=/svc,service-1
+    filters:
+      - AuthApi

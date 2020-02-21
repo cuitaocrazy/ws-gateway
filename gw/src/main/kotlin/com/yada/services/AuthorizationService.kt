@@ -18,7 +18,7 @@ interface IAuthorizationService {
     fun getUserResList(user: User): Mono<List<Res>>
 }
 
-private fun svcUri(svcId: String, uri: String) = "/svc/${svcId}${uri}"
+private fun svcUri(svcId: String, uri: String) = "/${svcId}${uri}"
 
 @Service
 class AuthorizationService @Autowired constructor(

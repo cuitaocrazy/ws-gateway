@@ -10,6 +10,7 @@ import org.springframework.http.ResponseCookie
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.server.ResponseStatusException
+import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Mono
 import java.time.Duration
 import java.util.*
@@ -109,3 +110,6 @@ var ServerRequest.authInfo: AuthInfo
 
 val ServerRequest.token: String?
     get() = this.cookies()["token"]?.run { this[0]?.value }
+
+val ServerWebExchange.token: String?
+    get() = this.request.cookies["token"]?.run { this[0]?.value }

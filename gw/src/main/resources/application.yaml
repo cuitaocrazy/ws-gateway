@@ -1,6 +1,11 @@
-server:
-  error:
-    includeStacktrace: NEVER
+server.error.includeStacktrace: NEVER
 
-jwt:
-  secret: yadajwt
+jwt.secret: yadajwt
+
+spring.cloud.gateway.routes:
+  - id: app1
+    uri: http://localhost:3000
+    predicates:
+      - App=/,app1
+    filters:
+      - Auth

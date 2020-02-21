@@ -1,4 +1,4 @@
-package com.yada.filters
+package com.yada.web
 
 import com.yada.JwtTokenUtil
 import com.yada.authInfo

@@ -1,7 +1,5 @@
 package com.yada.web
 
-import com.yada.filters.AuthApiHandlerFilter
-import com.yada.filters.AuthHandlerFilter
 import com.yada.web.handlers.AdminAuthHandler
 import com.yada.web.handlers.AuthHandler
 import com.yada.web.handlers.apis.AppHandler

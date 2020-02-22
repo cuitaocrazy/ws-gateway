@@ -134,3 +134,76 @@ gradle buildAll
 ```
 
 打包都的jar在`gw/build/libs`目录
+
+
+## 开发环境
+
+docker compose在`gw/dev`目录下
+第一步: 
+```zsh
+docker-compose build
+```
+主要构建app镜像和svc镜像
+
+第二步:
+
+```zsh
+docker-compose up
+```
+
+启动所有服务, 可以忽略第一步,直接进行这一步
+
+第三部:
+
+```zsh
+docker exec -it ${mongo docker container id} bash
+mongo
+rs.initiate({_id:"rs", members:[{_id:0, host:"127.0.0.1:27017"}]})
+exit
+exit
+```
+
+container id可用`docker ps`查看
+
+配置mongodb的Replica Set
+
+至此辅助环境配置完毕
+
+#### Docker服务说明
+
+##### mongo
+
+数据服务
+
+##### mongo-express
+
+mongodb数据浏览器
+
+url: http://localhost:8082
+
+##### app
+
+测试应用
+
+context path为:/app/app-1
+
+url: http://localhost:3010/app/app-1
+
+##### svc
+
+测试服务
+
+context path: 无(接收任何uri)
+
+url: http://localhost:3011
+
+接受`GET` `POST` `PUT` `DELETE`方法,返回一些请求信息
+
+#### gw开发配置
+
+配置文件在`gw/src/main/resources/application-dev.yaml`
+
+已经配置好了app,svc的测试
+
+启动这个配置需要环境变量`spring.profiles.active=dev`, 详情查阅spring和idea的相关配置
+

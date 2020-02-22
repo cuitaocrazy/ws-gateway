@@ -14,8 +14,6 @@ import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
 
-typealias HandlerFilter = (ServerRequest, (ServerRequest) -> Mono<ServerResponse>) -> Mono<ServerResponse>
-
 abstract class CommonAuthHandlerFilter(private val jwtUtil: JwtTokenUtil) : HandlerFilterFunction<ServerResponse, ServerResponse> {
     override fun filter(request: ServerRequest, next: HandlerFunction<ServerResponse>): Mono<ServerResponse> {
         val token = request.cookies()["token"]?.run { this[0]?.value }

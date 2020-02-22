@@ -374,13 +374,5 @@ open class InitDevDataRunner @Autowired constructor(
         val usrs = jacksonObjectMapper().readValue<List<User>>(userJson)
 
         Mono.from(client.getDatabase(dbName).drop()).thenMany(Flux.mergeSequential(orgs.map { orgSvc.createOrUpdate(it) })).thenMany(Flux.mergeSequential(svcs.map { svcSvc.createOrUpdate(it) })).thenMany(Flux.mergeSequential(apps.map { appSvc.createOrUpdate(it) })).thenMany(Flux.mergeSequential(usrs.map { usrSvc.createOrUpdate(it) })).subscribe()
-
-//        Mono.from(client.startSession()).flatMap { session->
-//            session.startTransaction()
-//            session.close()
-//            client.getDatabase("").drop()
-//            null
-//        }
-
     }
 }

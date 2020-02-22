@@ -19,11 +19,6 @@ interface IOrgService {
 }
 
 fun Org.isMyOffspring(org: Org) = org.id.startsWith(this.id)
-//fun OrgTree.toList(): List<Org> {
-//    fun Set<OrgTree>.toList() = this.map { it.toList() }.flatten()
-//
-//    return listOf(org) + (children?.toList() ?: listOf())
-//}
 
 private fun makeTree(orgs: List<Org>): List<OrgTree> {
     val ret = ArrayList<OrgTree>()

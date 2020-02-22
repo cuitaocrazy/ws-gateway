@@ -35,37 +35,6 @@ open class MongoConfig constructor(
     @Bean
     open fun transactionManager(factory: ReactiveMongoDatabaseFactory) = ReactiveMongoTransactionManager(factory)
 
-//    @Bean
-//    open fun myRoutes(builder: RouteLocatorBuilder): RouteLocator = builder.routes().route{ predicateSpec ->
-////        predicateSpec.path("/get/**").filters{ gatewayFilterSpec ->
-////            gatewayFilterSpec.addRequestHeader("Hello", "World").rewritePath("/get/(?<segment>.*)", "/app/\${segment}")
-////        }.uri("forward:/app")//.uri("http://httpbin.org:80")
-//        predicateSpec
-//    }.build()
-
-//    @Bean
-//    open fun userDetailsService(): MapReactiveUserDetailsService? {
-//        val user: UserDetails = User
-//                .withUsername("admin")
-//                .password(passwordEncoder().encode("password"))
-//                .roles("ADMIN")
-//                .build()
-//        return MapReactiveUserDetailsService(user)
-//    }
-//
-//    @Bean
-//    open fun springSecurityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain? {
-//        return http.authorizeExchange()
-//                .anyExchange().authenticated()
-//                .and().formLogin()
-//                .and().build()
-//    }
-//
-//    @Bean
-//    open fun passwordEncoder(): PasswordEncoder {
-//        return BCryptPasswordEncoder()
-//    }
-
     @Bean
     open fun messageSource(): MessageSource? {
         val messageSource = ResourceBundleMessageSource()

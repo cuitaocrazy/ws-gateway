@@ -15,18 +15,20 @@ interface IAdminAuthService {
     fun authorize(token: String, uri: String, opt: Operator): Mono<Boolean>
 }
 
+private const val adminStr = "admin"
+
 @Service
 class AdminAuthService @Autowired constructor(private val adminUserRepo: IAdminUserRepository, private val pwdDigestService: IPwdDigestService, private val jwtUtil: JwtTokenUtil) : IAdminAuthService {
-    override fun login(username: String, password: String): Mono<AuthInfo> = Mono.just(username == "admin")
-            .filter { it }
-            .map { pwdDigestService.getPwdDigest("admin", password) }
-            .flatMap { pwdDigest ->
-                adminUserRepo.getAdminUser()
-                        .map { pwdDigest == it.pwd }
-                        .defaultIfEmpty(pwdDigestService.getDefaultPwdDigest("admin") == pwdDigest)
-                        .filter { it }
-                        .map { AuthInfo.create() }
-            }
+    override fun login(username: String, password: String): Mono<AuthInfo> = if (username == adminStr) {
+        adminUserRepo
+                .getAdminUser()
+                .map { it.pwd }
+                .defaultIfEmpty(pwdDigestService.getDefaultPwdDigest(adminStr))
+                .filter { pwdDigestService.getPwdDigest(adminStr, password) == it }
+                .map { AuthInfo.create() }
+    } else {
+        Mono.empty()
+    }
 
     override fun logout(token: String): Mono<Void> = Mono.empty()
 

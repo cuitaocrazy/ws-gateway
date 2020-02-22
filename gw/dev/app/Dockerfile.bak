@@ -1,0 +1,4 @@
+FROM node
+WORKDIR /app/build
+COPY . .
+RUN npm i && npm run build

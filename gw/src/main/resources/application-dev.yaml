@@ -9,3 +9,15 @@ logging:
 server:
   error:
     includeStacktrace: ALWAYS
+
+spring.cloud.gateway.routes:
+  - uri: http://localhost:3010
+    predicates:
+      - App=/app/app-1
+    filters:
+      - Auth
+  - uri: http://localhost:3011
+    predicates:
+      - Svc=/svc,service-1
+    filters:
+      - AuthApi

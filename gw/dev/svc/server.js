@@ -2,7 +2,7 @@ const express = require('express')
 
 const app = express()
 
-const proc = (req, res) => {
+const commProc = (req, res) => {
   const obj = {
     url: req.url,
     method: req.method,
@@ -11,9 +11,25 @@ const proc = (req, res) => {
   console.log(JSON.stringify(obj, null, ' '))
   res.send(obj)
 }
-app.get('*', proc)
-app.put('*', proc)
-app.delete('*', proc)
-app.post('*', proc)
+
+const resListProc = (_, res) => {
+  const obj = [
+    {
+      uri: '/res1',
+      ops: ['READ', 'CREATE', 'UPDATE', 'DELETE']
+    },
+    {
+      uri: '/res2/{id}',
+      ops: ['READ', 'CREATE', 'UPDATE', 'DELETE']
+    },
+    {
+      uri: '/res3/**',
+      ops: ['READ', 'CREATE', 'UPDATE', 'DELETE']
+    }
+  ]
+  res.send(obj)
+}
+app.use('/*/res_list', resListProc)
+app.use(commProc)
 
 app.listen(3000, () => console.log('server is started!'))

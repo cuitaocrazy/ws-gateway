@@ -58,7 +58,7 @@ class AuthGatewayFilterFactory @Autowired constructor(private val jwtTokenUtil: 
                 jwtTokenUtil.getEntity(this)
             }
 
-            if (exchange.request.uri.path == exchange.attributes["index"] && !exchange.response.isCommitted) {
+            if ((exchange.request.uri.path == exchange.attributes["index"] || exchange.request.uri.path == (exchange.attributes["index"] as String + "/")) && !exchange.response.isCommitted) {
                 if (authInfo == null) {
                     val res = exchange.response
                     res.statusCode = HttpStatus.SEE_OTHER
@@ -120,8 +120,14 @@ class AuthApiGatewayFilterFactory @Autowired constructor(private val jwtTokenUti
 
             if (!exchange.response.isCommitted) {
                 val op = convertOp(exchange.request.method!!)
-                val subUri = exchange.request.uri.path.removePrefix(exchange.attributes["pathPrefix"] as String)
-                if (authInfo == null || !hasPower(authInfo.resList!!, op, subUri)) {
+                val svcId = exchange.attributes["svcId"]!! as String
+                val pathPrefix = exchange.attributes["pathPrefix"]!! as String
+                val resListUri = UriComponentsBuilder.fromPath(pathPrefix).pathSegment(svcId).pathSegment("res_list").encode().build().toUriString()
+                val subUri = exchange.request.uri.path.removePrefix(pathPrefix)
+
+                if(exchange.request.uri.host == "localhost" && exchange.request.uri.path == resListUri) {
+                    chain.filter(exchange)
+                } else if (authInfo == null || !hasPower(authInfo.resList!!, op, subUri)) {
                     val res = exchange.response
                     res.statusCode = HttpStatus.UNAUTHORIZED
                     exchange.response.setComplete()
@@ -146,8 +152,11 @@ class AuthApiGatewayFilterFactory @Autowired constructor(private val jwtTokenUti
 
     private fun convertOp(method: HttpMethod): Operator = when (method) {
         HttpMethod.GET -> Operator.READ
+        HttpMethod.OPTIONS -> Operator.READ
+        HttpMethod.TRACE -> Operator.READ
         HttpMethod.POST -> Operator.CREATE
         HttpMethod.PUT -> Operator.UPDATE
+        HttpMethod.PATCH -> Operator.UPDATE
         HttpMethod.DELETE -> Operator.DELETE
         else -> throw Error("不支持${method}")
     }

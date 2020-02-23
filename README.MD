@@ -5,11 +5,13 @@
 1. 统一认证
 2. 实现网关
 
+网关的谓词和过滤器可以用spring cloud gateway自带的, 可根据需要在配置文件里配置,参考:[谓词](https://cloud.spring.io/spring-cloud-gateway/reference/html/#gateway-request-predicates-factories), [过滤器](https://cloud.spring.io/spring-cloud-gateway/reference/html/#gatewayfilter-factories)
+
 
 
 ## 用户管理
 
-用户管理通过`http://{hostname}:{porg}/admin`进行管理
+用户管理通过`http://{hostname}:{port}/admin`进行管理
 
 管理员只有一个:admin
 
@@ -97,7 +99,7 @@ spring.cloud.gateway.routes:
 spring.cloud.gateway.routes:
   - uri: http://localhost:3000 # 服务站点的uri
     predicates:
-      - Svc=/svc,service-1 # 第一个值是service的path前缀,第二个值是service的名字
+      - Svc=/svc,service-1 # 第一个值是service的path前缀,第二个值是service的Id
     filters:
       - AuthApi # 认证授权检查过滤器,检查所有符合{path前缀}/{service的名字}的path,如果没有通过则返回401
 ```
@@ -114,6 +116,61 @@ spring.cloud.gateway.routes:
     filters:
       - name: AuthApi
 ```
+
+
+
+## 下游服务开发
+
+### 资源曝露接口
+
+网关需要提供资源列表,以便于网关抓去提供给app应用使用
+
+uri的[规则](https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/web/util/pattern/PathPattern.html)
+
+op的种类:`READ` `CREATE` `UPDATE` `DELETE`
+
+op和http method的映射:
+
+```kotlin
+HttpMethod.GET -> Operator.READ
+HttpMethod.OPTIONS -> Operator.READ
+HttpMethod.TRACE -> Operator.READ
+HttpMethod.POST -> Operator.CREATE
+HttpMethod.PUT -> Operator.UPDATE
+HttpMethod.PATCH -> Operator.UPDATE
+HttpMethod.DELETE -> Operator.DELETE
+```
+
+例子:
+
+```json
+[
+  {
+    "uri": "/foo/{id}/{param}",
+    "ops": ["READ", "CREATE"]
+  },
+  {
+    "uri": "/bar",
+    "ops": ["READ"]
+  }
+]
+```
+
+特定的uri:`res_list`
+
+例如: http://localhost:3000/{context path}/res_list
+
+
+
+### api请求headers扩张
+
+服务api的请求会被网关做两个headers扩张:
+
+`X-YADA-ORG-ID`: 请求用户的机构Id
+
+`X-YADA-USER-ID`: 请求用户的用户Id
+
+如果服务需要,可以通过request的headers读取
 
 
 

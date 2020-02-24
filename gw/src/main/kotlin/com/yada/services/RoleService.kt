@@ -4,6 +4,7 @@ import com.yada.model.Role
 import com.yada.repository.RoleRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
@@ -16,14 +17,21 @@ interface IRoleService {
 }
 
 @Service
-open class RoleService @Autowired constructor(private val roleRepo: RoleRepository) : IRoleService {
+open class RoleService @Autowired constructor(private val roleRepo: RoleRepository, private val userService: IUserService) : IRoleService {
     override fun getAll(): Flux<Role> = roleRepo.findAllByOrderByIdAsc()
 
     override fun get(id: String): Mono<Role> = roleRepo.findById(id)
 
+    @Transactional
     override fun exist(id: String): Mono<Boolean> = roleRepo.existsById(id)
 
+    @Transactional
     override fun createOrUpdate(role: Role): Mono<Role> = roleRepo.save(role)
 
-    override fun delete(id: String): Mono<Void> = roleRepo.deleteById(id)
+    @Transactional
+    override fun delete(id: String): Mono<Void> = userService.getAll()
+            .filter { user -> id in user.roles }
+            .map { user -> user.copy(roles = user.roles - id) }
+            .flatMap(userService::createOrUpdate)
+            .then(roleRepo.deleteById(id))
 }

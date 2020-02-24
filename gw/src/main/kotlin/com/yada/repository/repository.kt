@@ -1,7 +1,7 @@
 package com.yada.repository
 
-import com.yada.model.App
 import com.yada.model.Org
+import com.yada.model.Role
 import com.yada.model.Svc
 import com.yada.model.User
 import org.springframework.beans.factory.annotation.Autowired
@@ -41,8 +41,8 @@ interface SvcRepository : ReactiveCrudRepository<Svc, String> {
     fun findAllByOrderByIdAsc(): Flux<Svc>
 }
 
-interface AppRepository : ReactiveCrudRepository<App, String> {
-    fun findAllByOrderByIdAsc(): Flux<App>
+interface RoleRepository : ReactiveCrudRepository<Role, String> {
+    fun findAllByOrderByIdAsc(): Flux<Role>
 }
 
 data class AdminUser(val id: String, val pwd: String)

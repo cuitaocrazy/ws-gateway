@@ -2,7 +2,6 @@ package com.yada
 
 import com.yada.model.Operator
 import com.yada.model.Res
-import com.yada.model.RoleId
 import com.yada.model.User
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.impl.DefaultClaims
@@ -59,11 +58,9 @@ class AuthInfo(private val claims: Claims) : Claims by claims, Principal {
 }
 
 @Suppress("UNCHECKED_CAST")
-private fun convertUser(map: Map<String, Any?>): User = User(map["id"] as String, map["orgId"] as String, (map["roles"] as List<Map<String, Any?>>).map(::convertRoleId).toSet())
+private fun convertUser(map: Map<String, Any?>): User = User(map["id"] as String, map["orgId"] as String, (map["roles"] as List<String>).toSet())
 
 @Suppress("UNCHECKED_CAST")
 private fun convertRes(map: Map<String, Any?>): Res = Res(map["uri"] as String, (map["ops"] as List<String>).map(::convertOp).toSet())
 
 private fun convertOp(opStr: String): Operator = Operator.valueOf(opStr)
-
-private fun convertRoleId(map: Map<String, Any?>): RoleId = RoleId(map["appId"] as String, map["roleName"] as String)

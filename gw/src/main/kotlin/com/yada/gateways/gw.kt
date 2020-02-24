@@ -126,7 +126,7 @@ class AuthApiGatewayFilterFactory @Autowired constructor(private val jwtTokenUti
                 val resListUri = UriComponentsBuilder.fromPath(pathPrefix).pathSegment(svcId).pathSegment("res_list").encode().build().toUriString()
                 val subUri = exchange.request.uri.path.removePrefix(pathPrefix)
 
-                if(exchange.request.uri.host == "localhost" && exchange.request.uri.path == resListUri) {
+                if (exchange.request.uri.host == "localhost" && exchange.request.uri.path == resListUri) {
                     chain.filter(exchange)
                 } else if (authInfo == null || !hasPower(authInfo.resList!!, op, subUri)) {
                     Mono.error(ResponseStatusException(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED"))

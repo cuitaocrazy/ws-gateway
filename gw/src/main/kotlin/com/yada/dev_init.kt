@@ -3,12 +3,12 @@ package com.yada
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.mongodb.reactivestreams.client.MongoClient
-import com.yada.model.App
 import com.yada.model.Org
+import com.yada.model.Role
 import com.yada.model.Svc
 import com.yada.model.User
-import com.yada.services.IAppService
 import com.yada.services.IOrgService
+import com.yada.services.IRoleService
 import com.yada.services.ISvcService
 import com.yada.services.IUserService
 import org.springframework.beans.factory.annotation.Autowired
@@ -59,28 +59,17 @@ private val userJson = """
     "id": "admin",
     "orgId": "00",
     "roles": [
-      {
-        "appId": "app-1",
-        "roleName": "admin"
-      },
-      {
-        "appId": "app-1",
-        "roleName": "user"
-      },
-      {
-        "appId": "app-2",
-        "roleName": "admin"
-      }
+      "role1"
     ]
   }
 ]
 """.trimIndent()
 
-private val appJson = """
+private val roleJson = """
 [
   {
-    "id": "app-1",
-    "resources": [
+    "id": "role1",
+    "svcs": [
       {
         "id": "service-1",
         "resources": [
@@ -112,72 +101,11 @@ private val appJson = """
           }
         ]
       }
-    ],
-    "roles": [
-      {
-        "name": "admin",
-        "resources": [
-          {
-            "id": "service-1",
-            "resources": [
-              {
-                "uri": "/res1",
-                "ops": [
-                  "READ"
-                ]
-              }
-            ]
-          },
-          {
-            "id": "service-2",
-            "resources": [
-              {
-                "uri": "/trans",
-                "ops": [
-                  "READ"
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "name": "user",
-        "resources": [
-          {
-            "id": "service-1",
-            "resources": [
-              {
-                "uri": "/merchant",
-                "ops": [
-                  "READ"
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "name": "anon",
-        "resources": [
-          {
-            "id": "service-1",
-            "resources": [
-              {
-                "uri": "/merchant",
-                "ops": [
-                  "READ"
-                ]
-              }
-            ]
-          }
-        ]
-      }
     ]
   },
   {
-    "id": "app-2",
-    "resources": [
+    "id": "role2",
+    "svcs": [
       {
         "id": "service-1",
         "resources": [
@@ -188,56 +116,6 @@ private val appJson = """
               "CREATE",
               "UPDATE",
               "DELETE"
-            ]
-          }
-        ]
-      }
-    ],
-    "roles": [
-      {
-        "name": "admin",
-        "resources": [
-          {
-            "id": "service-1",
-            "resources": [
-              {
-                "uri": "/merchant",
-                "ops": [
-                  "READ"
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "name": "user",
-        "resources": [
-          {
-            "id": "service-1",
-            "resources": [
-              {
-                "uri": "/merchant",
-                "ops": [
-                  "READ"
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "name": "anon",
-        "resources": [
-          {
-            "id": "service-1",
-            "resources": [
-              {
-                "uri": "/merchant",
-                "ops": [
-                  "READ"
-                ]
-              }
             ]
           }
         ]
@@ -355,7 +233,7 @@ private val svcJson = """
 open class InitDevDataRunner @Autowired constructor(
         private val orgSvc: IOrgService,
         private val usrSvc: IUserService,
-        private val appSvc: IAppService,
+        private val roleSvc: IRoleService,
         private val svcSvc: ISvcService,
         private val client: MongoClient,
         @Value("\${yada.db.mongo.db:yada_auth}")
@@ -365,9 +243,14 @@ open class InitDevDataRunner @Autowired constructor(
 
         val orgs = jacksonObjectMapper().readValue<List<Org>>(orgJson)
         val svcs = jacksonObjectMapper().readValue<List<Svc>>(svcJson)
-        val apps = jacksonObjectMapper().readValue<List<App>>(appJson)
+        val apps = jacksonObjectMapper().readValue<List<Role>>(roleJson)
         val usrs = jacksonObjectMapper().readValue<List<User>>(userJson)
 
-        Mono.from(client.getDatabase(dbName).drop()).thenMany(Flux.mergeSequential(orgs.map { orgSvc.createOrUpdate(it) })).thenMany(Flux.mergeSequential(svcs.map { svcSvc.createOrUpdate(it) })).thenMany(Flux.mergeSequential(apps.map { appSvc.createOrUpdate(it) })).thenMany(Flux.mergeSequential(usrs.map { usrSvc.createOrUpdate(it) })).subscribe()
+        Mono.from(client.getDatabase(dbName).drop())
+                .thenMany(Flux.mergeSequential(orgs.map { orgSvc.createOrUpdate(it) }))
+                .thenMany(Flux.mergeSequential(svcs.map { svcSvc.createOrUpdate(it) }))
+                .thenMany(Flux.mergeSequential(apps.map { roleSvc.createOrUpdate(it) }))
+                .thenMany(Flux.mergeSequential(usrs.map { usrSvc.createOrUpdate(it) }))
+                .subscribe()
     }
 }

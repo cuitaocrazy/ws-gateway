@@ -1,0 +1,29 @@
+package com.yada.services
+
+import com.yada.model.Role
+import com.yada.repository.RoleRepository
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Service
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+
+interface IRoleService {
+    fun getAll(): Flux<Role>
+    fun get(id: String): Mono<Role>
+    fun exist(id: String): Mono<Boolean>
+    fun createOrUpdate(role: Role): Mono<Role>
+    fun delete(id: String): Mono<Void>
+}
+
+@Service
+open class RoleService @Autowired constructor(private val roleRepo: RoleRepository) : IRoleService {
+    override fun getAll(): Flux<Role> = roleRepo.findAllByOrderByIdAsc()
+
+    override fun get(id: String): Mono<Role> = roleRepo.findById(id)
+
+    override fun exist(id: String): Mono<Boolean> = roleRepo.existsById(id)
+
+    override fun createOrUpdate(role: Role): Mono<Role> = roleRepo.save(role)
+
+    override fun delete(id: String): Mono<Void> = roleRepo.deleteById(id)
+}

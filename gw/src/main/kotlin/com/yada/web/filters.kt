@@ -47,6 +47,7 @@ class AuthHandlerFilter @Autowired constructor(jwtUtil: JwtTokenUtil) : CommonAu
 open class AuthApiHandlerFilter @Autowired constructor(jwtUtil: JwtTokenUtil) : CommonAuthHandlerFilter(jwtUtil) {
     override fun unauth(request: ServerRequest, next: HandlerFunction<ServerResponse>): Mono<ServerResponse> =
             Mono.error(ResponseStatusException(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED"))
+
     override fun verify(authInfo: AuthInfo?): Boolean = authInfo != null
 }
 
@@ -54,5 +55,6 @@ open class AuthApiHandlerFilter @Autowired constructor(jwtUtil: JwtTokenUtil) : 
 class AuthAdminApiHandlerFilter @Autowired constructor(jwtUtil: JwtTokenUtil) : CommonAuthHandlerFilter(jwtUtil) {
     override fun unauth(request: ServerRequest, next: HandlerFunction<ServerResponse>): Mono<ServerResponse> =
             Mono.error(ResponseStatusException(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED"))
+
     override fun verify(authInfo: AuthInfo?): Boolean = authInfo != null && authInfo.isAdmin
 }

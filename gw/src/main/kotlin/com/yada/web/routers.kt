@@ -2,8 +2,8 @@ package com.yada.web
 
 import com.yada.web.handlers.AdminAuthHandler
 import com.yada.web.handlers.AuthHandler
-import com.yada.web.handlers.apis.AppHandler
 import com.yada.web.handlers.apis.OrgHandler
+import com.yada.web.handlers.apis.RoleHandler
 import com.yada.web.handlers.apis.SvcHandler
 import com.yada.web.handlers.apis.UserHandler
 import org.springframework.beans.factory.annotation.Autowired
@@ -59,7 +59,7 @@ open class AdminAuthRouterConfig @Autowired constructor(private val adminAuthHan
 
 @Configuration
 open class AdminApiRouterConfig @Autowired constructor(
-        private val appHandler: AppHandler,
+        private val roleHandler: RoleHandler,
         private val orgHandler: OrgHandler,
         private val svcHandler: SvcHandler,
         private val userHandler: UserHandler,
@@ -67,12 +67,12 @@ open class AdminApiRouterConfig @Autowired constructor(
     @Bean
     open fun adminApiRouter() = router {
         "/admin/apis".nest {
-            "/app".nest {
-                GET("", appHandler::getAll)
-                GET("/{id}", appHandler::get)
-                GET("/{id}/exist", appHandler::exist)
-                PUT("", appHandler::createOrUpdate)
-                DELETE("/{id}", appHandler::delete)
+            "/role".nest {
+                GET("", roleHandler::getAll)
+                GET("/{id}", roleHandler::get)
+                GET("/{id}/exist", roleHandler::exist)
+                PUT("", roleHandler::createOrUpdate)
+                DELETE("/{id}", roleHandler::delete)
             }
             "/org".nest {
                 GET("", orgHandler::getTree)

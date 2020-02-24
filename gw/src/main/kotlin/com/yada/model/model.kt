@@ -7,8 +7,6 @@ enum class Operator(val op: String) {
     DELETE("DELETE")
 }
 
-data class RoleId(val appId: String, val roleName: String)
-
 data class Org(
         val id: String,
         val name: String
@@ -17,22 +15,15 @@ data class Org(
 data class User(
         val id: String,
         val orgId: String,
-        val roles: Set<RoleId>
+        val roles: Set<String>
 )
 
 data class Res(val uri: String, val ops: Set<Operator>)
 
 data class Svc(val id: String, val resources: Set<Res>)
 
-typealias SvcRes = Svc
-
 data class Role(
-        val name: String,
-        val resources: Set<SvcRes>
+        val id: String,
+        val svcs: Set<Svc>
 )
 
-data class App(
-        val id: String,
-        val resources: Set<SvcRes>,
-        val roles: Set<Role>
-)

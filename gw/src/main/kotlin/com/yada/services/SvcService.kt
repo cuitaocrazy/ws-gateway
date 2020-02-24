@@ -17,7 +17,7 @@ interface ISvcService {
 }
 
 @Service
-open class SvcService @Autowired constructor(private val repo: SvcRepository, private val appSvc: IAppService) : ISvcService {
+open class SvcService @Autowired constructor(private val repo: SvcRepository, private val roleSvc: IRoleService) : ISvcService {
     override fun getAll(): Flux<Svc> = repo.findAllByOrderByIdAsc()
 
     override fun get(id: String): Mono<Svc> = repo.findById(id)
@@ -30,8 +30,8 @@ open class SvcService @Autowired constructor(private val repo: SvcRepository, pr
             repo.findById(oldId).flatMap { repo.save(it.copy(id = newId)) }.flatMap { repo.deleteById(oldId).then(Mono.just(it)) }
 
     @Transactional
-    override fun delete(id: String): Mono<Void> = appSvc.getAll().flatMap { app ->
-        val set = app.resources.filter { it.id != id }.toSet()
-        if (set.size != app.resources.size) appSvc.createOrUpdate(app.copy(resources = set)) else Mono.empty()
+    override fun delete(id: String): Mono<Void> = roleSvc.getAll().flatMap { role ->
+        val set = role.svcs.filter { it.id != id }.toSet()
+        if (set.size != role.svcs.size) roleSvc.createOrUpdate(role.copy(svcs = set)) else Mono.empty()
     }.then(repo.deleteById(id))
 }

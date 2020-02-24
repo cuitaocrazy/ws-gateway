@@ -14,6 +14,7 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.server.PathContainer
 import org.springframework.stereotype.Component
+import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.server.ServerWebExchange
 import org.springframework.web.util.UriComponentsBuilder
 import org.springframework.web.util.pattern.PathPatternParser
@@ -128,9 +129,7 @@ class AuthApiGatewayFilterFactory @Autowired constructor(private val jwtTokenUti
                 if(exchange.request.uri.host == "localhost" && exchange.request.uri.path == resListUri) {
                     chain.filter(exchange)
                 } else if (authInfo == null || !hasPower(authInfo.resList!!, op, subUri)) {
-                    val res = exchange.response
-                    res.statusCode = HttpStatus.UNAUTHORIZED
-                    exchange.response.setComplete()
+                    Mono.error(ResponseStatusException(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED"))
                 } else {
                     val req = exchange.request.mutate()
                             .header("X-YADA-ORG-ID", authInfo.user?.orgId)

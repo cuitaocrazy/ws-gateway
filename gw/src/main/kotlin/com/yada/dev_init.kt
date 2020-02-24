@@ -85,23 +85,18 @@ private val appJson = """
         "id": "service-1",
         "resources": [
           {
-            "uri": "/merchant",
+            "uri": "/res1",
             "ops": [
               "READ",
               "CREATE",
               "UPDATE",
               "DELETE"
             ]
-          }
-        ]
-      },
-      {
-        "id": "service-1",
-        "resources": [
+          },
           {
             "uri": "/terminal",
             "ops": [
-              "READ"
+                "READ"
             ]
           }
         ]
@@ -126,7 +121,7 @@ private val appJson = """
             "id": "service-1",
             "resources": [
               {
-                "uri": "/merchant",
+                "uri": "/res1",
                 "ops": [
                   "READ"
                 ]
@@ -258,7 +253,7 @@ private val svcJson = """
     "id": "service-1",
     "resources": [
       {
-        "uri": "/merchant",
+        "uri": "/res1",
         "ops": [
           "READ",
           "CREATE",

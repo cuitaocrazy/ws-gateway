@@ -162,9 +162,9 @@ HttpMethod.DELETE -> Operator.DELETE
 
 
 
-### api请求headers扩张
+### api请求headers扩展
 
-服务api的请求会被网关做两个headers扩张:
+服务api的请求会被网关做两个headers扩展:
 
 `X-YADA-ORG-ID`: 请求用户的机构Id
 
@@ -210,7 +210,7 @@ docker-compose up
 
 启动所有服务, 可以忽略第一步,直接进行这一步
 
-第三部:
+第三步:
 
 ```zsh
 docker exec -it ${mongo docker container id} bash

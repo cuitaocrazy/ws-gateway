@@ -40,7 +40,7 @@ open class AuthRouterConfig @Autowired constructor(private val authHandler: Auth
 }
 
 @Configuration
-open class AdminAuthRouterConfig @Autowired constructor(private val adminAuthHandler: AdminAuthHandler, private val authApiFilter: AuthApiHandlerFilter) {
+open class AdminAuthRouterConfig @Autowired constructor(private val adminAuthHandler: AdminAuthHandler, private val authAdminApiFilter: AuthAdminApiHandlerFilter) {
     @Bean
     open fun adminAuthRouter() = router {
         "/admin".nest {
@@ -52,7 +52,7 @@ open class AdminAuthRouterConfig @Autowired constructor(private val adminAuthHan
             POST("/apis/logout", adminAuthHandler::logout)
             POST("/apis/change_pwd", adminAuthHandler::changePwd)
             GET("/apis/refresh_token", adminAuthHandler::refreshToken)
-            filter { request, next -> authApiFilter.filter(request, next) }
+            filter { request, next -> authAdminApiFilter.filter(request, next) }
         }
     }
 }
@@ -63,7 +63,7 @@ open class AdminApiRouterConfig @Autowired constructor(
         private val orgHandler: OrgHandler,
         private val svcHandler: SvcHandler,
         private val userHandler: UserHandler,
-        private val authApiFilter: AuthApiHandlerFilter) {
+        private val authAdminApiFilter: AuthAdminApiHandlerFilter) {
     @Bean
     open fun adminApiRouter() = router {
         "/admin/apis".nest {
@@ -95,6 +95,6 @@ open class AdminApiRouterConfig @Autowired constructor(
                 DELETE("/{id}", userHandler::delete)
             }
         }
-        filter { request, next -> authApiFilter.filter(request, next) }
+        filter { request, next -> authAdminApiFilter.filter(request, next) }
     }
 }

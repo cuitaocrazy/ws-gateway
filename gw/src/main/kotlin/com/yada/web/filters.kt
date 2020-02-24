@@ -1,5 +1,6 @@
 package com.yada.web
 
+import com.yada.AuthInfo
 import com.yada.JwtTokenUtil
 import com.yada.authInfo
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,13 +20,15 @@ abstract class CommonAuthHandlerFilter(private val jwtUtil: JwtTokenUtil) : Hand
         val token = request.cookies()["token"]?.run { this[0]?.value }
         val jwtEntity = token?.run { jwtUtil.getEntity(this) }
 
-        return if (jwtEntity != null) {
-            request.authInfo = jwtEntity
+        return if (verify(jwtEntity)) {
+            request.authInfo = jwtEntity!!
             next.handle(request)
         } else {
             unauth(request, next)
         }
     }
+
+    abstract fun verify(authInfo: AuthInfo?): Boolean
 
     abstract fun unauth(request: ServerRequest, next: HandlerFunction<ServerResponse>): Mono<ServerResponse>
 }
@@ -36,10 +39,20 @@ class AuthHandlerFilter @Autowired constructor(jwtUtil: JwtTokenUtil) : CommonAu
         val redirect = UriComponentsBuilder.fromPath("/login").queryParam("redirect", request.uri().path).build().encode().toUri()
         return seeOther(redirect).build()
     }
+
+    override fun verify(authInfo: AuthInfo?): Boolean = authInfo != null
 }
 
 @Component
-class AuthApiHandlerFilter @Autowired constructor(jwtUtil: JwtTokenUtil) : CommonAuthHandlerFilter(jwtUtil) {
+open class AuthApiHandlerFilter @Autowired constructor(jwtUtil: JwtTokenUtil) : CommonAuthHandlerFilter(jwtUtil) {
     override fun unauth(request: ServerRequest, next: HandlerFunction<ServerResponse>): Mono<ServerResponse> =
             Mono.error(ResponseStatusException(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED"))
+    override fun verify(authInfo: AuthInfo?): Boolean = authInfo != null
+}
+
+@Component
+class AuthAdminApiHandlerFilter @Autowired constructor(jwtUtil: JwtTokenUtil) : CommonAuthHandlerFilter(jwtUtil) {
+    override fun unauth(request: ServerRequest, next: HandlerFunction<ServerResponse>): Mono<ServerResponse> =
+            Mono.error(ResponseStatusException(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED"))
+    override fun verify(authInfo: AuthInfo?): Boolean = authInfo != null && authInfo.isAdmin
 }

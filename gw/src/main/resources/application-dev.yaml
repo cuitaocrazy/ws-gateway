@@ -21,3 +21,7 @@ spring.cloud.gateway.routes:
       - Svc=/svc,service-1
     filters:
       - AuthApi
+
+management.endpoints:
+  web.exposure.include: metrics
+  health.show-details: always

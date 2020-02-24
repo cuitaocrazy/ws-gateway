@@ -1,3 +1,9 @@
 server.error.includeStacktrace: NEVER
 
 jwt.secret: yadajwt
+
+spring:
+  cloud:
+    gateway:
+      metrics:
+        enabled: true

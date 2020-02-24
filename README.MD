@@ -131,7 +131,7 @@ op的种类:`READ` `CREATE` `UPDATE` `DELETE`
 
 op和http method的映射:
 
-```kotlin
+```text
 HttpMethod.GET -> Operator.READ
 HttpMethod.OPTIONS -> Operator.READ
 HttpMethod.TRACE -> Operator.READ
@@ -260,7 +260,11 @@ url: http://localhost:3011
 
 配置文件在`gw/src/main/resources/application-dev.yaml`
 
-已经配置好了app,svc的测试
+已经配置好了app,svc的测试,地址分别是:
+
+http://localhost:8080/app/app-1
+
+http://localhost:8080/svc/service-1
 
 启动这个配置需要环境变量`spring.profiles.active=dev`, 详情查阅spring和idea的相关配置
 

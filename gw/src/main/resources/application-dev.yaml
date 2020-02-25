@@ -25,3 +25,4 @@ spring.cloud.gateway.routes:
 management.endpoints:
   web.exposure.include: metrics
   health.show-details: always
+

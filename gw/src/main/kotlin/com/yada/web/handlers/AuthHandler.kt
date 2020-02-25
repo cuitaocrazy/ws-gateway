@@ -3,6 +3,7 @@ package com.yada.web.handlers
 import com.yada.JwtTokenUtil
 import com.yada.authInfo
 import com.yada.services.IAuthenticationService
+import com.yada.services.IRecaptchaService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
@@ -17,7 +18,7 @@ import reactor.core.publisher.Mono
 import java.net.URI
 
 @Component
-class AuthHandler @Autowired constructor(private val jwtUtil: JwtTokenUtil, private val authService: IAuthenticationService) {
+class AuthHandler @Autowired constructor(private val jwtUtil: JwtTokenUtil, private val authService: IAuthenticationService, private val recaptchaService: IRecaptchaService) {
     private val formBeanName = "loginForm"
 
     @Suppress("UNUSED_PARAMETER")
@@ -25,25 +26,39 @@ class AuthHandler @Autowired constructor(private val jwtUtil: JwtTokenUtil, priv
             ServerResponse.ok().render("/auth/index", mapOf(formBeanName to LoginData("", "")))
 
     fun login(req: ServerRequest): Mono<ServerResponse> = req.formData()
-            .flatMap {
+            .flatMap { it ->
                 val redirect = req.queryParam("redirect")
                 val map = it.toSingleValueMap()
                 val form = LoginData(map["username"], map["password"])
+                val recaptchaResponse = map["g-recaptcha-response"]
 
                 val bindingResult = BeanPropertyBindingResult(form, formBeanName)
                 ValidationUtils.rejectIfEmptyOrWhitespace(bindingResult, "username", "field.required")
                 ValidationUtils.rejectIfEmptyOrWhitespace(bindingResult, "password", "field.required")
                 val model = mapOf(BindingResult.MODEL_KEY_PREFIX + bindingResult.objectName to bindingResult, formBeanName to form)
 
+                if (recaptchaResponse == null || recaptchaResponse == "") {
+                    bindingResult.reject("login.must.recaptcha")
+                }
+
                 if (bindingResult.hasErrors()) {
                     ServerResponse.ok().render("/auth/index", model)
                 } else {
-                    authService.login(form.username!!, form.password!!).flatMap { authInfo ->
+                    val loginP = authService.login(form.username!!, form.password!!).flatMap { authInfo ->
                         ServerResponse.seeOther(URI(redirect.orElse("/"))).cookie(jwtUtil.generateCookie(authInfo)).build()
-                    }.switchIfEmpty(kotlin.run {
+                    }.switchIfEmpty(Mono.defer {
                         bindingResult.reject("login.fail")
                         ServerResponse.ok().render("/auth/index", model)
                     })
+
+                    recaptchaService.check(recaptchaResponse!!).flatMap { passed ->
+                        if (!passed) {
+                            bindingResult.reject("login.fail.recaptcha")
+                            ServerResponse.ok().render("/auth/index", model)
+                        } else {
+                            loginP
+                        }
+                    }
                 }
             }
 

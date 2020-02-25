@@ -34,6 +34,7 @@ open class AuthRouterConfig @Autowired constructor(private val authHandler: Auth
             GET("/logout", authHandler::logout)
             POST("/change_pwd", authHandler::changePwd)
             GET("/refresh_token", authHandler::refreshToken)
+            GET("/filter_apis", authHandler::filterApis)
             filter { request, next -> authApiFilter.filter(request, next) }
         }
     }

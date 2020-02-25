@@ -9,6 +9,7 @@ import org.springframework.http.ResponseCookie
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.server.ServerWebExchange
+import org.springframework.web.util.pattern.PathPatternParser
 import java.time.Duration
 import java.util.*
 import kotlin.properties.ReadOnlyProperty
@@ -105,3 +106,5 @@ val ServerRequest.token: String?
 
 val ServerWebExchange.token: String?
     get() = this.request.cookies["token"]?.run { this[0]?.value }
+
+val pathPatternParser = PathPatternParser()

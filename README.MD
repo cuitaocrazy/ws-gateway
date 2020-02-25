@@ -42,6 +42,31 @@
 
 
 
+app所要使用的api列表可以通过`http://{hostname}:{port}/filter_apis`以获取当前用户可访问的api列表
+
+请求方法`GET`, `conten-type: application/json`
+
+body例子:
+
+```json
+[
+  {
+    "uri": "/service-1/res1",
+    "ops": ["READ", "WRITE"]
+  },
+	{
+    "uri": "/service-1/res2",
+    "ops": ["READ"]
+  }
+]
+```
+
+返回body和请求body一样
+
+**注意: uri是/{serviceId}/{resPath}的组合, 不包含前缀**
+
+
+
 ## 项目配置
 
 配置在`gw/src/main/resources/application.yaml`

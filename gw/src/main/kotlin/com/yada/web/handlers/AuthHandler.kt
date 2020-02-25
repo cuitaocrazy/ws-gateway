@@ -2,11 +2,12 @@ package com.yada.web.handlers
 
 import com.yada.JwtTokenUtil
 import com.yada.authInfo
+import com.yada.model.Res
 import com.yada.services.IAuthenticationService
+import com.yada.services.IAuthorizationService
 import com.yada.services.IRecaptchaService
 import org.springframework.beans.factory.BeanFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
@@ -24,6 +25,7 @@ import java.net.URI
 class AuthHandler @Autowired constructor(
         private val jwtUtil: JwtTokenUtil,
         private val authService: IAuthenticationService,
+        private val authorServer: IAuthorizationService,
         @Value("\${yada.recaptcha}") recaptchaName: String,
         beans: BeanFactory) {
     private val recaptchaService: IRecaptchaService = beans.getBean(recaptchaName) as IRecaptchaService
@@ -90,4 +92,10 @@ class AuthHandler @Autowired constructor(
     }
 
     fun refreshToken(req: ServerRequest): Mono<ServerResponse> = ServerResponse.ok().cookie(jwtUtil.renewCookie(req.authInfo)).build()
+
+    fun filterApis(req: ServerRequest): Mono<ServerResponse> = ServerResponse.ok().bodyValue(
+            req.bodyToMono<List<Res>>().flatMap {
+                authorServer.filterApis(it, req.authInfo.resList!!)
+            }
+    )
 }

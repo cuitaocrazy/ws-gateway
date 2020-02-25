@@ -3,6 +3,7 @@ package com.yada.gateways
 import com.yada.JwtTokenUtil
 import com.yada.model.Operator
 import com.yada.model.Res
+import com.yada.pathPatternParser
 import com.yada.token
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.gateway.filter.GatewayFilter
@@ -17,11 +18,8 @@ import org.springframework.stereotype.Component
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.server.ServerWebExchange
 import org.springframework.web.util.UriComponentsBuilder
-import org.springframework.web.util.pattern.PathPatternParser
 import reactor.core.publisher.Mono
 import java.util.function.Predicate
-
-private val pathPatternParser = PathPatternParser()
 
 @Component
 class AppRoutePredicateFactory : AbstractRoutePredicateFactory<AppRoutePredicateFactory.Config>(Config::class.java) {

@@ -1,15 +1,12 @@
 package com.yada
 
+
 import com.yada.model.Operator
 import com.yada.model.Res
 import com.yada.model.User
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.impl.DefaultClaims
 import java.security.Principal
-
-
-import kotlin.reflect.*
-import kotlin.reflect.full.*
 
 class AuthInfo(private val claims: Claims) : Claims by claims, Principal {
     companion object {

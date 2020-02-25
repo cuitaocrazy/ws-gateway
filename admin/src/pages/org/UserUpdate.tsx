@@ -1,17 +1,17 @@
 import React from 'react';
 import { Dispatch } from 'redux';
 import { connect } from 'dva';
-import { Card, Form, Input, TreeSelect } from 'antd';
+import { Card, Form, Input, TreeSelect, Checkbox } from 'antd';
 import { FormComponentProps } from 'antd/es/form';
 import { TreeNode } from 'antd/es/tree-select';
-import { OrgTreeData, UserData } from './data';
+import { OrgTreeData, UserData, RoleData } from './data';
 import { ModelState } from './model';
-import RoleField from './RoleField';
 
 interface UserUpdateProps extends FormComponentProps {
   dispatch: Dispatch<any>;
   info: Partial<UserData>;
   orgTree: OrgTreeData[];
+  roles: RoleData[];
 }
 
 const formItemLayout = {
@@ -28,7 +28,11 @@ const formItemLayout = {
 };
 
 const UserForm: React.SFC<UserUpdateProps> = props => {
-  const { dispatch, info, orgTree, form, form: { getFieldDecorator } } = props;
+  const { dispatch, info, orgTree, roles, form, form: { getFieldDecorator } } = props;
+
+  React.useEffect(() => {
+    dispatch({ type: 'org/fetchRoles' });
+  }, [info]);
 
   const makeTree = (orgTree: OrgTreeData[]): TreeNode[] => orgTree.map(orgTree => ({
     value: orgTree.org.id,
@@ -89,7 +93,9 @@ const UserForm: React.SFC<UserUpdateProps> = props => {
         <Form.Item {...formItemLayout} label="角色">
           {getFieldDecorator('roles', {
             initialValue: info.roles,
-          })(<RoleField />)}
+          })(
+            <Checkbox.Group options={roles.map(role => role.id)} />
+          )}
         </Form.Item>
       </Form>
     </Card>
@@ -105,6 +111,7 @@ export default connect(
     loading: { models: { [key: string]: boolean } };
   }) => ({
     orgTree: org.orgTree,
+    roles: org.roles,
     loading: loading.models.org,
   }),
 )(Form.create<UserUpdateProps>()(UserForm));

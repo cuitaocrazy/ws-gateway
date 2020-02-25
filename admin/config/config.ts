@@ -120,6 +120,12 @@ export default {
               component: './app',
             },
             {
+              name: 'role',
+              icon: 'appstore',
+              path: '/role',
+              component: './role',
+            },
+            {
               name: 'org',
               icon: 'user',
               path: '/org',

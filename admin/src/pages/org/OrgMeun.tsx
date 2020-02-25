@@ -2,7 +2,7 @@ import React from 'react';
 import { Dispatch } from 'redux';
 import { Dropdown, Menu } from 'antd';
 import { connect } from 'dva';
-import { OrgTreeData, OrgData, UserData } from './data';
+import { OrgTreeData, OrgData, RoleData, UserData } from './data';
 import { ModelState } from './model';
 import OrgForm from './OrgForm';
 import UserForm from './UserForm';
@@ -10,11 +10,12 @@ import UserForm from './UserForm';
 interface TreeMenuProps {
   dispatch: Dispatch<any>;
   orgTree: OrgTreeData[];
+  roles: RoleData[];
   node: OrgTreeData;
 }
 
 const TreeMenu: React.FC<TreeMenuProps> = props => {
-  const { dispatch, orgTree, node } = props;
+  const { dispatch, orgTree, roles, node } = props;
 
   const [isCreateOrg, setIsCreateOrg] = React.useState<boolean>(false);
   const [isUpdateOrg, setIsUpdateOrg] = React.useState<boolean>(false);
@@ -87,7 +88,7 @@ const TreeMenu: React.FC<TreeMenuProps> = props => {
           <OrgForm title="添加机构" visible={isCreateOrg} onCancel={() => setIsCreateOrg(false)}
             info={node.org} onSubmit={handleCreateOrg} />
           <UserForm title="添加用户" visible={isCreateUser} onCancel={() => setIsCreateUser(false)}
-            orgTree={orgTree} info={{ orgId: node.org.id, roles: [] }} onSubmit={handleCreateUser} />
+            orgTree={orgTree} roles={roles} info={{ orgId: node.org.id, roles: [] }} onSubmit={handleCreateUser} />
         </div>
       </span>
     </Dropdown>
@@ -103,6 +104,7 @@ export default connect(
     loading: { models: { [key: string]: boolean } };
   }) => ({
     orgTree: org.orgTree,
+    roles: org.roles,
     loading: loading.models.org,
   }),
 )(TreeMenu);

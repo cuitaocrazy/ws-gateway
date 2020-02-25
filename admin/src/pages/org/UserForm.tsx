@@ -1,8 +1,8 @@
 import React from 'react';
-import { Modal, Form, Input, TreeSelect } from 'antd';
+import { Modal, Form, Input, TreeSelect, Checkbox } from 'antd';
 import { FormComponentProps } from 'antd/es/form';
 import { TreeNode } from 'antd/es/tree-select';
-import { OrgTreeData, UserData } from './data';
+import { OrgTreeData, RoleData, UserData } from './data';
 import { existUserId } from './service';
 
 interface UserFormProps extends FormComponentProps {
@@ -12,6 +12,7 @@ interface UserFormProps extends FormComponentProps {
   onSubmit(value: UserData): void;
   info: Partial<UserData>;
   orgTree: OrgTreeData[];
+  roles: RoleData[];
 }
 
 const formItemLayout = {
@@ -29,7 +30,7 @@ const formItemLayout = {
 const UserForm: React.SFC<UserFormProps> = props => {
   const {
     title, visible, onCancel, onSubmit,
-    info, orgTree, form, form: { getFieldDecorator }
+    info, orgTree, roles, form, form: { getFieldDecorator }
   } = props;
 
   const makeTree = (orgTree: OrgTreeData[]): TreeNode[] => orgTree.map(orgTree => ({
@@ -98,6 +99,13 @@ const UserForm: React.SFC<UserFormProps> = props => {
               treeDefaultExpandAll
               treeData={makeTree(orgTree)}
             />
+          )}
+        </Form.Item>
+        <Form.Item {...formItemLayout} label="角色">
+          {getFieldDecorator('roles', {
+            initialValue: info.roles,
+          })(
+            <Checkbox.Group options={roles.map(role => role.id)} />
           )}
         </Form.Item>
       </Form>

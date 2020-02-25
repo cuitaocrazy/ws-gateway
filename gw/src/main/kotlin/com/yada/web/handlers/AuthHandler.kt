@@ -38,7 +38,7 @@ class AuthHandler @Autowired constructor(
                 val redirect = req.queryParam("redirect")
                 val map = it.toSingleValueMap()
                 val form = LoginData(map["username"], map["password"])
-                val recaptchaResponse = map["g-recaptcha-response"]
+                val recaptchaResponse = recaptchaService.getCode(map)
 
                 val bindingResult = BeanPropertyBindingResult(form, formBeanName)
                 ValidationUtils.rejectIfEmptyOrWhitespace(bindingResult, "username", "field.required")

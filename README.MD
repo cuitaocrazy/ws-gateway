@@ -56,7 +56,7 @@ jwt签名密钥
 
 
 
-### 验证服务
+### 验证码服务
 
 key: `yada.recaptcha`
 

@@ -53,20 +53,7 @@ const userData: UserData[] = [
     id: "admin",
     pwd: "123456",
     orgId: "00",
-    roles: [
-      {
-        appId: "app-1",
-        roleName: "admin",
-      },
-      {
-        appId: "app-1",
-        roleName: "user",
-      },
-      {
-        appId: "app-2",
-        roleName: "admin",
-      }
-    ],
+    roles: ["admin", "user"],
   }
 ]
 

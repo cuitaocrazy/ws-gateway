@@ -1,8 +1,3 @@
-export interface RoleIdData {
-  appId: string;
-  roleName: string;
-}
-
 export interface OrgData {
   id: string;
   name: string;
@@ -17,16 +12,11 @@ export interface UserData {
   id: string;
   pwd: string;
   orgId: string;
-  roles: RoleIdData[];
+  roles: string[];
 }
 
 export interface RoleData {
-  name: string;
-}
-
-export interface AppData {
   id: string;
-  roles: RoleData[];
 }
 
 export interface KeyData {

@@ -22,6 +22,7 @@ const OrgView: React.FC<OrgProps> = props => {
 
   React.useEffect(() => {
     dispatch({ type: 'org/fetchOrgTree' });
+    dispatch({ type: 'org/fetchRoles' });
   }, []);
 
   const onTreeSelect = (selectedKeys: string[]) => {

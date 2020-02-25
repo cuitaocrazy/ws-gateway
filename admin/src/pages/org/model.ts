@@ -1,12 +1,12 @@
 import { Effect } from 'dva';
 import { Reducer } from 'redux';
-import { OrgTreeData, UserData, AppData, KeyData } from './data';
-import { getOrgTree, getUserByOrgId, getApps, createAndUpdataOrg, deleteOrg, createAndUpdataUser, deleteUser } from './service';
+import { OrgTreeData, UserData, RoleData, KeyData } from './data';
+import { getOrgTree, getUserByOrgId, getRoles, createAndUpdataOrg, deleteOrg, createAndUpdataUser, deleteUser } from './service';
 
 export interface ModelState {
   orgTree: OrgTreeData[];
   users: UserData[];
-  apps: AppData[];
+  roles: RoleData[];
   keys: KeyData[];
   orgId: string;
 }
@@ -17,7 +17,7 @@ export interface ModelType {
   effects: {
     fetchOrgTree: Effect;
     fetchUserByOrgId: Effect;
-    fetchApps: Effect;
+    fetchRoles: Effect;
     fetchCreateOrUpdateOrg: Effect;
     fetchDeleteOrg: Effect;
     fetchCreateOrUpdateUser: Effect;
@@ -26,7 +26,7 @@ export interface ModelType {
   reducers: {
     setOrgTree: Reducer<ModelState>;
     setUsers: Reducer<ModelState>;
-    setApps: Reducer<ModelState>;
+    setRoles: Reducer<ModelState>;
     setKeys: Reducer<ModelState>;
     setOrgId: Reducer<ModelState>;
   };
@@ -35,7 +35,7 @@ export interface ModelType {
 const defaulState: ModelState = {
   orgTree: [],
   users: [],
-  apps: [],
+  roles: [],
   keys: [],
   orgId: "",
 }
@@ -60,10 +60,10 @@ const Model: ModelType = {
       });
       if (callback) callback(users);
     },
-    *fetchApps({ callback }, { call, put }) {
-      const apps = yield call(getApps);
-      yield put({ type: 'setApps', payload: apps || [] });
-      if (callback) callback(apps || []);
+    *fetchRoles({ callback }, { call, put }) {
+      const roles = yield call(getRoles);
+      yield put({ type: 'setRoles', payload: roles || [] });
+      if (callback) callback(roles || []);
     },
     *fetchCreateOrUpdateOrg({ callback, payload }, { call, put }) {
       yield call(createAndUpdataOrg, payload)
@@ -110,10 +110,10 @@ const Model: ModelType = {
         users: payload,
       };
     },
-    setApps(state = defaulState, { payload }) {
+    setRoles(state = defaulState, { payload }) {
       return {
         ...state,
-        apps: payload,
+        roles: payload,
       };
     },
     setKeys(state = defaulState, { payload }) {

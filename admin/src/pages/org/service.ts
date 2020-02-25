@@ -9,8 +9,8 @@ export async function getUserByOrgId(orgId: string) {
   return request(`/admin/apis/user?org_id=${encodeURIComponent(orgId)}`);
 }
 
-export async function getApps() {
-  return request('/admin/apis/app');
+export async function getRoles() {
+  return request('/admin/apis/role');
 }
 
 export async function existOrgId(orgId: string) {

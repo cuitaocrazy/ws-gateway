@@ -52,6 +52,23 @@
 
 jwt签名密钥
 
+必须配置
+
+
+
+### 验证服务
+
+key: `yada.recaptcha`
+
+values:
+
+1. `recaptcha.Google`: 直接访问google
+2. `recaptcha.GoogleCN`: 访问recaptcha.net跳转
+3. `recaptcha.None`: 不验证
+4. 以后会实现本地验证码服务
+
+必须配置
+
 
 
 ### MongoDb

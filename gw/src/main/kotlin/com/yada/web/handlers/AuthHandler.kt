@@ -4,7 +4,10 @@ import com.yada.JwtTokenUtil
 import com.yada.authInfo
 import com.yada.services.IAuthenticationService
 import com.yada.services.IRecaptchaService
+import org.springframework.beans.factory.BeanFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.validation.BeanPropertyBindingResult
@@ -18,7 +21,12 @@ import reactor.core.publisher.Mono
 import java.net.URI
 
 @Component
-class AuthHandler @Autowired constructor(private val jwtUtil: JwtTokenUtil, private val authService: IAuthenticationService, private val recaptchaService: IRecaptchaService) {
+class AuthHandler @Autowired constructor(
+        private val jwtUtil: JwtTokenUtil,
+        private val authService: IAuthenticationService,
+        @Value("\${yada.recaptcha}") recaptchaName: String,
+        beans: BeanFactory) {
+    private val recaptchaService: IRecaptchaService = beans.getBean(recaptchaName) as IRecaptchaService
     private val formBeanName = "loginForm"
 
     @Suppress("UNUSED_PARAMETER")

@@ -112,7 +112,7 @@
             });
         });
     </script>
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script th:if="${@environment.getProperty('yada.recaptcha') == 'recaptcha.GoogleCN' || @environment.getProperty('yada.recaptcha') == 'recaptcha.Google'}" src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body>
 <form id="loginForm" method="post" class="wrap" th:object="${loginForm}">
@@ -127,7 +127,7 @@
             <input type="password" id="password" th:field="*{password}" class="form-input" placeholder="请输入密码">
             <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
         </div>
-        <div class="g-recaptcha" data-sitekey="6Leu2NsUAAAAAFttLaiyEKDu9yLgrYJhN77Ou1ge"></div>
+        <div th:if="${@environment.getProperty('yada.recaptcha') == 'recaptcha.GoogleCN' || @environment.getProperty('yada.recaptcha') == 'recaptcha.Google'}" class="g-recaptcha" data-sitekey="6Leu2NsUAAAAAFttLaiyEKDu9yLgrYJhN77Ou1ge"></div>
         <div class="login-btn">
             <input type="submit" class="form-input form-btn" th:value="#{login.submit}">
         </div>

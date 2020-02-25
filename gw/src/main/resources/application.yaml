@@ -2,6 +2,8 @@ server.error.includeStacktrace: NEVER
 
 jwt.secret: yadajwt
 
+yada:
+  recaptcha: recaptcha.GoogleCN
 spring:
   cloud:
     gateway:

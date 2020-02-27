@@ -1,6 +1,7 @@
 import { parse } from 'querystring';
 import pathRegexp from 'path-to-regexp';
 import { Route } from '@/models/connect';
+import jwt_decode from 'jwt-decode';
 
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
 const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
@@ -61,7 +62,6 @@ export const getRouteAuthority = (path: string, routeData: Route[]) => {
 };
 
 export const getCookie = (cname: string) => {
-  // TODO 判断token是不是admin
   var name = cname + "=";
   var ca = document.cookie.split(';');
   for (var i = 0; i < ca.length; i++) {
@@ -74,4 +74,18 @@ export const getCookie = (cname: string) => {
     }
   }
   return undefined;
+}
+
+export const isAdmin = () => {
+  const value = "; " + document.cookie;
+  const tokens: string[] = value.split("; token=");
+  tokens.shift();
+  return tokens.filter(token => {
+    if (token && token !== "") {
+      const decoded: any = jwt_decode(token);
+      return decoded.isAdmin;
+    } else {
+      return false;
+    }
+  }).length > 0;
 }

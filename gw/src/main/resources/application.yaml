@@ -3,9 +3,7 @@ server.error.includeStacktrace: NEVER
 jwt.secret: yadajwt
 
 yada:
-  recaptcha: recaptcha.GoogleCN
-  admin:
-    ipWhitelist: /127.0.0.1,/0:0:0:0:0:0:0:1
+  recaptcha: recaptcha.None
 spring:
   cloud:
     gateway:

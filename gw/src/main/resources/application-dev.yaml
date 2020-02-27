@@ -26,3 +26,8 @@ management.endpoints:
   web.exposure.include: metrics
   health.show-details: always
 
+yada:
+  recaptcha: recaptcha.GoogleCN
+  admin:
+    ipWhitelist:
+

@@ -73,9 +73,9 @@ body例子:
 
 主要配置说明:
 
-### `jwt.secret`
+### jwt签名密钥
 
-jwt签名密钥
+key: `jwt.secret`
 
 必须配置
 
@@ -91,6 +91,20 @@ values:
 2. `recaptcha.GoogleCN`: 访问recaptcha.net跳转
 3. `recaptcha.None`: 不验证
 4. 以后会实现本地验证码服务
+
+必须配置
+
+
+
+### admin webapp访问白名单
+
+允许访问管理页面的ip, 不再白名单列表的ip都会返回404
+
+key: `yada.admin.ipWhitelist`
+
+value: {ip},{ip}...{ip}
+
+当value空值是, 白名单列表是0个, 那么任何ip都可访问
 
 必须配置
 

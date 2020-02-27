@@ -104,9 +104,15 @@ key: `yada.admin.ipWhitelist`
 
 value: {ip},{ip}...{ip}
 
+例子:
+
+```yaml
+yada.admin.ipWhitelist: 127.0.0.1,/0:0:0:0:0:0:0:1
+```
+
 当value空值是, 白名单列表是0个, 那么任何ip都可访问
 
-必须配置
+默认为空
 
 
 

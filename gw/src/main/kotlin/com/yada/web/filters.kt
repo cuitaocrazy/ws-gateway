@@ -73,7 +73,7 @@ class AuthAdminApiHandlerFilter @Autowired constructor(jwtUtil: JwtTokenUtil) : 
 }
 
 @Component
-class WhitelistHandlerFilter @Autowired constructor(@Value("\${yada.admin.ipWhitelist}") private val whitelist: List<String>) : Filter {
+class WhitelistHandlerFilter @Autowired constructor(@Value("\${yada.admin.ipWhitelist:}") private val whitelist: List<String>) : Filter {
     override fun invoke(request: ServerRequest, next: Next): Mono<ServerResponse> =
             if (whitelist.isNotEmpty() && request.remoteAddress().isPresent && request.remoteAddress().get().address.toString() !in whitelist) {
                 Mono.error(ResponseStatusException(HttpStatus.NOT_FOUND))

@@ -4,8 +4,6 @@ jwt.secret: yadajwt
 
 yada:
   recaptcha: recaptcha.None
-  admin:
-    ipWhitelist: 127.0.0.1,/0:0:0:0:0:0:0:1
 spring:
   cloud:
     gateway:

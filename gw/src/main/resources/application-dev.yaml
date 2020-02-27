@@ -28,6 +28,5 @@ management.endpoints:
 
 yada:
   recaptcha: recaptcha.GoogleCN
-  admin:
-    ipWhitelist:
+
 

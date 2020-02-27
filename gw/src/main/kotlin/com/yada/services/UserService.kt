@@ -14,6 +14,7 @@ interface IUserService {
     fun getByOrgId(orgId: String): Flux<User>
     fun createOrUpdate(user: User): Mono<User>
     fun delete(id: String): Mono<Void>
+    fun deleteByOrgId(orgId: String): Mono<Void>
     fun exist(id: String): Mono<Boolean>
     fun getPwd(id: String): Mono<String>
     fun changePwd(id: String, pwd: String): Mono<Void>
@@ -32,6 +33,9 @@ open class UserService @Autowired constructor(private val userRepo: UserReposito
 
     @Transactional
     override fun delete(id: String): Mono<Void> = userRepo.deleteById(id)
+
+    @Transactional
+    override fun deleteByOrgId(orgId: String): Mono<Void> = userRepo.deleteByOrgId(orgId)
 
     override fun exist(id: String): Mono<Boolean> = userRepo.existsById(id)
 

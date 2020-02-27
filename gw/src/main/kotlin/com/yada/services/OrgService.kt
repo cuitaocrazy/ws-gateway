@@ -36,7 +36,7 @@ private fun makeTree(orgs: List<Org>): List<OrgTree> {
 }
 
 @Service
-open class OrgService @Autowired constructor(private val repo: OrgRepository) : IOrgService {
+open class OrgService @Autowired constructor(private val repo: OrgRepository, private val userSvc: IUserService) : IOrgService {
     override fun getTree(orgIdPrefix: String?): Flux<OrgTree> =
             repo.findByIdStartingWithOrderByIdAsc(orgIdPrefix ?: "")//("^${orgIdPrefix ?: ""}.*")
                     .collectList()
@@ -47,7 +47,7 @@ open class OrgService @Autowired constructor(private val repo: OrgRepository) : 
     override fun createOrUpdate(org: Org): Mono<Org> = repo.save(org)
 
     @Transactional
-    override fun delete(id: String): Mono<Void> = repo.deleteById(id)
+    override fun delete(id: String): Mono<Void> = userSvc.deleteByOrgId(id).then(repo.deleteById(id))
 
     override fun get(id: String): Mono<Org> = repo.findById(id)
 

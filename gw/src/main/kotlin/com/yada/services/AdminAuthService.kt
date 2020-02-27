@@ -34,13 +34,13 @@ class AdminAuthService @Autowired constructor(private val adminUserRepo: IAdminU
 
     override fun authorize(token: String, uri: String, opt: Operator): Mono<Boolean> = Mono.just(jwtUtil.getEntity(token) != null)
 
-    override fun changePassword(username: String, oldPassword: String, newPassword: String): Mono<Boolean> = if (username == "admin") {
-        val newPwdDigest = pwdDigestService.getPwdDigest("admin", newPassword)
-        val oldPwdDigest = pwdDigestService.getPwdDigest("admin", oldPassword)
+    override fun changePassword(username: String, oldPassword: String, newPassword: String): Mono<Boolean> = if (username == adminStr) {
+        val newPwdDigest = pwdDigestService.getPwdDigest(adminStr, newPassword)
+        val oldPwdDigest = pwdDigestService.getPwdDigest(adminStr, oldPassword)
 
         adminUserRepo.getAdminUser()
                 .map { it.pwd == oldPwdDigest }
-                .defaultIfEmpty(pwdDigestService.getDefaultPwdDigest("admin") == oldPwdDigest)
+                .defaultIfEmpty(pwdDigestService.getDefaultPwdDigest(adminStr) == oldPwdDigest)
                 .filter { it }
                 .flatMap { adminUserRepo.changePwd(newPwdDigest).then(Mono.just(true)) }
                 .defaultIfEmpty(false)

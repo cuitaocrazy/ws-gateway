@@ -90,7 +90,6 @@ values:
 1. `recaptcha.Google`: 直接访问google
 2. `recaptcha.GoogleCN`: 访问recaptcha.net跳转
 3. `recaptcha.None`: 不验证
-4. 以后会实现本地验证码服务
 
 必须配置
 
@@ -109,6 +108,8 @@ value: {ip},{ip}...{ip}
 ```yaml
 yada.admin.ipWhitelist: 127.0.0.1,/0:0:0:0:0:0:0:1
 ```
+
+*`/0:0:0:0:0:0:0:1`不知道为什么address.toString()的ipv6前面会加个`/`*
 
 当value空值是, 白名单列表是0个, 那么任何ip都可访问
 

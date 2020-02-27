@@ -7,6 +7,7 @@ import com.yada.pathPatternParser
 import com.yada.token
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.gateway.filter.GatewayFilter
+import org.springframework.cloud.gateway.filter.GatewayFilterChain
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory
 import org.springframework.cloud.gateway.handler.predicate.AbstractRoutePredicateFactory
 import org.springframework.cloud.gateway.handler.predicate.GatewayPredicate
@@ -30,12 +31,18 @@ class AppRoutePredicateFactory : AbstractRoutePredicateFactory<AppRoutePredicate
         val pathPrefix = config.path
         val pathPattern = pathPatternParser.parse("$pathPrefix/**")
 
-        return GatewayPredicate {
-            val path = PathContainer.parsePath(it.request.uri.rawPath)
-            if (pathPattern.matches(path)) {
-                it.attributes["index"] = pathPrefix
-                true
-            } else false
+        return object : GatewayPredicate {
+            override fun test(exchange: ServerWebExchange): Boolean {
+                val path = PathContainer.parsePath(exchange.request.uri.rawPath)
+                return if (pathPattern.matches(path)) {
+                    exchange.attributes["index"] = pathPrefix
+                    true
+                } else false
+            }
+
+            override fun toString(): String {
+                return "App: path=${config.path}"
+            }
         }
     }
 
@@ -52,29 +59,34 @@ class AuthGatewayFilterFactory @Autowired constructor(private val jwtTokenUtil: 
      * 一个配置可能出现两次初始化，是两个线程同时执行的，可能是spring的问题，因此在这个函数里不能做副作用操作，以免出现不可预测的错误
      */
     override fun apply(config: Config): GatewayFilter {
-        return GatewayFilter { exchange, chain ->
-            val authInfo = exchange.token?.run {
-                jwtTokenUtil.getEntity(this)
-            }
-
-            if ((exchange.request.uri.path == exchange.attributes["index"] || exchange.request.uri.path == (exchange.attributes["index"] as String + "/")) && !exchange.response.isCommitted) {
-                if (authInfo == null) {
-                    val res = exchange.response
-                    res.statusCode = HttpStatus.SEE_OTHER
-                    res.headers.set(HttpHeaders.LOCATION, getLoginPath(exchange))
-                    exchange.response.setComplete()
-                } else {
-                    val req = exchange.request.mutate()
-                            .header("X-YADA-ORG-ID", authInfo.user?.orgId)
-                            .header("X-YADA-USER-ID", authInfo.user?.id)
-                            .header("COOKIE", null)
-                            .build()
-                    chain.filter(exchange.mutate().request(req).build())
+        return object : GatewayFilter {
+            override fun filter(exchange: ServerWebExchange, chain: GatewayFilterChain): Mono<Void> {
+                val authInfo = exchange.token?.run {
+                    jwtTokenUtil.getEntity(this)
                 }
-            } else {
-                if (exchange.response.isCommitted) Mono.empty() else chain.filter(exchange)
+
+                return if ((exchange.request.uri.path == exchange.attributes["index"] || exchange.request.uri.path == (exchange.attributes["index"] as String + "/")) && !exchange.response.isCommitted) {
+                    if (authInfo == null) {
+                        val res = exchange.response
+                        res.statusCode = HttpStatus.SEE_OTHER
+                        res.headers.set(HttpHeaders.LOCATION, getLoginPath(exchange))
+                        exchange.response.setComplete()
+                    } else {
+                        val req = exchange.request.mutate()
+                                .header("X-YADA-ORG-ID", authInfo.user?.orgId)
+                                .header("X-YADA-USER-ID", authInfo.user?.id)
+                                .header("COOKIE", null)
+                                .build()
+                        chain.filter(exchange.mutate().request(req).build())
+                    }
+                } else {
+                    if (exchange.response.isCommitted) Mono.empty() else chain.filter(exchange)
+                }
             }
 
+            override fun toString(): String {
+                return "Auth"
+            }
         }
     }
 
@@ -91,13 +103,19 @@ class SvcRoutePredicateFactory : AbstractRoutePredicateFactory<SvcRoutePredicate
         val pathPrefix = UriComponentsBuilder.fromPath(config.pathPrefix).pathSegment(config.svcId).encode().build().toUriString()
         val pathPattern = pathPatternParser.parse("$pathPrefix/**")
 
-        return GatewayPredicate {
-            val path = PathContainer.parsePath(it.request.uri.rawPath)
-            if (pathPattern.matches(path)) {
-                it.attributes["pathPrefix"] = config.pathPrefix
-                it.attributes["svcId"] = config.svcId
-                true
-            } else false
+        return object : GatewayPredicate {
+            override fun test(exchange: ServerWebExchange): Boolean {
+                val path = PathContainer.parsePath(exchange.request.uri.rawPath)
+                return if (pathPattern.matches(path)) {
+                    exchange.attributes["pathPrefix"] = config.pathPrefix
+                    exchange.attributes["svcId"] = config.svcId
+                    true
+                } else false
+            }
+
+            override fun toString(): String {
+                return "Svc: pathPrefix=${config.pathPrefix}, svcId=${config.svcId}"
+            }
         }
     }
 
@@ -112,34 +130,39 @@ class AuthApiGatewayFilterFactory @Autowired constructor(private val jwtTokenUti
     : AbstractGatewayFilterFactory<AuthApiGatewayFilterFactory.Config>(Config::class.java) {
 
     override fun apply(config: Config): GatewayFilter {
-        return GatewayFilter { exchange, chain ->
-            val authInfo = exchange.token?.run {
-                jwtTokenUtil.getEntity(this)
-            }
-
-            if (!exchange.response.isCommitted) {
-                val op = convertOp(exchange.request.method!!)
-                val svcId = exchange.attributes["svcId"]!! as String
-                val pathPrefix = exchange.attributes["pathPrefix"]!! as String
-                val resListUri = UriComponentsBuilder.fromPath(pathPrefix).pathSegment(svcId).pathSegment("res_list").encode().build().toUriString()
-                val subUri = exchange.request.uri.path.removePrefix(pathPrefix)
-
-                if (exchange.request.uri.host == "localhost" && exchange.request.uri.path == resListUri) {
-                    chain.filter(exchange)
-                } else if (authInfo == null || !hasPower(authInfo.resList!!, op, subUri)) {
-                    Mono.error(ResponseStatusException(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED"))
-                } else {
-                    val req = exchange.request.mutate()
-                            .header("X-YADA-ORG-ID", authInfo.user?.orgId)
-                            .header("X-YADA-USER-ID", authInfo.user?.id)
-                            .header("COOKIE", null)
-                            .build()
-                    chain.filter(exchange.mutate().request(req).build())
+        return object : GatewayFilter {
+            override fun filter(exchange: ServerWebExchange, chain: GatewayFilterChain): Mono<Void> {
+                val authInfo = exchange.token?.run {
+                    jwtTokenUtil.getEntity(this)
                 }
-            } else {
-                Mono.empty()
+
+                return if (!exchange.response.isCommitted) {
+                    val op = convertOp(exchange.request.method!!)
+                    val svcId = exchange.attributes["svcId"]!! as String
+                    val pathPrefix = exchange.attributes["pathPrefix"]!! as String
+                    val resListUri = UriComponentsBuilder.fromPath(pathPrefix).pathSegment(svcId).pathSegment("res_list").encode().build().toUriString()
+                    val subUri = exchange.request.uri.path.removePrefix(pathPrefix)
+
+                    if (exchange.request.uri.host == "localhost" && exchange.request.uri.path == resListUri) {
+                        chain.filter(exchange)
+                    } else if (authInfo == null || !hasPower(authInfo.resList!!, op, subUri)) {
+                        Mono.error(ResponseStatusException(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED"))
+                    } else {
+                        val req = exchange.request.mutate()
+                                .header("X-YADA-ORG-ID", authInfo.user?.orgId)
+                                .header("X-YADA-USER-ID", authInfo.user?.id)
+                                .header("COOKIE", null)
+                                .build()
+                        chain.filter(exchange.mutate().request(req).build())
+                    }
+                } else {
+                    Mono.empty()
+                }
             }
 
+            override fun toString(): String {
+                return "AuthApi"
+            }
         }
     }
 

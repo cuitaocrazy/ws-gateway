@@ -61,6 +61,7 @@ export const getRouteAuthority = (path: string, routeData: Route[]) => {
 };
 
 export const getCookie = (cname: string) => {
+  // TODO 判断token是不是admin
   var name = cname + "=";
   var ca = document.cookie.split(';');
   for (var i = 0; i < ca.length; i++) {

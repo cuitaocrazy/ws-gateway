@@ -114,12 +114,6 @@ export default {
               component: './svc',
             },
             {
-              name: 'app',
-              icon: 'appstore',
-              path: '/app',
-              component: './app',
-            },
-            {
               name: 'role',
               icon: 'appstore',
               path: '/role',

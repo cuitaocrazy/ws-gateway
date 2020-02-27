@@ -79,7 +79,7 @@
         }
     </style>
     <script th:src="@{/js/jquery-3.1.1.js}"></script>
-    <script th:src="@{/static/js/jquery.validate-1.19.1.js}"></script>
+    <script th:src="@{/js/jquery.validate-1.19.1.js}"></script>
     <script>
         $(document).ready(function() {
             $("#loginForm").validate({
@@ -112,7 +112,8 @@
             });
         });
     </script>
-    <script th:if="${@environment.getProperty('yada.recaptcha') == 'recaptcha.GoogleCN' || @environment.getProperty('yada.recaptcha') == 'recaptcha.Google'}" src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script th:if="${@environment.getProperty('yada.recaptcha') == 'recaptcha.Google'}" src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script th:if="${@environment.getProperty('yada.recaptcha') == 'recaptcha.GoogleCN'}" src="https://recaptcha.net/recaptcha/api.js" async defer></script>
 </head>
 <body>
 <form id="loginForm" method="post" class="wrap" th:object="${loginForm}">

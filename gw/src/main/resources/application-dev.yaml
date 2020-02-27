@@ -21,9 +21,6 @@ spring.cloud.gateway.routes:
       - Svc=/svc,service-1
     filters:
       - AuthApi
-  - uri: http://localhost:3011
-    predicates:
-      - Path=/abc
 
 management.endpoints:
   web.exposure.include: metrics,gateway

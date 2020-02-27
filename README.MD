@@ -329,3 +329,17 @@ http://localhost:8080/svc/service-1
 
 启动这个配置需要环境变量`spring.profiles.active=dev`, 详情查阅spring和idea的相关配置
 
+
+
+## 关于动态路由
+
+本来想写个动态路由, 但是它在spring cloud gateway已经实现.
+
+[使用文档](https://cloud.spring.io/spring-cloud-gateway/multi/multi__actuator_api.html)
+
+这个api只有一个毛病: 当`GET`请求`/actuator/gateway/routes`时, 他现在返回的json并没有返回整个结构, 而是返回谓词和过滤器的toString()字符串.
+
+这个在`org.springframework.cloud.gateway.actuate.GatewayControllerEndpoint#routes`方法上已经标注`// TODO: Flush out routes without a definition`, 因此就等待他的这个接口完善后就可以完美实现动态路由.
+
+**注意: 在实验他的添加删除接口时, 别忘了调用下`POST` `/actuator/gateway/refresh`以刷新路由**
+

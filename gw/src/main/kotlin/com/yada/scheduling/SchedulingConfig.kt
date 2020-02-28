@@ -44,17 +44,16 @@ open class GwConfig @Autowired constructor(
     private val svcMap = mutableMapOf<String, String>()
 
     init {
-        val list = // org.springframework.boot.web.serve.AbstractConfigurableWebServerFactory默认端口：8080
-                properties.routes.mapNotNull { routeDefinition ->
-                    val appPredicate = routeDefinition.predicates.filter { it.name == "Svc" }.firstOrNull()
-                    if (appPredicate != null) {
-                        // org.springframework.boot.web.serve.AbstractConfigurableWebServerFactory默认端口：8080
-                        val port = env.getProperty("server.port") ?: "8080"
-                        val schema = if (env.getProperty("server.ssl.key-store") == null) "http" else "https"
-                        val config = configurationService.with(svcRoutePredicateFactory).name(appPredicate.name).properties(appPredicate.args).bind() as SvcRoutePredicateFactory.Config
-                        Pair(config.svcId, "$schema://localhost:$port" + UriComponentsBuilder.fromPath(config.pathPrefix).pathSegment(config.svcId).pathSegment("res_list").encode().build().toUriString())
-                    } else null
-                }
+        val list = properties.routes.mapNotNull { routeDefinition ->
+            val appPredicate = routeDefinition.predicates.filter { it.name == "Svc" }.firstOrNull()
+            if (appPredicate != null) {
+                // org.springframework.boot.web.serve.AbstractConfigurableWebServerFactory默认端口：8080
+                val port = env.getProperty("server.port") ?: "8080"
+                val schema = if (env.getProperty("server.ssl.key-store") == null) "http" else "https"
+                val config = configurationService.with(svcRoutePredicateFactory).name(appPredicate.name).properties(appPredicate.args).bind() as SvcRoutePredicateFactory.Config
+                Pair(config.svcId, "$schema://localhost:$port" + UriComponentsBuilder.fromPath(config.pathPrefix).pathSegment(config.svcId).pathSegment("res_list").encode().build().toUriString())
+            } else null
+        }
         list.forEach {
             svcMap[it.first] = it.second
         }

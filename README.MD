@@ -95,6 +95,26 @@ values:
 
 
 
+### 密码强度
+
+key: `yada.password.strength.score`
+
+values:
+
+1. `0` Weak
+2. `1` Fair
+3. `2` Good
+4. `3` Strong
+5. `4` Very strong
+
+默认值: `1`
+
+[使用库说明](https://github.com/nulab/zxcvbn4j)
+
+该Java库配合前台js库[dropbox](https://github.com/dropbox)/**[zxcvbn](https://github.com/dropbox/zxcvbn)**使用
+
+
+
 ### admin webapp访问白名单
 
 允许访问管理页面的ip, 不再白名单列表的ip都会返回404

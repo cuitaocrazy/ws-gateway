@@ -1,5 +1,6 @@
 package com.yada.web.handlers
 
+import com.nulabinc.zxcvbn.Zxcvbn
 import com.yada.JwtTokenUtil
 import com.yada.authInfo
 import com.yada.model.Res
@@ -27,9 +28,11 @@ class AuthHandler @Autowired constructor(
         private val authService: IAuthenticationService,
         private val authorServer: IAuthorizationService,
         @Value("\${yada.recaptcha}") recaptchaName: String,
+        @Value("\${yada.password.strength.score:1}") private val score: Int,
         beans: BeanFactory) {
     private val recaptchaService: IRecaptchaService = beans.getBean(recaptchaName) as IRecaptchaService
     private val formBeanName = "loginForm"
+    private val zxcvbn = Zxcvbn()
 
     @Suppress("UNUSED_PARAMETER")
     fun getLoginForm(req: ServerRequest): Mono<ServerResponse> =
@@ -50,46 +53,57 @@ class AuthHandler @Autowired constructor(
                 if (recaptchaResponse == null || recaptchaResponse == "") {
                     bindingResult.reject("login.must.recaptcha")
                 }
-
-                if (bindingResult.hasErrors()) {
-                    ServerResponse.ok().render("/auth/index", model)
-                } else {
-                    val loginP = authService.login(form.username!!, form.password!!).flatMap { authInfo ->
-                        ServerResponse.seeOther(URI(redirect.orElse("/"))).cookie(jwtUtil.generateCookie(authInfo)).build()
-                    }.switchIfEmpty(Mono.defer {
-                        bindingResult.reject("login.fail")
-                        ServerResponse.ok().render("/auth/index", model)
-                    })
-
-                    recaptchaService.check(recaptchaResponse!!).flatMap { passed ->
-                        if (!passed) {
-                            bindingResult.reject("login.fail.recaptcha")
-                            ServerResponse.ok().render("/auth/index", model)
-                        } else {
-                            loginP
+                Mono.just(!bindingResult.hasErrors()).filter { it }
+                        .flatMap {
+                            recaptchaService.check(recaptchaResponse!!)
+                                    .doOnSuccess {
+                                        if (!it) {
+                                            bindingResult.reject("login.fail.recaptcha")
+                                        }
+                                    }
                         }
-                    }
-                }
+                        .filter { it }
+                        .flatMap {
+                            authService.login(form.username!!, form.password!!).doOnEach {
+                                if (!it.hasValue()) {
+                                    bindingResult.reject("login.fail")
+                                }
+                            }
+                        }
+                        .flatMap { ServerResponse.seeOther(URI(redirect.orElse("/"))).cookie(jwtUtil.generateCookie(it)).build() }
+                        .switchIfEmpty(Mono.defer { ServerResponse.ok().render("/auth/index", model) })
             }
 
     fun logout(req: ServerRequest): Mono<ServerResponse> = ServerResponse.ok().cookie(jwtUtil.getEmptyCookie(req.authInfo)).build()
 
     data class ChangePwdData(val oldPwd: String?, val newPwd: String?)
 
-    fun changePwd(req: ServerRequest): Mono<ServerResponse> {
-        val dataMono: Mono<ChangePwdData> = req.bodyToMono()
-        return dataMono.flatMap { data ->
-            if (data.oldPwd != null && data.newPwd != null) {
-                val username = req.authInfo.username!!
-                authService.changePassword(username, data.oldPwd, data.newPwd)
-                        .filter { it }
-                        .switchIfEmpty(Mono.error(ResponseStatusException(HttpStatus.CONFLICT, "密码出错")))
-                        .then(ServerResponse.ok().build())
-            } else {
-                Mono.error(ResponseStatusException(HttpStatus.CONFLICT, "密码不能为空"))
-            }
-        }
-    }
+    fun changePwd(req: ServerRequest): Mono<ServerResponse> =
+            req.bodyToMono<ChangePwdData>()
+                    .filter {
+                        it.oldPwd != null && it.newPwd != null
+                    }
+                    .map {
+                        if (it.oldPwd != null && it.newPwd != null)
+                            throw ResponseStatusException(HttpStatus.CONFLICT, "密码不能为空")
+                        else
+                            object {
+                                val oldPwd = it.oldPwd!!
+                                val newPwd = it.newPwd!!
+                            }
+                    }
+                    .map {
+                        it.apply {
+                            if (zxcvbn.measure(newPwd).score < score) {
+                                throw ResponseStatusException(HttpStatus.CONFLICT, "密码强度需要${score}")
+                            }
+                        }
+                    }.flatMap { data ->
+                        authService.changePassword(req.authInfo.username!!, data.oldPwd, data.newPwd)
+                                .filter { it }
+                                .switchIfEmpty(Mono.error { ResponseStatusException(HttpStatus.CONFLICT, "修改密码时出错") })
+                                .then(ServerResponse.ok().build())
+                    }
 
     fun refreshToken(req: ServerRequest): Mono<ServerResponse> = ServerResponse.ok().cookie(jwtUtil.renewCookie(req.authInfo)).build()
 

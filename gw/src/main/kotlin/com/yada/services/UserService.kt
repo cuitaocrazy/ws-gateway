@@ -39,7 +39,7 @@ open class UserService @Autowired constructor(private val userRepo: UserReposito
 
     override fun exist(id: String): Mono<Boolean> = userRepo.existsById(id)
 
-    override fun getPwd(id: String): Mono<String> = userRepo.fundOnPwd(id).map { ObjectMapper().readTree(it)["pwd"]?.asText() }
+    override fun getPwd(id: String): Mono<String> = userRepo.findPwdById(id).map { ObjectMapper().readTree(it)["pwd"]?.asText() }
 
     @Transactional
     override fun changePwd(id: String, pwd: String): Mono<Void> = userRepo.changePwd(id, pwd)

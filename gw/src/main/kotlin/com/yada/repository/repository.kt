@@ -34,7 +34,7 @@ interface OrgRepository : ReactiveCrudRepository<Org, String> {
 interface UserRepository : IUserRepository, ReactiveCrudRepository<User, String> {
     fun findByOrgIdOrderByIdAsc(orgId: String): Flux<User>
     @Query("{'id': ?0}", fields = "{'pwd': 1, '_id': 0}")
-    fun fundOnPwd(id: String): Mono<String>
+    fun findPwdById(id: String): Mono<String>
 
     fun deleteByOrgId(orgId: String): Mono<Void>
 }

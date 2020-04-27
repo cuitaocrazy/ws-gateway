@@ -7,7 +7,10 @@
 
 网关的谓词和过滤器可以用spring cloud gateway自带的, 可根据需要在配置文件里配置,参考:[谓词](https://cloud.spring.io/spring-cloud-gateway/reference/html/#gateway-request-predicates-factories), [过滤器](https://cloud.spring.io/spring-cloud-gateway/reference/html/#gatewayfilter-factories)
 
+## 环境要求
 
+jdk 1.8
+mongodb 3.0+ 必须开启Replica Set已支持事务
 
 ## 用户管理
 
@@ -71,77 +74,21 @@ body例子:
 
 配置在`gw/src/main/resources/application.yaml`
 
-主要配置说明:
-
-### jwt签名密钥
-
-key: `jwt.secret`
-
-必须配置
+### 基本配置
 
 
-
-### 验证码服务
-
-key: `yada.recaptcha`
-
-values:
-
-1. `recaptcha.Google`: 直接访问google
-2. `recaptcha.GoogleCN`: 访问recaptcha.net跳转
-3. `recaptcha.None`: 不验证
-
-必须配置
-
-
-
-### 密码强度
-
-key: `yada.password.strength.score`
-
-values:
-
-1. `0` Weak
-2. `1` Fair
-3. `2` Good
-4. `3` Strong
-5. `4` Very strong
-
-默认值: `1`
-
-[使用库说明](https://github.com/nulab/zxcvbn4j)
-
-该Java库配合前台js库[dropbox](https://github.com/dropbox)/**[zxcvbn](https://github.com/dropbox/zxcvbn)**使用
-
-
-
-### admin webapp访问白名单
-
-允许访问管理页面的ip, 不再白名单列表的ip都会返回404
-
-key: `yada.admin.ipWhitelist`
-
-value: {ip},{ip}...{ip}
-
-例子:
-
-```yaml
-yada.admin.ipWhitelist: 127.0.0.1,0:0:0:0:0:0:0:1
-```
-
-当value空值是, 白名单列表是0个, 那么任何ip都可访问
-
-默认为空
-
-
-
-### MongoDb
-
-`yada.db.mongo.db`:数据库名称, 默认值:`yada_auth`
-
-`yada.db.mongo.url:mongodb`:数据库的url, 例如:`mongodb://localhost/?replicaSet=rs`
-
-因为这个项目中用到了mongodb的事务,因此MongoDb必须配置Replica Set
+| key                            | 说明                                                         | 类型                                                         | 条件([bcp 14](https://tools.ietf.org/html/bcp14)) | 默认值        | 例子                                                         |
+| ------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ---------------------------------------------- | ------------- | ------------------------------------------------------------ |
+| `jwt.secret`                   | wt签名密钥                                                   | String                                                       | May                                            | `yadajwt`     |                                                              |
+| `jwt.expire`                   | jwt时效                                                      | Long(秒)                                                     | May                                            | `3600`(1小时) |                                                              |
+| `yada.user.defaultPwd`         | 用户的默认密码                                               | String                                                       | May                                            | `changepwd`   |                                                              |
+| `yada.recaptcha`               | 验证码服务                                                   | 枚举类型:<br/>`recaptcha.Google`: 直接访问google人机验证<br/>`recaptcha.GoogleCN`: 中国区访问google人机验证<br/>`recaptcha.None`: 不验证 | Must                                           |               |                                                              |
+| `yada.password.strength.score` | 密码强度                                                     | 枚举类型:<br/>`0` :Weak<br/>`1` :Fair<br/>`2` :Good<br/>`3` :Strong<br/>`4` :Very strong | May                                            | 1             |                                                              |
+| `yada.admin.ipWhitelist`       | admin webapp访问白名单. 允许访问管理页面的ip, 不再白名单列表的ip都会返回404 | ipv4和ipv6列表,以逗号分隔                                    | May                                            | <空字符串>    | `127.0.0.1,0:0:0:0:0:0:0:1`                                  |
+| `yada.db.mongo.db`             | 数据库名称                                                   | 要复合mongodb数据库名的规范                                  | May                                            | `yada_auth`   |                                                              |
+| `yada.db.mongo.url`            | mongodb链接字符串                                            | mongodb必须带上Replica Set名称                               | Must                                           |               | `mongodb://localhost/?replicaSet=rs`                         |
+| `server.port`                  | 服务端口                                                     | 参照[iana](https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml) | May                                            | 8080          |                                                              |
+| `management.endpoints`         | Spring管理接口配置                                           |                                                              | May                                            |               | `management.endpoints.web.exposure.include: metrics,gateway`<br/>`management.endpoints.health.show-details: always` |
 
 
 

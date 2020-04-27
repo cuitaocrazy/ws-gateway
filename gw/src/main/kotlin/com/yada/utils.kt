@@ -47,7 +47,7 @@ class LoggerDelegate : ReadOnlyProperty<Any?, Logger> {
 /**
  * 参考：https://dzone.com/articles/spring-boot-security-json-web-tokenjwt-hello-world
  */
-private const val TOKEN_EXPIRE_INTERVAL: Long = 1 * 60 * 60 // 单位：秒
+//private const val TOKEN_EXPIRE_INTERVAL: Long = 1 * 60 * 60 // 单位：秒
 
 @Component
 class TimeUtil {
@@ -55,13 +55,13 @@ class TimeUtil {
 }
 
 @Component
-class JwtTokenUtil @Autowired constructor(private @Value("\${jwt.secret:yadajwt}") val secret: String, private val timeUtil: TimeUtil) {
-    private fun Date.getExpirationDate() = Date(this.time + TOKEN_EXPIRE_INTERVAL * 1000)
+class JwtTokenUtil @Autowired constructor(@Value("\${jwt.secret:yadajwt}") private val secret: String, @Value("\${jwt.expire:3600}") private val tokenExpireInterval: Long, private val timeUtil: TimeUtil) {
+    private fun Date.getExpirationDate() = Date(this.time + tokenExpireInterval * 1000)
     private fun JwtBuilder.generateToken() = this.signWith(SignatureAlgorithm.HS512, secret).compact()
     private val emptyCookie = ResponseCookie.from("token", "").path(getPath(false)).maxAge(0).build()
     private val adminEmptyCookie = ResponseCookie.from("token", "").path(getPath(true)).maxAge(0).build()
 
-    fun getEmptyCookie(entity: AuthInfo): ResponseCookie = if (entity.isAdmin == true) adminEmptyCookie else emptyCookie
+    fun getEmptyCookie(entity: AuthInfo): ResponseCookie = if (entity.isAdmin) adminEmptyCookie else emptyCookie
 
     fun getEntity(token: String) =
             try {
@@ -82,7 +82,7 @@ class JwtTokenUtil @Autowired constructor(private @Value("\${jwt.secret:yadajwt}
 
     fun renewCookie(entity: AuthInfo, currentDate: Date = timeUtil.getCurrentDate()): ResponseCookie = generateCookie(
             Jwts.builder().setClaims(entity).setIssuedAt(currentDate).setExpiration(currentDate.getExpirationDate()).generateToken(),
-            Duration.ofMillis(TOKEN_EXPIRE_INTERVAL * 1000),
+            Duration.ofMillis(tokenExpireInterval * 1000),
             getPath(entity.isAdmin))
 
     private fun generateCookie(token: String, maxAge: Duration, path: String) = ResponseCookie.from("token", token)

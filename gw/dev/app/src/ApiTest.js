@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 export default () => {
-  const [apiUrl, setApiUrl] = useState('http://localhost:8080/svc/service-1/api/test')
+  const [apiUrl, setApiUrl] = useState('http://localhost:8080/svc/service-1/res1')
   const [apiResult, setApiResult] = useState('')
   return <div>
     <h3>api url</h3>

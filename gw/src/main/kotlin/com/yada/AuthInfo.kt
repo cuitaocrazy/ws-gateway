@@ -28,12 +28,12 @@ class AuthInfo(private val claims: Claims) : Claims by claims, Principal {
             this["isAdmin"] = value
         }
 
-    @Suppress("UNCHECKED_CAST")
     var user: User?
         get() = this["userInfo"]?.run {
-            when (this) {
-                is Map<*, *> -> convertUser(this as Map<String, Any>)
-                else -> throw Error("未知")
+            if (this is Map<*, *>) {
+                convertUser(this)
+            } else {
+                null
             }
         }
         set(value) {
@@ -41,9 +41,16 @@ class AuthInfo(private val claims: Claims) : Claims by claims, Principal {
         }
 
     var resList: List<Res>?
-        @Suppress("UNCHECKED_CAST")
-        get() = (this["resList"]).run {
-            (this as List<*>).map { convertRes(it as Map<String, Any>) }
+        get() = (this["resList"])?.run {
+            if (this is List<*>) {
+                this.mapNotNull {
+                    if (it is Map<*, *>) {
+                        it
+                    } else null
+                }.map { convertRes(it) }
+            } else {
+                null
+            }
         }
         set(value) {
             this["resList"] = value
@@ -59,10 +66,10 @@ class AuthInfo(private val claims: Claims) : Claims by claims, Principal {
 }
 
 @Suppress("UNCHECKED_CAST")
-private fun convertUser(map: Map<String, Any>): User = User(map["id"] as String, map["orgId"] as String, (map["roles"] as List<String>).toSet())
+private fun convertUser(map: Map<*, *>): User = User(map["id"] as String, map["orgId"] as String, (map["roles"] as List<String>).toSet())
 
 @Suppress("UNCHECKED_CAST")
-private fun convertRes(map: Map<String, Any>): Res = Res(map["uri"] as String, (map["ops"] as List<String>).map(::convertOp).toSet())
+private fun convertRes(map: Map<*, *>): Res = Res(map["uri"] as String, (map["ops"] as List<String>).map(::convertOp).toSet())
 
 private fun convertOp(opStr: String): Operator = Operator.valueOf(opStr)
 

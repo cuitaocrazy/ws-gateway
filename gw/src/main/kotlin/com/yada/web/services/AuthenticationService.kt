@@ -18,9 +18,12 @@ interface IAuthenticationService {
 class AuthenticationService @Autowired constructor(
         private val userService: IUserService,
         private val pwdDigestService: IPwdDigestService,
-        private val author: IAuthorizationService) : IAuthenticationService {
+        private val author: IAuthorizationService
+) : IAuthenticationService {
     override fun login(username: String, password: String): Mono<AuthInfo> =
-            userService.getPwd(username).map { it == pwdDigestService.getPwdDigest(username, password) }.filter { it }
+            userService.getPwd(username)
+                    .map { it == pwdDigestService.getPwdDigest(username, password) }
+                    .filter { it }
                     .flatMap { userService.get(username) }
                     .flatMap { user ->
                         author.getUserResList(user).map { resList -> AuthInfo.create(user, resList) }
@@ -33,7 +36,8 @@ class AuthenticationService @Autowired constructor(
                     .map { it == pwdDigestService.getPwdDigest(username, oldPassword) }
                     .filter { it }
                     .flatMap {
-                        userService.changePwd(username, pwdDigestService.getPwdDigest(username, newPassword)).then(Mono.just(true))
+                        userService.changePwd(username, pwdDigestService.getPwdDigest(username, newPassword))
+                                .then(Mono.just(true))
                     }
                     .defaultIfEmpty(false)
 }

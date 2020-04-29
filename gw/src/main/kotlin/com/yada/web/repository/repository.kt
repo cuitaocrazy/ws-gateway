@@ -14,16 +14,19 @@ import org.springframework.data.repository.reactive.ReactiveCrudRepository
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import org.springframework.data.mongodb.core.query.Query as MonoQuery
 
 interface IUserRepository {
     fun changePwd(id: String, pwd: String): Mono<Void>
 }
 
-class UserRepositoryImpl @Autowired constructor(private val reactiveMongoTemplate: ReactiveMongoTemplate) : IUserRepository {
+class UserRepositoryImpl @Autowired constructor(
+        private val reactiveMongoTemplate: ReactiveMongoTemplate
+) : IUserRepository {
     override fun changePwd(id: String, pwd: String): Mono<Void> {
-        val query = org.springframework.data.mongodb.core.query.Query(Criteria.where("id").`is`(id))
+        val query = MonoQuery(Criteria.where("id").`is`(id))
         val update = Update().set("pwd", pwd)
-        return reactiveMongoTemplate.updateFirst(query, update, User::class.java).then(Mono.create<Void> { it.success() })
+        return reactiveMongoTemplate.updateFirst(query, update, User::class.java).then(Mono.empty())
     }
 }
 
@@ -56,7 +59,9 @@ interface IAdminUserRepository {
 }
 
 @Component
-class AdminUserRepositoryImpl @Autowired constructor(private val reactiveMongoTemplate: ReactiveMongoTemplate) : IAdminUserRepository {
+class AdminUserRepositoryImpl @Autowired constructor(
+        private val reactiveMongoTemplate: ReactiveMongoTemplate
+) : IAdminUserRepository {
     private val collectionName = "admin"
 
     override fun changePwd(pwd: String): Mono<Void> {
@@ -64,7 +69,7 @@ class AdminUserRepositoryImpl @Autowired constructor(private val reactiveMongoTe
     }
 
     override fun getAdminUser(): Mono<AdminUser> {
-        val query = org.springframework.data.mongodb.core.query.Query(Criteria.where("id").`is`("admin"))
+        val query = MonoQuery(Criteria.where("id").`is`("admin"))
         return reactiveMongoTemplate.findOne(query, collectionName)
     }
 

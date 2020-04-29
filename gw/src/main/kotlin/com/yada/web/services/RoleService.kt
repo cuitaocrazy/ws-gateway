@@ -5,11 +5,10 @@ import com.yada.web.repository.RoleRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 interface IRoleService {
-    fun getAll(): Flux<Role>
+    fun getAll(): Mono<List<Role>>
     fun get(id: String): Mono<Role>
     fun exist(id: String): Mono<Boolean>
     fun createOrUpdate(role: Role): Mono<Role>
@@ -17,8 +16,11 @@ interface IRoleService {
 }
 
 @Service
-open class RoleService @Autowired constructor(private val roleRepo: RoleRepository, private val userService: IUserService) : IRoleService {
-    override fun getAll(): Flux<Role> = roleRepo.findAllByOrderByIdAsc()
+open class RoleService @Autowired constructor(
+        private val roleRepo: RoleRepository,
+        private val userService: IUserService
+) : IRoleService {
+    override fun getAll(): Mono<List<Role>> = roleRepo.findAllByOrderByIdAsc().collectList()
 
     override fun get(id: String): Mono<Role> = roleRepo.findById(id)
 

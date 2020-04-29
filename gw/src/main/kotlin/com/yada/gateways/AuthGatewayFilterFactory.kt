@@ -52,6 +52,12 @@ class AuthGatewayFilterFactory @Autowired constructor(private val jwtTokenUtil: 
         }
     }
 
-    private fun getLoginPath(exchange: ServerWebExchange) = UriComponentsBuilder.fromPath("/login").queryParam("redirect", exchange.request.uri.path).build().encode().toUri().toString()
+    private fun getLoginPath(exchange: ServerWebExchange) =
+            UriComponentsBuilder.fromPath("/login")
+                    .queryParam("redirect", exchange.request.uri.path)
+                    .build()
+                    .encode()
+                    .toUriString()
+
     class Config
 }

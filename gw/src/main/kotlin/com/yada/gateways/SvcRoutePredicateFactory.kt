@@ -15,7 +15,11 @@ class SvcRoutePredicateFactory : AbstractRoutePredicateFactory<SvcRoutePredicate
     override fun shortcutFieldOrder(): MutableList<String> = mutableListOf("pathPrefix", "svcId")
 
     override fun apply(config: Config): Predicate<ServerWebExchange> {
-        val pathPrefix = UriComponentsBuilder.fromPath(config.pathPrefix).pathSegment(config.svcId).encode().build().toUriString()
+        val pathPrefix = UriComponentsBuilder.fromPath(config.pathPrefix)
+                .pathSegment(config.svcId)
+                .encode()
+                .build()
+                .toUriString()
         val pathPattern = pathPatternParser.parse("$pathPrefix/**")
 
         return object : GatewayPredicate {
@@ -25,7 +29,8 @@ class SvcRoutePredicateFactory : AbstractRoutePredicateFactory<SvcRoutePredicate
                     exchange.attributes["pathPrefix"] = config.pathPrefix
                     exchange.attributes["svcId"] = config.svcId
                     true
-                } else false
+                } else
+                    false
             }
 
             override fun toString(): String {

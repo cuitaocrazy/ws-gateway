@@ -35,7 +35,12 @@ class ApiAuthGatewayFilterFactory @Autowired constructor(private val jwtTokenUti
                     val op = convertOp(exchange.request.method!!)
                     val svcId = exchange.attributes["svcId"]!! as String
                     val pathPrefix = exchange.attributes["pathPrefix"]!! as String
-                    val resListUri = UriComponentsBuilder.fromPath(pathPrefix).pathSegment(svcId).pathSegment("res_list").encode().build().toUriString()
+                    val resListUri = UriComponentsBuilder.fromPath(pathPrefix)
+                            .pathSegment(svcId)
+                            .pathSegment("res_list")
+                            .encode()
+                            .build()
+                            .toUriString()
                     val subUri = exchange.request.uri.path.removePrefix(pathPrefix)
 
                     if (exchange.request.uri.host == "localhost" && exchange.request.uri.path == resListUri) {

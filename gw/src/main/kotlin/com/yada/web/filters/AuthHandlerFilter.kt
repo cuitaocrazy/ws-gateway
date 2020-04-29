@@ -14,12 +14,15 @@ class AuthHandlerFilter @Autowired constructor(jwtUtil: JwtTokenUtil) : Filter {
             jwtUtil,
             { authInfo -> authInfo != null },
             { request, _ ->
-                val redirect = UriComponentsBuilder.fromPath("/login").queryParam("redirect", request.uri().path).build().encode().toUri()
+                val redirect = UriComponentsBuilder.fromPath("/login")
+                        .queryParam("redirect", request.uri().path)
+                        .build()
+                        .encode()
+                        .toUri()
                 ServerResponse.seeOther(redirect).build()
             }
     )
 
     override fun invoke(request: ServerRequest, next: Next): Mono<ServerResponse> =
             filter(request, next)
-
 }

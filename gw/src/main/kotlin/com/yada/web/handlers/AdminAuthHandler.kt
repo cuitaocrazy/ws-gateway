@@ -27,22 +27,25 @@ class AdminAuthHandler @Autowired constructor(private val authSvc: IAdminAuthSer
         }.switchIfEmpty(Mono.error { ResponseStatusException(HttpStatus.CONFLICT, "登录失败") })
     }
 
-    fun logout(req: ServerRequest): Mono<ServerResponse> = ServerResponse.ok().cookie(jwtUtil.getEmptyCookie(req.authInfo)).build()
+    fun logout(req: ServerRequest): Mono<ServerResponse> =
+            ServerResponse.ok().cookie(jwtUtil.getEmptyCookie(req.authInfo)).build()
 
     fun changePwd(req: ServerRequest): Mono<ServerResponse> {
         val dataMono: Mono<ChangePwdData> = req.bodyToMono()
         return dataMono.flatMap { data ->
             if (data.oldPwd != null && data.newPwd != null) {
-                authSvc.changePassword(req.authInfo.username!!, data.oldPwd, data.newPwd).flatMap { flag ->
-                    if (flag)
-                        ServerResponse.ok().build()
-                    else
-                        Mono.error(ResponseStatusException(HttpStatus.CONFLICT, "密码错误"))
-                }
+                authSvc.changePassword(req.authInfo.username!!, data.oldPwd, data.newPwd)
+                        .flatMap { flag ->
+                            if (flag)
+                                ServerResponse.ok().build()
+                            else
+                                Mono.error(ResponseStatusException(HttpStatus.CONFLICT, "密码错误"))
+                        }
             } else
                 Mono.error(ResponseStatusException(HttpStatus.CONFLICT, "密码不能为空"))
         }
     }
 
-    fun refreshToken(req: ServerRequest): Mono<ServerResponse> = ServerResponse.ok().cookie(jwtUtil.renewCookie(req.authInfo)).build()
+    fun refreshToken(req: ServerRequest): Mono<ServerResponse> =
+            ServerResponse.ok().cookie(jwtUtil.renewCookie(req.authInfo)).build()
 }

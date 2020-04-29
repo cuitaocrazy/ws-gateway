@@ -24,15 +24,22 @@ private fun svcUri(svcId: String, uri: String) = "/${svcId}${uri}"
 @Service
 class AuthorizationService @Autowired constructor(
         private val roleService: IRoleService,
-        private val jwtUtil: JwtTokenUtil) : IAuthorizationService {
+        private val jwtUtil: JwtTokenUtil
+) : IAuthorizationService {
 
     override fun authorize(token: String, uri: String, opt: Operator): Mono<Boolean> =
             Mono.just(jwtUtil.getEntity(token)!!.resList!!.any { it.uri == uri && opt in it.ops })
 
     override fun getUserResList(user: User): Mono<List<Res>> =
-            roleService.getAll()
+            roleService.getAll().flatMapIterable { it }
                     .filter { it.id in user.roles }
-                    .map { role -> role.svcs.flatMap { svc -> svc.resources.map { Res(svcUri(svc.id, it.uri), it.ops) } } }
+                    .map { role ->
+                        role.svcs.flatMap { svc ->
+                            svc.resources.map {
+                                Res(svcUri(svc.id, it.uri), it.ops)
+                            }
+                        }
+                    }
                     .reduce { s, e -> s + e }
                     .map(this::mergeRes)
 
@@ -45,7 +52,9 @@ class AuthorizationService @Autowired constructor(
                     }
                 }
         val retList = apiList.mapNotNull { apiRes ->
-            resParsers.firstOrNull { it.parser.matches(PathContainer.parsePath(apiRes.uri)) }?.run {
+            resParsers.firstOrNull {
+                it.parser.matches(PathContainer.parsePath(apiRes.uri))
+            }?.run {
                 apiRes.copy(ops = apiRes.ops.filter { it in ops }.toSet())
             }
         }
@@ -54,6 +63,11 @@ class AuthorizationService @Autowired constructor(
     }
 
     // 合并相同uri的ops
-    private fun mergeRes(resList: List<Res>) = resList.groupBy { it.uri }.map { entry -> Res(entry.key, entry.value.flatMap { it.ops }.toSet()) }
+    private fun mergeRes(resList: List<Res>) =
+            resList.groupBy { it.uri }
+                    .map {
+                        entry ->
+                        Res(entry.key, entry.value.flatMap { it.ops }.toSet())
+                    }
 
 }

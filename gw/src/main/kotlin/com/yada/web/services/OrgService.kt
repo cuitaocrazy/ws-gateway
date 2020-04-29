@@ -36,7 +36,10 @@ private fun makeTree(orgs: List<Org>): List<OrgTree> {
 }
 
 @Service
-open class OrgService @Autowired constructor(private val repo: OrgRepository, private val userSvc: IUserService) : IOrgService {
+open class OrgService @Autowired constructor(
+        private val repo: OrgRepository,
+        private val userSvc: IUserService
+) : IOrgService {
     override fun getTree(orgIdPrefix: String?): Flux<OrgTree> =
             repo.findByIdStartingWithOrderByIdAsc(orgIdPrefix ?: "")//("^${orgIdPrefix ?: ""}.*")
                     .collectList()

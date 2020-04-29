@@ -12,8 +12,12 @@ interface IPwdDigestService {
 }
 
 @Service
-class PwdDigestService @Autowired constructor(@Value("\${yada.user.defaultPwd:changepwd}") private val defaultPwd: String) : IPwdDigestService {
+class PwdDigestService @Autowired constructor(
+        @Value("\${yada.user.defaultPwd:changepwd}")
+        private val defaultPwd: String
+) : IPwdDigestService {
     override fun getDefaultPwdDigest(username: String): String = getPwdDigest(username, defaultPwd)
 
-    override fun getPwdDigest(username: String, pwdPlaintext: String): String = Base64.encodeBase64String(DigestUtils.sha1(username + pwdPlaintext))
+    override fun getPwdDigest(username: String, pwdPlaintext: String): String =
+            Base64.encodeBase64String(DigestUtils.sha1(username + pwdPlaintext))
 }

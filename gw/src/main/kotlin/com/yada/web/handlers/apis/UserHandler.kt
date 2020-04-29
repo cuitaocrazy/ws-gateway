@@ -12,9 +12,18 @@ import reactor.core.publisher.Mono
 
 @Component
 class UserHandler @Autowired constructor(private val userService: IUserService) {
-    fun getUsersBy(req: ServerRequest): Mono<ServerResponse> = ok().body(userService.getByOrgId(req.queryParam("org_id").orElse("")))
-    fun get(req: ServerRequest): Mono<ServerResponse> = withNotFound(userService.get(req.pathVariable("id")))
-    fun exist(req: ServerRequest): Mono<ServerResponse> = ok().body(userService.exist(req.pathVariable("id")))
-    fun createOrUpdate(req: ServerRequest): Mono<ServerResponse> = ok().body(req.bodyToMono(User::class.java).flatMap(userService::createOrUpdate))
-    fun delete(req: ServerRequest): Mono<ServerResponse> = ok().body(userService.delete(req.pathVariable("id")))
+    fun getUsersBy(req: ServerRequest): Mono<ServerResponse> =
+            ok().body(userService.getByOrgId(req.queryParam("org_id").orElse("")))
+
+    fun get(req: ServerRequest): Mono<ServerResponse> =
+            withNotFound(userService.get(req.pathVariable("id")))
+
+    fun exist(req: ServerRequest): Mono<ServerResponse> =
+            ok().body(userService.exist(req.pathVariable("id")))
+
+    fun createOrUpdate(req: ServerRequest): Mono<ServerResponse> =
+            ok().body(req.bodyToMono(User::class.java).flatMap(userService::createOrUpdate))
+
+    fun delete(req: ServerRequest): Mono<ServerResponse> =
+            ok().body(userService.delete(req.pathVariable("id")))
 }

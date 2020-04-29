@@ -48,12 +48,17 @@ class AuthHandler @Autowired constructor(
                 val bindingResult = BeanPropertyBindingResult(form, formBeanName)
                 ValidationUtils.rejectIfEmptyOrWhitespace(bindingResult, "username", "field.required")
                 ValidationUtils.rejectIfEmptyOrWhitespace(bindingResult, "password", "field.required")
-                val model = mapOf(BindingResult.MODEL_KEY_PREFIX + bindingResult.objectName to bindingResult, formBeanName to form)
+                val model = mapOf(
+                        BindingResult.MODEL_KEY_PREFIX + bindingResult.objectName to bindingResult,
+                        formBeanName to form
+                )
 
                 if (recaptchaResponse == null || recaptchaResponse == "") {
                     bindingResult.reject("login.must.recaptcha")
                 }
-                Mono.just(!bindingResult.hasErrors()).filter { it }
+
+                Mono.just(!bindingResult.hasErrors())
+                        .filter { it }
                         .flatMap {
                             recaptchaService.check(recaptchaResponse!!)
                                     .doOnSuccess {
@@ -70,11 +75,16 @@ class AuthHandler @Autowired constructor(
                                 }
                             }
                         }
-                        .flatMap { ServerResponse.seeOther(URI(redirect.orElse("/"))).cookie(jwtUtil.generateCookie(it)).build() }
+                        .flatMap {
+                            ServerResponse.seeOther(URI(redirect.orElse("/")))
+                                    .cookie(jwtUtil.generateCookie(it))
+                                    .build()
+                        }
                         .switchIfEmpty(Mono.defer { ServerResponse.ok().render("/auth/index", model) })
             }
 
-    fun logout(req: ServerRequest): Mono<ServerResponse> = ServerResponse.ok().cookie(jwtUtil.getEmptyCookie(req.authInfo)).build()
+    fun logout(req: ServerRequest): Mono<ServerResponse> =
+            ServerResponse.ok().cookie(jwtUtil.getEmptyCookie(req.authInfo)).build()
 
     data class ChangePwdData(val oldPwd: String?, val newPwd: String?)
 
@@ -105,11 +115,14 @@ class AuthHandler @Autowired constructor(
                                 .then(ServerResponse.ok().build())
                     }
 
-    fun refreshToken(req: ServerRequest): Mono<ServerResponse> = ServerResponse.ok().cookie(jwtUtil.renewCookie(req.authInfo)).build()
+    fun refreshToken(req: ServerRequest): Mono<ServerResponse> =
+            ServerResponse.ok().cookie(jwtUtil.renewCookie(req.authInfo)).build()
 
-    fun filterApis(req: ServerRequest): Mono<ServerResponse> = ServerResponse.ok().bodyValue(
-            req.bodyToMono<List<Res>>().flatMap {
-                authorServer.filterApis(it, req.authInfo.resList!!)
-            }
-    )
+    fun filterApis(req: ServerRequest): Mono<ServerResponse> =
+            ServerResponse.ok()
+                    .bodyValue(
+                            req.bodyToMono<List<Res>>().flatMap {
+                                authorServer.filterApis(it, req.authInfo.resList!!)
+                            }
+                    )
 }

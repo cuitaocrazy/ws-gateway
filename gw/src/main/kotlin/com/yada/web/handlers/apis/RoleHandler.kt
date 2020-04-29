@@ -13,10 +13,18 @@ import reactor.core.publisher.Mono
 @Component
 class RoleHandler @Autowired constructor(private val roleService: IRoleService) {
     @Suppress("UNUSED_PARAMETER")
-    fun getAll(req: ServerRequest): Mono<ServerResponse> = ok().body(roleService.getAll())
+    fun getAll(req: ServerRequest): Mono<ServerResponse> =
+            ok().body(roleService.getAll())
 
-    fun get(req: ServerRequest): Mono<ServerResponse> = withNotFound(roleService.get(req.pathVariable("id")))
-    fun exist(req: ServerRequest): Mono<ServerResponse> = ok().body(roleService.exist(req.pathVariable("id")))
-    fun createOrUpdate(req: ServerRequest): Mono<ServerResponse> = ok().body(req.bodyToMono(Role::class.java).flatMap(roleService::createOrUpdate))
-    fun delete(req: ServerRequest): Mono<ServerResponse> = ok().body(roleService.delete(req.pathVariable("id")))
+    fun get(req: ServerRequest): Mono<ServerResponse> =
+            withNotFound(roleService.get(req.pathVariable("id")))
+
+    fun exist(req: ServerRequest): Mono<ServerResponse> =
+            ok().body(roleService.exist(req.pathVariable("id")))
+
+    fun createOrUpdate(req: ServerRequest): Mono<ServerResponse> =
+            ok().body(req.bodyToMono(Role::class.java).flatMap(roleService::createOrUpdate))
+
+    fun delete(req: ServerRequest): Mono<ServerResponse> =
+            ok().body(roleService.delete(req.pathVariable("id")))
 }

@@ -22,14 +22,26 @@ interface IUserService {
 }
 
 @Service
-open class UserService @Autowired constructor(private val userRepo: UserRepository, private val pwdDigestService: IPwdDigestService) : IUserService {
+open class UserService @Autowired constructor(
+        private val userRepo: UserRepository,
+        private val pwdDigestService: IPwdDigestService
+) : IUserService {
     override fun get(id: String): Mono<User> = userRepo.findById(id)
 
     override fun getByOrgId(orgId: String): Flux<User> = userRepo.findByOrgIdOrderByIdAsc(orgId)
 
     @Transactional
-    override fun createOrUpdate(user: User): Mono<User> = userRepo.findById(user.id).flatMap { userRepo.save(user) }
-            .switchIfEmpty(userRepo.save(user).flatMap { userRepo.changePwd(it.id, pwdDigestService.getDefaultPwdDigest(it.id)).then(Mono.just(it)) })
+    override fun createOrUpdate(user: User): Mono<User> =
+            userRepo
+                    .findById(user.id)
+                    .flatMap { userRepo.save(user) }
+                    .switchIfEmpty(
+                            userRepo.save(user)
+                                    .flatMap {
+                                        userRepo.changePwd(it.id, pwdDigestService.getDefaultPwdDigest(it.id))
+                                                .then(Mono.just(it))
+                                    }
+                    )
 
     @Transactional
     override fun delete(id: String): Mono<Void> = userRepo.deleteById(id)
@@ -39,7 +51,9 @@ open class UserService @Autowired constructor(private val userRepo: UserReposito
 
     override fun exist(id: String): Mono<Boolean> = userRepo.existsById(id)
 
-    override fun getPwd(id: String): Mono<String> = userRepo.findPwdById(id).map { ObjectMapper().readTree(it)["pwd"]?.asText() }
+    override fun getPwd(id: String): Mono<String> =
+            userRepo.findPwdById(id)
+                    .map { ObjectMapper().readTree(it)["pwd"]?.asText() }
 
     @Transactional
     override fun changePwd(id: String, pwd: String): Mono<Void> = userRepo.changePwd(id, pwd)

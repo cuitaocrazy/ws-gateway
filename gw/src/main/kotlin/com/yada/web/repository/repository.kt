@@ -1,9 +1,6 @@
 package com.yada.web.repository
 
-import com.yada.web.model.Org
-import com.yada.web.model.Role
-import com.yada.web.model.Svc
-import com.yada.web.model.User
+import com.yada.web.model.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.findOne
@@ -50,6 +47,8 @@ interface SvcRepository : ReactiveCrudRepository<Svc, String> {
 interface RoleRepository : ReactiveCrudRepository<Role, String> {
     fun findAllByOrderByIdAsc(): Flux<Role>
 }
+
+interface DefaultRoleSvcResRepository : ReactiveCrudRepository<DefaultRoleSvcRes, String>
 
 data class AdminUser(val id: String, val pwd: String)
 

@@ -2,10 +2,7 @@ package com.yada.web.routers
 
 import com.yada.web.filters.AuthAdminApiHandlerFilter
 import com.yada.web.filters.WhitelistHandlerFilter
-import com.yada.web.handlers.apis.OrgHandler
-import com.yada.web.handlers.apis.RoleHandler
-import com.yada.web.handlers.apis.SvcHandler
-import com.yada.web.handlers.apis.UserHandler
+import com.yada.web.handlers.apis.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -18,7 +15,8 @@ open class AdminApiRouterConfig @Autowired constructor(
         private val svcHandler: SvcHandler,
         private val userHandler: UserHandler,
         private val authAdminApiFilter: AuthAdminApiHandlerFilter,
-        private val whitelistFilter: WhitelistHandlerFilter) {
+        private val whitelistFilter: WhitelistHandlerFilter,
+        private val defaultRoleSvcResHandler: DefaultRoleSvcResHandler) {
     @Bean
     open fun adminApiRouter() = router {
         "/admin/apis".nest {
@@ -49,6 +47,10 @@ open class AdminApiRouterConfig @Autowired constructor(
                 GET("/{id}/exist", userHandler::exist)
                 PUT("", userHandler::createOrUpdate)
                 DELETE("/{id}", userHandler::delete)
+            }
+            "/default_role".nest {
+                GET("", defaultRoleSvcResHandler::get)
+                PUT("", defaultRoleSvcResHandler::createOrUpdate)
             }
         }
         filter(whitelistFilter)

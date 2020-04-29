@@ -27,3 +27,4 @@ data class Role(
         val svcs: Set<Svc>
 )
 
+typealias DefaultRoleSvcRes = Svc

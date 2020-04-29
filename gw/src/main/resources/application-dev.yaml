@@ -20,7 +20,7 @@ spring.cloud.gateway.routes:
     predicates:
       - Svc=/svc,service-1
     filters:
-      - ApiAuth=noCheck
+      - ApiAuth
 
 management.endpoints:
   web.exposure.include: metrics,gateway

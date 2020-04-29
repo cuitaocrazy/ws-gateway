@@ -1,7 +1,7 @@
-package com.yada.web
+package com.yada.web.routers
 
-import com.yada.web.handlers.AdminAuthHandler
-import com.yada.web.handlers.AuthHandler
+import com.yada.web.filters.AuthAdminApiHandlerFilter
+import com.yada.web.filters.WhitelistHandlerFilter
 import com.yada.web.handlers.apis.OrgHandler
 import com.yada.web.handlers.apis.RoleHandler
 import com.yada.web.handlers.apis.SvcHandler
@@ -9,66 +9,7 @@ import com.yada.web.handlers.apis.UserHandler
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.router
-
-@Configuration
-open class AuthRouterConfig @Autowired constructor(
-        private val authHandler: AuthHandler,
-        private val authFilter: AuthHandlerFilter,
-        private val authApiFilter: AuthApiHandlerFilter,
-        private val whitelistFilter: WhitelistHandlerFilter) {
-    @Bean
-    open fun authRouter() = router {
-        "".nest {
-            "/login".nest {
-                GET("", authHandler::getLoginForm)
-                POST("", authHandler::login)
-            }
-            filter(whitelistFilter)
-        }
-
-        "".nest {
-            GET("/") { _ ->
-                ServerResponse.ok().render("/index")
-            }
-            filter(whitelistFilter)
-            filter { request, next -> authFilter.invoke(request, next) }
-        }
-
-        "".nest {
-            GET("/logout", authHandler::logout)
-            POST("/change_pwd", authHandler::changePwd)
-            GET("/refresh_token", authHandler::refreshToken)
-            GET("/filter_apis", authHandler::filterApis)
-            filter(whitelistFilter)
-            filter(authApiFilter)
-        }
-    }
-}
-
-@Configuration
-open class AdminAuthRouterConfig @Autowired constructor(
-        private val adminAuthHandler: AdminAuthHandler,
-        private val authAdminApiFilter: AuthAdminApiHandlerFilter,
-        private val whitelistFilter: WhitelistHandlerFilter) {
-    @Bean
-    open fun adminAuthRouter() = router {
-        "/admin".nest {
-            GET("", adminAuthHandler::index)
-            POST("/login", adminAuthHandler::login)
-            filter(whitelistFilter)
-        }
-
-        "/admin".nest {
-            POST("/apis/logout", adminAuthHandler::logout)
-            POST("/apis/change_pwd", adminAuthHandler::changePwd)
-            GET("/apis/refresh_token", adminAuthHandler::refreshToken)
-            filter(whitelistFilter)
-            filter(authAdminApiFilter)
-        }
-    }
-}
 
 @Configuration
 open class AdminApiRouterConfig @Autowired constructor(

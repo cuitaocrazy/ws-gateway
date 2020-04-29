@@ -1,6 +1,6 @@
-package com.yada.services
+package com.yada.web.services
 
-import com.yada.AuthInfo
+import com.yada.security.AuthInfo
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono

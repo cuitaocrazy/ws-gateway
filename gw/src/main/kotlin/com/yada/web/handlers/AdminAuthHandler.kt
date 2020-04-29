@@ -1,8 +1,8 @@
 package com.yada.web.handlers
 
-import com.yada.JwtTokenUtil
-import com.yada.authInfo
-import com.yada.services.IAdminAuthService
+import com.yada.security.JwtTokenUtil
+import com.yada.security.authInfo
+import com.yada.web.services.IAdminAuthService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component

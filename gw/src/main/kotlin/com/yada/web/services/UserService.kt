@@ -1,8 +1,8 @@
-package com.yada.services
+package com.yada.web.services
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.yada.model.User
-import com.yada.repository.UserRepository
+import com.yada.web.model.User
+import com.yada.web.repository.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

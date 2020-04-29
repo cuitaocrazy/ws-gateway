@@ -1,7 +1,7 @@
 package com.yada.web.handlers.apis
 
-import com.yada.model.Svc
-import com.yada.services.SvcService
+import com.yada.web.model.Svc
+import com.yada.web.services.SvcService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest

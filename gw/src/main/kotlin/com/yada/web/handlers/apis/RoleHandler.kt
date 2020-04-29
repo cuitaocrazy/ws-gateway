@@ -1,7 +1,7 @@
 package com.yada.web.handlers.apis
 
-import com.yada.model.Role
-import com.yada.services.IRoleService
+import com.yada.web.model.Role
+import com.yada.web.services.IRoleService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest

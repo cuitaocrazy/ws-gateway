@@ -1,7 +1,7 @@
 package com.yada.web.handlers.apis
 
-import com.yada.model.Org
-import com.yada.services.IOrgService
+import com.yada.web.model.Org
+import com.yada.web.services.IOrgService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest

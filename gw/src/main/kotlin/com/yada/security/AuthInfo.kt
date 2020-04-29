@@ -1,9 +1,9 @@
-package com.yada
+package com.yada.security
 
 
-import com.yada.model.Operator
-import com.yada.model.Res
-import com.yada.model.User
+import com.yada.web.model.Operator
+import com.yada.web.model.Res
+import com.yada.web.model.User
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.impl.DefaultClaims
 import java.security.Principal

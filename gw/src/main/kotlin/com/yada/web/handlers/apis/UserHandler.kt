@@ -1,7 +1,7 @@
 package com.yada.web.handlers.apis
 
-import com.yada.model.User
-import com.yada.services.IUserService
+import com.yada.web.model.User
+import com.yada.web.services.IUserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest

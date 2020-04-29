@@ -1,9 +1,9 @@
 package com.yada.scheduling
 
 import com.yada.gateways.SvcRoutePredicateFactory
-import com.yada.model.Res
-import com.yada.model.Svc
-import com.yada.services.ISvcService
+import com.yada.web.model.Res
+import com.yada.web.model.Svc
+import com.yada.web.services.ISvcService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.AutoConfigureBefore
 import org.springframework.cloud.gateway.config.GatewayAutoConfiguration

@@ -1,7 +1,7 @@
-package com.yada.services
+package com.yada.web.services
 
-import com.yada.model.Org
-import com.yada.repository.OrgRepository
+import com.yada.web.model.Org
+import com.yada.web.repository.OrgRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

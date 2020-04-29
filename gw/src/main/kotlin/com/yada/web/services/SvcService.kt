@@ -1,7 +1,7 @@
-package com.yada.services
+package com.yada.web.services
 
-import com.yada.model.Svc
-import com.yada.repository.SvcRepository
+import com.yada.web.model.Svc
+import com.yada.web.repository.SvcRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

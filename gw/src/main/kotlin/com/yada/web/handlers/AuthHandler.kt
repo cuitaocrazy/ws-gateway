@@ -1,12 +1,12 @@
 package com.yada.web.handlers
 
 import com.nulabinc.zxcvbn.Zxcvbn
-import com.yada.JwtTokenUtil
-import com.yada.authInfo
-import com.yada.model.Res
-import com.yada.services.IAuthenticationService
-import com.yada.services.IAuthorizationService
-import com.yada.services.IRecaptchaService
+import com.yada.security.JwtTokenUtil
+import com.yada.security.authInfo
+import com.yada.web.model.Res
+import com.yada.web.services.IAuthenticationService
+import com.yada.web.services.IAuthorizationService
+import com.yada.web.services.IRecaptchaService
 import org.springframework.beans.factory.BeanFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value

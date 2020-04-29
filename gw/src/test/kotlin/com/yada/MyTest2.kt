@@ -1,8 +1,8 @@
 package com.yada
 
-import com.yada.model.Org
-import com.yada.services.IOrgService
-import com.yada.services.OrgTree
+import com.yada.web.model.Org
+import com.yada.web.services.IOrgService
+import com.yada.web.services.OrgTree
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -12,6 +12,7 @@ import reactor.test.StepVerifier
 @SpringBootTest
 class MyTest2 @Autowired constructor(private val orgSvc: IOrgService) {
     private val logger by LoggerDelegate()
+
     @Test
     fun t() {
         val m = orgSvc.createOrUpdate(Org("00", "org 00"))

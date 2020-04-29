@@ -129,7 +129,7 @@ spring.cloud.gateway.routes:
     predicates:
       - Svc=/svc,service-1 # 第一个值是service的path前缀,第二个值是service的Id
     filters:
-      - AuthApi # 认证授权检查过滤器,检查所有符合{path前缀}/{service的名字}的path,如果没有通过则返回401
+      - ApiAuth # 认证授权检查过滤器,如果不检查授权,建议: ApiAuth=uncheckPower
 ```
 
 等效配置:
@@ -142,7 +142,8 @@ spring.cloud.gateway.routes:
     	  pathPrefix: /svc
     	  svcId: service-1
     filters:
-      - name: AuthApi
+      - name: ApiAuth
+      	checkPower: checkPower # 默认值就是“checkPower”,如果不检查授权就配非“checkPower”的字符串(区分大小写),建议使用“uncheckPower”这个字符串
 ```
 
 

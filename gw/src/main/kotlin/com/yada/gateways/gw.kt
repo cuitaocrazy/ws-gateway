@@ -126,8 +126,10 @@ class SvcRoutePredicateFactory : AbstractRoutePredicateFactory<SvcRoutePredicate
 }
 
 @Component
-class AuthApiGatewayFilterFactory @Autowired constructor(private val jwtTokenUtil: JwtTokenUtil)
-    : AbstractGatewayFilterFactory<AuthApiGatewayFilterFactory.Config>(Config::class.java) {
+class ApiAuthGatewayFilterFactory @Autowired constructor(private val jwtTokenUtil: JwtTokenUtil)
+    : AbstractGatewayFilterFactory<ApiAuthGatewayFilterFactory.Config>(Config::class.java) {
+
+    override fun shortcutFieldOrder(): MutableList<String> = mutableListOf("checkPower")
 
     override fun apply(config: Config): GatewayFilter {
         return object : GatewayFilter {
@@ -145,7 +147,7 @@ class AuthApiGatewayFilterFactory @Autowired constructor(private val jwtTokenUti
 
                     if (exchange.request.uri.host == "localhost" && exchange.request.uri.path == resListUri) {
                         chain.filter(exchange)
-                    } else if (authInfo == null || !hasPower(authInfo.resList!!, op, subUri)) {
+                    } else if (authInfo == null || (config.checkPower == "checkPower" && !hasPower(authInfo.resList!!, op, subUri))) {
                         Mono.error(ResponseStatusException(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED"))
                     } else {
                         val req = exchange.request.mutate()
@@ -161,7 +163,7 @@ class AuthApiGatewayFilterFactory @Autowired constructor(private val jwtTokenUti
             }
 
             override fun toString(): String {
-                return "AuthApi"
+                return "ApiAuth"
             }
         }
     }
@@ -181,5 +183,7 @@ class AuthApiGatewayFilterFactory @Autowired constructor(private val jwtTokenUti
         else -> throw Error("不支持${method}")
     }
 
-    class Config
+    class Config {
+        var checkPower: String = "checkPower"
+    }
 }

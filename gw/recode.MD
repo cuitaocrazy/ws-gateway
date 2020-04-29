@@ -29,3 +29,9 @@ ok().body(Mono.just(ofList("1", "2")))
 为了不引起奇异，可能会把`Flux<T>`都改成`Mono<List<T>>`,
 就算你返回`Flux<T>`只要`T`不是`String`，也是在服务端把
 这些Object读完转成json数组再返回请求方
+
+# Reactor Core
+
+[阻塞管理原理](https://github.com/reactor/BlockHound/blob/master/docs/quick_start.md)
+
+[Debug工具](https://github.com/reactor/reactor-tools)

@@ -40,6 +40,7 @@ open class AdminApiRouterConfig @Autowired constructor(
                 PUT("", svcHandler::createOrUpdate)
                 DELETE("", svcHandler::delete)
                 GET("/{id}/actual_res", svcHandler::actualRes)
+                GET("/actual_svc_ids", svcHandler::actualSvcIds)
             }
             "/user".nest {
                 GET("", userHandler::getUsersBy)

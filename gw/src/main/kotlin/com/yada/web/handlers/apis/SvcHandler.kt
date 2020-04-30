@@ -28,4 +28,8 @@ class SvcHandler @Autowired constructor(private val svcService: ISvcService, pri
 
     fun actualRes(req: ServerRequest): Mono<ServerResponse> =
             ok().body(actualSvcResOfServerService.get(req.pathVariable("id")))
+
+    @Suppress("UNUSED_PARAMETER")
+    fun actualSvcIds(req: ServerRequest): Mono<ServerResponse> =
+            ok().body(Mono.just(actualSvcResOfServerService.getAllSvcId()))
 }

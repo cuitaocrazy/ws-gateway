@@ -17,6 +17,7 @@ import java.util.*
 
 interface IActualSvcResOfServerService {
     fun get(svcId: String): Mono<List<Res>>
+    fun getAllSvcId(): List<String>
 }
 
 /**
@@ -46,38 +47,58 @@ class ActualSvcResOfServerService @Autowired constructor(
                 .bodyToMono<List<Res>>()
     }.orElse(Mono.empty())
 
-    private fun getSvcServerUrl(svcId: String): Optional<String> {
-        val properties = context.getBean(GatewayProperties::class.java)
-        val env = context.getBean(Environment::class.java)
-        val svcRoutePredicateFactory = context.getBean(SvcRoutePredicateFactory::class.java)
-        val configurationService = context.getBean(ConfigurationService::class.java)
+    override fun getAllSvcId(): List<String> = getSvcIds()
 
-        val list = properties.routes.mapNotNull { routeDefinition ->
+    class GatewayEnv(context: ApplicationContext) {
+        val properties: GatewayProperties = context.getBean(GatewayProperties::class.java)
+        val env: Environment = context.getBean(Environment::class.java)
+        val svcRoutePredicateFactory: SvcRoutePredicateFactory = context.getBean(SvcRoutePredicateFactory::class.java)
+        val configurationService: ConfigurationService = context.getBean(ConfigurationService::class.java)
+    }
+
+    private fun getSvcServerUrl(svcId: String): Optional<String> =
+            GatewayEnv(context).run {
+                val list = properties.routes.mapNotNull { routeDefinition ->
+                    val appPredicate = routeDefinition.predicates.firstOrNull { it.name == "Svc" }
+                    if (appPredicate != null) {
+                        // org.springframework.boot.web.serve.AbstractConfigurableWebServerFactory默认端口：8080
+                        val port = env.getProperty("server.port") ?: "8080"
+                        val schema = if (env.getProperty("server.ssl.key-store") == null) "http" else "https"
+                        val config = configurationService
+                                .with(svcRoutePredicateFactory)
+                                .name(appPredicate.name)
+                                .properties(appPredicate.args)
+                                .bind()
+                                as SvcRoutePredicateFactory.Config
+                        val url = "$schema://localhost:$port" +
+                                UriComponentsBuilder
+                                        .fromPath(config.pathPrefix)
+                                        .pathSegment(config.svcId)
+                                        .pathSegment("res_list")
+                                        .encode()
+                                        .build()
+                                        .toUriString()
+
+                        Pair(config.svcId, url)
+                    } else null
+                }
+
+                Optional.ofNullable(list.firstOrNull { it.first == svcId }?.second)
+            }
+
+    private fun getSvcIds() = GatewayEnv(context).run {
+        properties.routes.mapNotNull { routeDefinition ->
             val appPredicate = routeDefinition.predicates.firstOrNull { it.name == "Svc" }
             if (appPredicate != null) {
-                // org.springframework.boot.web.serve.AbstractConfigurableWebServerFactory默认端口：8080
-                val port = env.getProperty("server.port") ?: "8080"
-                val schema = if (env.getProperty("server.ssl.key-store") == null) "http" else "https"
                 val config = configurationService
                         .with(svcRoutePredicateFactory)
                         .name(appPredicate.name)
                         .properties(appPredicate.args)
                         .bind()
                         as SvcRoutePredicateFactory.Config
-                val url = "$schema://localhost:$port" +
-                        UriComponentsBuilder
-                                .fromPath(config.pathPrefix)
-                                .pathSegment(config.svcId)
-                                .pathSegment("res_list")
-                                .encode()
-                                .build()
-                                .toUriString()
 
-                Pair(config.svcId, url)
+                config.svcId
             } else null
         }
-
-        return Optional.ofNullable(list.filter { it.first == svcId }.firstOrNull()?.second)
     }
-
 }

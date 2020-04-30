@@ -3,6 +3,7 @@ package com.yada.web.services
 import com.yada.security.JwtTokenUtil
 import com.yada.web.model.Operator
 import com.yada.web.model.Res
+import com.yada.web.model.Svc
 import com.yada.web.model.User
 import com.yada.web.pathPatternParser
 import org.springframework.beans.factory.annotation.Autowired
@@ -41,7 +42,9 @@ class AuthorizationService @Autowired constructor(
                             role.svcs
                         }
                         // 用户角色服务资源+默认角色服务资源
-                        defaultRoleSvcResService.get().map { it + svcList }
+                        defaultRoleSvcResService.get().map { dSvcList ->
+                            dSvcList.map { Svc(it.id, it.resources) } + svcList
+                        }
                     }.map { svcList ->
                         val allResList = svcList.flatMap { svc ->
                             svc.resources.map {

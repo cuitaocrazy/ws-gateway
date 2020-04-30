@@ -3,7 +3,6 @@ package com.yada.web.services
 import com.yada.security.JwtTokenUtil
 import com.yada.web.model.Operator
 import com.yada.web.model.Res
-import com.yada.web.model.Role
 import com.yada.web.model.User
 import com.yada.web.pathPatternParser
 import org.springframework.beans.factory.annotation.Autowired

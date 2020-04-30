@@ -49,7 +49,8 @@ class ActualSvcResOfServerService @Autowired constructor(
 
     override fun getAllSvcId(): List<String> = getSvcIds()
 
-    class GatewayEnv(context: ApplicationContext) {
+    // 为支持动态网关路由，每次都从新取配置信息
+    private class GatewayEnv(context: ApplicationContext) {
         val properties: GatewayProperties = context.getBean(GatewayProperties::class.java)
         val env: Environment = context.getBean(Environment::class.java)
         val svcRoutePredicateFactory: SvcRoutePredicateFactory = context.getBean(SvcRoutePredicateFactory::class.java)

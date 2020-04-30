@@ -35,3 +35,8 @@ ok().body(Mono.just(ofList("1", "2")))
 [阻塞管理原理](https://github.com/reactor/BlockHound/blob/master/docs/quick_start.md)
 
 [Debug工具](https://github.com/reactor/reactor-tools)
+
+# 关于自定义Spring组件报错`IllegalArgumentException`
+
+当一些组件用到事务时，Spring可能会对他进行代理继承`org.springframework.cglib.proxy.Enhancer.generateClass`,
+但是kotlin默认class时final class，因此需要标记`open class`

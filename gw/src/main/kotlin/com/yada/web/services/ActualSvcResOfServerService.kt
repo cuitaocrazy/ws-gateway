@@ -8,6 +8,7 @@ import org.springframework.cloud.gateway.support.ConfigurationService
 import org.springframework.context.ApplicationContext
 import org.springframework.core.env.Environment
 import org.springframework.http.MediaType
+import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import org.springframework.web.util.UriComponentsBuilder
@@ -32,6 +33,7 @@ interface IActualSvcResOfServerService {
  * 也没实现这个问题，但是他有TODO等待完成，因此等待它去完善这个再去实现动态更新。
  *
  */
+@Service
 class ActualSvcResOfServerService @Autowired constructor(
         private val context: ApplicationContext
 ) : IActualSvcResOfServerService {

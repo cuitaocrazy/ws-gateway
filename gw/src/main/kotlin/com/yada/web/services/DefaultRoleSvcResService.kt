@@ -13,7 +13,7 @@ interface IDefaultRoleSvcResService {
 }
 
 @Service
-class DefaultRoleSvcResService @Autowired constructor(
+open class DefaultRoleSvcResService @Autowired constructor(
         private val defaultRoleSvcResRepository: DefaultRoleSvcResRepository
 ) : IDefaultRoleSvcResService {
 

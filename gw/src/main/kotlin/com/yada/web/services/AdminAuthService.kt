@@ -6,6 +6,7 @@ import com.yada.web.model.Operator
 import com.yada.web.repository.IAdminUserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Mono
 
 interface IAdminAuthService {
@@ -18,7 +19,7 @@ interface IAdminAuthService {
 private const val adminStr = "admin"
 
 @Service
-class AdminAuthService @Autowired constructor(
+open class AdminAuthService @Autowired constructor(
         private val adminUserRepo: IAdminUserRepository,
         private val pwdDigestService: IPwdDigestService,
         private val jwtUtil: JwtTokenUtil
@@ -40,6 +41,7 @@ class AdminAuthService @Autowired constructor(
     override fun authorize(token: String, uri: String, opt: Operator): Mono<Boolean> =
             Mono.just(jwtUtil.getEntity(token) != null)
 
+    @Transactional
     override fun changePassword(username: String, oldPassword: String, newPassword: String): Mono<Boolean> =
             if (username == adminStr) {
                 val newPwdDigest = pwdDigestService.getPwdDigest(adminStr, newPassword)

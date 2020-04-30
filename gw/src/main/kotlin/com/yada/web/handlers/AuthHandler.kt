@@ -3,6 +3,7 @@ package com.yada.web.handlers
 import com.nulabinc.zxcvbn.Zxcvbn
 import com.yada.security.JwtTokenUtil
 import com.yada.security.authInfo
+import com.yada.security.token
 import com.yada.web.model.Res
 import com.yada.web.services.IAuthenticationService
 import com.yada.web.services.IAuthorizationService
@@ -84,7 +85,9 @@ class AuthHandler @Autowired constructor(
             }
 
     fun logout(req: ServerRequest): Mono<ServerResponse> =
-            ServerResponse.ok().cookie(jwtUtil.getEmptyCookie(req.authInfo)).build()
+            authService.logout(req.token!!)
+                    .then(ServerResponse.ok().cookie(jwtUtil.getEmptyCookie(req.authInfo)).build())
+
 
     data class ChangePwdData(val oldPwd: String?, val newPwd: String?)
 

@@ -3,6 +3,7 @@ package com.yada.web.services
 import com.yada.security.JwtTokenUtil
 import com.yada.web.model.Operator
 import com.yada.web.model.Res
+import com.yada.web.model.Role
 import com.yada.web.model.User
 import com.yada.web.pathPatternParser
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,24 +25,33 @@ private fun svcUri(svcId: String, uri: String) = "/${svcId}${uri}"
 @Service
 class AuthorizationService @Autowired constructor(
         private val roleService: IRoleService,
-        private val jwtUtil: JwtTokenUtil
+        private val jwtUtil: JwtTokenUtil,
+        private val defaultRoleSvcResService: DefaultRoleSvcResService
 ) : IAuthorizationService {
 
     override fun authorize(token: String, uri: String, opt: Operator): Mono<Boolean> =
             Mono.just(jwtUtil.getEntity(token)!!.resList!!.any { it.uri == uri && opt in it.ops })
 
     override fun getUserResList(user: User): Mono<List<Res>> =
-            roleService.getAll().flatMapIterable { it }
-                    .filter { it.id in user.roles }
-                    .map { role ->
-                        role.svcs.flatMap { svc ->
+            roleService.getAll()
+                    .map { roles ->
+                        roles.filter { it.id in user.roles }
+                    }
+                    .flatMap { roles ->
+                        val svcList = roles.flatMap { role ->
+                            role.svcs
+                        }
+                        // 用户角色服务资源+默认角色服务资源
+                        defaultRoleSvcResService.get().map { it + svcList }
+                    }.map { svcList ->
+                        val allResList = svcList.flatMap { svc ->
                             svc.resources.map {
+                                // 转换资源uri带上svcId前缀
                                 Res(svcUri(svc.id, it.uri), it.ops)
                             }
                         }
+                        mergeRes(allResList)
                     }
-                    .reduce { s, e -> s + e }
-                    .map(this::mergeRes)
 
     override fun filterApis(apiList: List<Res>, userResList: List<Res>): Mono<List<Res>> {
         val resParsers = userResList
@@ -65,8 +75,7 @@ class AuthorizationService @Autowired constructor(
     // 合并相同uri的ops
     private fun mergeRes(resList: List<Res>) =
             resList.groupBy { it.uri }
-                    .map {
-                        entry ->
+                    .map { entry ->
                         Res(entry.key, entry.value.flatMap { it.ops }.toSet())
                     }
 

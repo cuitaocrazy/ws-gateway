@@ -8,32 +8,26 @@ import org.springframework.context.MessageSource
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.support.ResourceBundleMessageSource
-import org.springframework.data.mongodb.ReactiveMongoDatabaseFactory
-import org.springframework.data.mongodb.ReactiveMongoTransactionManager
 import org.springframework.data.mongodb.config.AbstractReactiveMongoConfiguration
-import org.springframework.data.mongodb.core.ReactiveMongoTemplate
+import org.springframework.data.mongodb.config.EnableMongoAuditing
 import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories
 
 
 @Configuration
 @EnableReactiveMongoRepositories
+@EnableMongoAuditing
 open class MongoConfig constructor(
         @Value("\${yada.db.mongo.db:yada_auth}")
         private val dbName: String,
         @Value("\${yada.db.mongo.url:mongodb://localhost/?replicaSet=rs}")
         private val url: String
 ) : AbstractReactiveMongoConfiguration() {
-    override fun reactiveMongoClient() = mongoClient()
+    override fun reactiveMongoClient(): MongoClient = MongoClients.create(ConnectionString(url))
 
     override fun getDatabaseName() = dbName
 
-    override fun reactiveMongoTemplate() = ReactiveMongoTemplate(mongoClient(), databaseName)
-
-    @Bean
-    open fun mongoClient(): MongoClient = MongoClients.create(ConnectionString(url))
-
-    @Bean
-    open fun transactionManager(factory: ReactiveMongoDatabaseFactory) = ReactiveMongoTransactionManager(factory)
+//    @Bean
+//    open fun transactionManager(factory: ReactiveMongoDatabaseFactory) = ReactiveMongoTransactionManager(factory)
 
     @Bean
     open fun messageSource(): MessageSource? {

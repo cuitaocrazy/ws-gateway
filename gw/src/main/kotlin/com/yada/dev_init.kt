@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Profile
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -56,7 +57,7 @@ private val orgJson = """
 private val userJson = """
 [
   {
-    "id": "admin",
+    "id": "user1",
     "orgId": "00",
     "roles": [
       "role1"
@@ -236,17 +237,17 @@ open class InitDevDataRunner @Autowired constructor(
         private val roleSvc: IRoleService,
         private val svcSvc: ISvcService,
         private val client: MongoClient,
+        private val reactiveMongoTemplate: ReactiveMongoTemplate,
         @Value("\${yada.db.mongo.db:yada_auth}")
         private val dbName: String
 ) : ApplicationRunner {
     override fun run(args: ApplicationArguments?) {
-
         val orgs = jacksonObjectMapper().readValue<List<Org>>(orgJson)
         val svcs = jacksonObjectMapper().readValue<List<Svc>>(svcJson)
         val apps = jacksonObjectMapper().readValue<List<Role>>(roleJson)
         val usrs = jacksonObjectMapper().readValue<List<User>>(userJson)
-
         Mono.from(client.getDatabase(dbName).drop())
+                .then(createAllMongoDbCollection(reactiveMongoTemplate))
                 .thenMany(Flux.mergeSequential(orgs.map { orgSvc.createOrUpdate(it) }))
                 .thenMany(Flux.mergeSequential(svcs.map { svcSvc.createOrUpdate(it) }))
                 .thenMany(Flux.mergeSequential(apps.map { roleSvc.createOrUpdate(it) }))

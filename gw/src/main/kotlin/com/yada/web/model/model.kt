@@ -28,3 +28,5 @@ data class Role(
 )
 
 data class DefaultRoleSvcRes(val id: String, val resources: Set<Res>)
+
+data class Admin(val id: String)

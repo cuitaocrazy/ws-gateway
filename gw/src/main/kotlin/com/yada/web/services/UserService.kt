@@ -1,6 +1,5 @@
 package com.yada.web.services
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.yada.web.model.User
 import com.yada.web.repository.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -51,9 +50,7 @@ open class UserService @Autowired constructor(
 
     override fun exist(id: String): Mono<Boolean> = userRepo.existsById(id)
 
-    override fun getPwd(id: String): Mono<String> =
-            userRepo.findPwdById(id)
-                    .map { ObjectMapper().readTree(it)["pwd"]?.asText() }
+    override fun getPwd(id: String): Mono<String> = userRepo.findPwdById(id)
 
     @Transactional
     override fun changePwd(id: String, pwd: String): Mono<Void> = userRepo.changePwd(id, pwd)

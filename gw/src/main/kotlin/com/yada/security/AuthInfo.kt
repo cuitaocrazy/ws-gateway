@@ -17,7 +17,7 @@ class AuthInfo(private val claims: Claims) : Claims by claims, Principal {
             this.username = user.id
         }
 
-        fun create() = AuthInfo().apply { isAdmin = true }
+        fun create(adminName: String) = AuthInfo().apply { isAdmin = true; username = adminName }
     }
 
     constructor() : this(DefaultClaims())

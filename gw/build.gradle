@@ -9,7 +9,6 @@ plugins {
     id 'org.springframework.boot' version '2.2.6.RELEASE'
 }
 
-apply plugin: 'java'
 apply plugin: 'io.spring.dependency-management'
 
 group 'com.yada'
@@ -49,6 +48,11 @@ dependencies {
 
 //    compileOnly 'org.projectlombok:lombok:1.18.10'
 //    annotationProcessor 'org.projectlombok:lombok:1.18.10'
+}
+
+application {
+    // Define the main class for the application.
+    mainClassName = 'com.yada.MyAppKt'
 }
 
 compileKotlin {

@@ -29,33 +29,18 @@ class AuthInfo(private val claims: Claims) : Claims by claims, Principal {
         }
 
     var user: User?
-        get() = this["userInfo"]?.run {
-            if (this is Map<*, *>) {
-                convertUser(this)
-            } else {
-                null
-            }
-        }
+        get() = (this["userInfo"] as? Map<*, *>)?.run(::convertUser)
         set(value) {
             this["userInfo"] = value
         }
 
     var resList: List<Res>?
-        get() = (this["resList"])?.run {
-            if (this is List<*>) {
-                this.mapNotNull {
-                    if (it is Map<*, *>) {
-                        it
-                    } else null
-                }.map { convertRes(it) }
-            } else {
-                null
-            }
-        }
+        get() = (this["resList"] as? List<*>)
+                ?.filterIsInstance<Map<*, *>>()
+                ?.map(::convertRes)
         set(value) {
             this["resList"] = value
         }
-
     var username: String?
         get() = this.subject
         set(value) {
@@ -65,11 +50,15 @@ class AuthInfo(private val claims: Claims) : Claims by claims, Principal {
     override fun getName(): String? = this.username
 }
 
-@Suppress("UNCHECKED_CAST")
-private fun convertUser(map: Map<*, *>): User = User(map["id"] as String, map["orgId"] as String, (map["roles"] as List<String>).toSet())
+private fun convertUser(map: Map<*, *>): User =
+        User(
+                map["id"] as String, map["orgId"] as String,
+                (map["roles"] as List<*>).filterIsInstance<String>().toSet()
+        )
 
-@Suppress("UNCHECKED_CAST")
-private fun convertRes(map: Map<*, *>): Res = Res(map["uri"] as String, (map["ops"] as List<String>).map(::convertOp).toSet())
+private fun convertRes(map: Map<*, *>): Res =
+        Res(map["uri"] as String, (map["ops"] as List<*>)
+                .filterIsInstance<String>().map(::convertOp).toSet())
 
 private fun convertOp(opStr: String): Operator = Operator.valueOf(opStr)
 

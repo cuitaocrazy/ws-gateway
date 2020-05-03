@@ -50,10 +50,10 @@ dependencies {
 //    annotationProcessor 'org.projectlombok:lombok:1.18.10'
 }
 
-application {
-    // Define the main class for the application.
-    mainClassName = 'com.yada.MyAppKt'
-}
+//application {
+//    // Define the main class for the application.
+//    mainClassName = 'com.yada.MyAppKt'
+//}
 
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"

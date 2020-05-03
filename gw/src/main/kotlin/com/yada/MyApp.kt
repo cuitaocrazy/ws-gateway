@@ -4,7 +4,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import reactor.tools.agent.ReactorDebugAgent
 
-
 @SpringBootApplication
 open class MyApp
 

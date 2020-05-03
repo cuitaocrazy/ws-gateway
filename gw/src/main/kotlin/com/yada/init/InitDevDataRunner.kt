@@ -1,8 +1,7 @@
-package com.yada
+package com.yada.init
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.mongodb.reactivestreams.client.MongoClient
 import com.yada.web.model.Org
 import com.yada.web.model.Role
 import com.yada.web.model.Svc
@@ -12,10 +11,10 @@ import com.yada.web.services.IRoleService
 import com.yada.web.services.ISvcService
 import com.yada.web.services.IUserService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Profile
+import org.springframework.core.annotation.Order
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
@@ -229,6 +228,7 @@ private val svcJson = """
 ]
 """.trimIndent()
 
+@Order(1)
 @Profile("dev")
 @Component
 open class InitDevDataRunner @Autowired constructor(
@@ -236,22 +236,20 @@ open class InitDevDataRunner @Autowired constructor(
         private val usrSvc: IUserService,
         private val roleSvc: IRoleService,
         private val svcSvc: ISvcService,
-        private val client: MongoClient,
-        private val reactiveMongoTemplate: ReactiveMongoTemplate,
-        @Value("\${yada.db.mongo.db:yada_auth}")
-        private val dbName: String
+        private val reactiveMongoTemplate: ReactiveMongoTemplate
 ) : ApplicationRunner {
     override fun run(args: ApplicationArguments?) {
         val orgs = jacksonObjectMapper().readValue<List<Org>>(orgJson)
         val svcs = jacksonObjectMapper().readValue<List<Svc>>(svcJson)
         val apps = jacksonObjectMapper().readValue<List<Role>>(roleJson)
         val usrs = jacksonObjectMapper().readValue<List<User>>(userJson)
-        Mono.from(client.getDatabase(dbName).drop())
-                .then(createAllMongoDbCollection(reactiveMongoTemplate))
+
+        Mono.from(reactiveMongoTemplate.mongoDatabase.drop())
+                .then(initMongoDbCollection(reactiveMongoTemplate))
                 .thenMany(Flux.mergeSequential(orgs.map { orgSvc.createOrUpdate(it) }))
                 .thenMany(Flux.mergeSequential(svcs.map { svcSvc.createOrUpdate(it) }))
                 .thenMany(Flux.mergeSequential(apps.map { roleSvc.createOrUpdate(it) }))
                 .thenMany(Flux.mergeSequential(usrs.map { usrSvc.createOrUpdate(it) }))
-                .subscribe()
+                .collectList().block()
     }
 }

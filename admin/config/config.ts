@@ -190,6 +190,7 @@ export default {
     '/admin/apis': {
       target: 'http://localhost:8080/',
       changeOrigin: true,
+      logLevel: 'debug',
       onProxyRes(proxyRes: any) {
         const key = 'set-cookie';
         if (proxyRes.headers[key]) {

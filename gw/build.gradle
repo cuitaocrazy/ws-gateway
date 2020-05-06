@@ -40,6 +40,8 @@ dependencies {
     implementation 'jakarta.xml.bind:jakarta.xml.bind-api'
     implementation 'org.glassfish.jaxb:jaxb-runtime'
     implementation 'io.projectreactor:reactor-tools'
+    implementation 'com.hazelcast:hazelcast:3.12.6'
+    implementation 'com.hazelcast:hazelcast-client:3.12.6'
     runtimeOnly 'org.springframework.boot:spring-boot-devtools'
 //    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

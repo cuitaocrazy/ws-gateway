@@ -29,10 +29,8 @@ import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRep
  * 当Entity有[Document][org.springframework.data.mongodb.core.mapping.Document]和[Indexed][org.springframework.data.mongodb.core.index]注解时, 现在的版本会自动创建索引， 但是会提示`Automatic index creation will be disabled by default as of Spring Data MongoDB 3.x. Please use 'MongoMappingContext#setAutoIndexCreation(boolean)' or override 'MongoConfigurationSupport#autoIndexCreation()' to be explicit.`
  * 当升级到3.0时需要注意，这个选项到那时默认值时`false`
  *
- * 这个配置也开启了Spring的审计功能([EnableMongoAuditing])，目前只是为Token的管理使用，不排除以后各个Entity都会开启真正的审计功能，如：创建日期，修改日期，被谁修改的等等
  */
 @Configuration
-@EnableMongoAuditing
 open class MongoConfig constructor(
         @Value("\${yada.db.mongo.db:yada_auth}")
         private val dbName: String,

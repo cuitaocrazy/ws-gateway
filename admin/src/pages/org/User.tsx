@@ -1,7 +1,7 @@
 import React from 'react';
 import { Dispatch } from 'redux';
 import { GridContent } from '@ant-design/pro-layout';
-import { Row, Col, Button, Menu, Empty, Icon, Modal } from 'antd';
+import { Row, Col, Button, Menu, Empty, Icon, Modal, notification } from 'antd';
 import { connect } from 'dva';
 import { UserData, KeyData } from './data';
 import { ModelState } from './model';
@@ -50,6 +50,12 @@ const User: React.FC<UserProps> = props => {
         dispatch({
           type: 'org/fetchDeleteUser',
           payload: user,
+          callback: () => {
+            notification.success({
+              message: '删除用户操作成功',
+              description: `用户【${user.id}】已删除成功!`,
+            });
+          },
         });
       },
     });

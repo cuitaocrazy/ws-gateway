@@ -1,6 +1,6 @@
 import React from 'react';
 import { Dispatch } from 'redux';
-import { Dropdown, Menu, Modal } from 'antd';
+import { Dropdown, Menu, Modal, notification } from 'antd';
 import { connect } from 'dva';
 import { OrgTreeData, OrgData, RoleData, UserData } from './data';
 import { ModelState } from './model';
@@ -27,6 +27,12 @@ const TreeMenu: React.FC<TreeMenuProps> = props => {
     dispatch({
       type: 'org/fetchCreateOrUpdateOrg',
       payload: org,
+      callback: () => {
+        notification.success({
+          message: '添加机构操作成功',
+          description: `机构【${org.id}-${org.name}】已添加成功!`,
+        });
+      },
     });
   }
 
@@ -34,6 +40,12 @@ const TreeMenu: React.FC<TreeMenuProps> = props => {
     dispatch({
       type: 'org/fetchCreateOrUpdateOrg',
       payload: org,
+      callback: () => {
+        notification.success({
+          message: '修改机构操作成功',
+          description: `机构【${org.id}-${org.name}】已修改成功!`,
+        });
+      },
     });
   }
 
@@ -47,6 +59,12 @@ const TreeMenu: React.FC<TreeMenuProps> = props => {
         dispatch({
           type: 'org/fetchDeleteOrg',
           payload: orgId,
+          callback: () => {
+            notification.success({
+              message: '删除机构操作成功',
+              description: `机构【${orgId}】已删除成功!`,
+            });
+          },
         });
       },
     });
@@ -56,6 +74,12 @@ const TreeMenu: React.FC<TreeMenuProps> = props => {
     dispatch({
       type: 'org/fetchCreateOrUpdateUser',
       payload: user,
+      callback: () => {
+        notification.success({
+          message: '添加用户操作成功',
+          description: `用户【${user.id}】已添加成功!`,
+        });
+      },
     });
   }
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Dispatch } from 'redux';
 import { PageHeaderWrapper, GridContent } from '@ant-design/pro-layout';
-import { Spin, Button, Menu, Card, Empty } from 'antd';
+import { Spin, Button, Menu, Card, Empty, notification } from 'antd';
 import { connect } from 'dva';
 import { RoleData, KeyData } from './data';
 import { ModelState } from './model';
@@ -39,6 +39,12 @@ const RoleView: React.FC<RoleProps> = props => {
     dispatch({
       type: 'role/fetchCreateOrUpdateRole',
       payload: role,
+      callback: () => {
+        notification.success({
+          message: '新增操作成功',
+          description: `角色【${role.id}】已创建成功!`,
+        });
+      },
     });
   }
 

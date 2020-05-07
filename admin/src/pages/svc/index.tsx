@@ -2,7 +2,7 @@ import React from 'react';
 import { Dispatch } from 'redux';
 import { GridContent } from '@ant-design/pro-layout';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Spin, Menu, Modal, Card, List, Row, Col, Icon, Button } from 'antd';
+import { Spin, Menu, Modal, Card, List, Row, Col, Icon, Button, notification } from 'antd';
 import { connect } from 'dva';
 import { SvcData, ResData } from './data.d';
 import { ModelState } from './model';
@@ -44,7 +44,11 @@ const SvcView: React.FC<SvcProps> = props => {
       payload: svc,
       callback: () => {
         setIsUpdateSvc(false);
-      }
+        notification.success({
+          message: '更新操作成功',
+          description: `服务资源【${svc.id}】已更新成功!`,
+        });
+      },
     });
   }
 
@@ -58,6 +62,13 @@ const SvcView: React.FC<SvcProps> = props => {
         dispatch({
           type: 'svc/fetchDeleteSvc',
           payload: id,
+          callback: () => {
+            setIsUpdateSvc(false);
+            notification.success({
+              message: '删除操作成功',
+              description: `服务资源【${id}】已删除成功!`,
+            });
+          },
         });
       },
     });

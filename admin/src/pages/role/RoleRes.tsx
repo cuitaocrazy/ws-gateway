@@ -1,7 +1,7 @@
 import React from 'react';
 import { Dispatch } from 'redux';
 import { connect } from 'dva';
-import { Card, Button, Collapse } from 'antd';
+import { Card, Button, Collapse, notification } from 'antd';
 import { RoleData, SvcData, KeyData } from './data';
 import { ModelState } from './model';
 import ResOps from './ResOps';
@@ -45,6 +45,12 @@ const RoleRes: React.FC<RoleResProps> = props => {
       dispatch({
         type: 'role/fetchUpdateDefaultRole',
         payload: roleSvcs,
+        callback: () => {
+          notification.success({
+            message: '保存操作成功',
+            description: `角色【${id}】的资源已保存成功!`,
+          });
+        },
       });
     } else {
       dispatch({
@@ -52,6 +58,12 @@ const RoleRes: React.FC<RoleResProps> = props => {
         payload: {
           id,
           svcs: roleSvcs,
+        },
+        callback: () => {
+          notification.success({
+            message: '保存操作成功',
+            description: `角色【${id}】的资源已保存成功!`,
+          });
         },
       });
     }

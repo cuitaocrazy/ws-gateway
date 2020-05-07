@@ -1,7 +1,7 @@
 import React from 'react';
 import { Dispatch } from 'redux';
 import { connect } from 'dva';
-import { Card, Form, Input, TreeSelect, Checkbox } from 'antd';
+import { Card, Form, Input, TreeSelect, Checkbox, notification } from 'antd';
 import { FormComponentProps } from 'antd/es/form';
 import { TreeNode } from 'antd/es/tree-select';
 import { OrgTreeData, UserData, RoleData } from './data';
@@ -56,6 +56,10 @@ const UserForm: React.SFC<UserUpdateProps> = props => {
                 type: 'org/fetchUserByOrgId',
                 payload: info.orgId,
               });
+            notification.success({
+              message: '更新用户操作成功',
+              description: `用户【${info.id}】已更新成功!`,
+            });
           }
         });
       }

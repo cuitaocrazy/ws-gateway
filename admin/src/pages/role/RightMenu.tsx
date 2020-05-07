@@ -1,6 +1,6 @@
 import React from 'react';
 import { Dispatch } from 'redux';
-import { Row, Col, Button, Icon, Modal } from 'antd';
+import { Row, Col, Button, Icon, Modal, notification } from 'antd';
 import { connect } from 'dva';
 import RoleForm from './RoleForm';
 import { RoleData } from './data';
@@ -21,6 +21,12 @@ const RightMenu: React.FC<RightMenuProps> = props => {
     dispatch({
       type: 'role/fetchCreateOrUpdateRole',
       payload: role,
+      callback: () => {
+        notification.success({
+          message: '修改操作成功',
+          description: `角色【${role.id}】已修改成功!`,
+        });
+      },
     });
   }
 
@@ -34,6 +40,12 @@ const RightMenu: React.FC<RightMenuProps> = props => {
         dispatch({
           type: 'role/fetchDeleteRole',
           payload: id,
+          callback: () => {
+            notification.success({
+              message: '删除操作成功',
+              description: `角色【${role.id}】已删除成功!`,
+            });
+          },
         });
       },
     });

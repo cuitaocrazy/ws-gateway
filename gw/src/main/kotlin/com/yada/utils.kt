@@ -2,12 +2,6 @@ package com.yada
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.data.mongodb.core.ReactiveMongoTemplate
-import org.springframework.data.mongodb.core.index.MongoPersistentEntityIndexResolver
-import org.springframework.data.mongodb.core.mapping.Document
-import org.springframework.stereotype.Component
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
 import java.util.*
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
@@ -41,9 +35,6 @@ class LoggerDelegate : ReadOnlyProperty<Any?, Logger> {
     }
 }
 
-//private const val TOKEN_EXPIRE_INTERVAL: Long = 1 * 60 * 60 // 单位：秒
-
-@Component
 class TimeUtil {
     fun getCurrentDate() = Date()
 }

@@ -2,10 +2,10 @@ package com.yada.web.services
 
 import com.yada.gateways.SvcRoutePredicateFactory
 import com.yada.web.model.Res
+import org.springframework.beans.factory.BeanFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.gateway.config.GatewayProperties
 import org.springframework.cloud.gateway.support.ConfigurationService
-import org.springframework.context.ApplicationContext
 import org.springframework.core.env.Environment
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
@@ -36,7 +36,7 @@ interface IActualSvcResOfServerService {
  */
 @Service
 class ActualSvcResOfServerService @Autowired constructor(
-        private val context: ApplicationContext
+        private val beanFactory: BeanFactory
 ) : IActualSvcResOfServerService {
 
     override fun get(svcId: String): Mono<List<Res>> = getSvcServerUrl(svcId).map { url ->
@@ -50,15 +50,15 @@ class ActualSvcResOfServerService @Autowired constructor(
     override fun getAllSvcId(): List<String> = getSvcIds()
 
     // 为支持动态网关路由，每次都从新取配置信息
-    private class GatewayEnv(context: ApplicationContext) {
-        val properties: GatewayProperties = context.getBean(GatewayProperties::class.java)
-        val env: Environment = context.getBean(Environment::class.java)
-        val svcRoutePredicateFactory: SvcRoutePredicateFactory = context.getBean(SvcRoutePredicateFactory::class.java)
-        val configurationService: ConfigurationService = context.getBean(ConfigurationService::class.java)
+    private class GatewayEnv(beanFactory: BeanFactory) {
+        val properties: GatewayProperties = beanFactory.getBean(GatewayProperties::class.java)
+        val env: Environment = beanFactory.getBean(Environment::class.java)
+        val svcRoutePredicateFactory: SvcRoutePredicateFactory = beanFactory.getBean(SvcRoutePredicateFactory::class.java)
+        val configurationService: ConfigurationService = beanFactory.getBean(ConfigurationService::class.java)
     }
 
     private fun getSvcServerUrl(svcId: String): Optional<String> =
-            GatewayEnv(context).run {
+            GatewayEnv(beanFactory).run {
                 val list = properties.routes.mapNotNull { routeDefinition ->
                     val appPredicate = routeDefinition.predicates.firstOrNull { it.name == "Svc" }
                     if (appPredicate != null) {
@@ -87,7 +87,7 @@ class ActualSvcResOfServerService @Autowired constructor(
                 Optional.ofNullable(list.firstOrNull { it.first == svcId }?.second)
             }
 
-    private fun getSvcIds() = GatewayEnv(context).run {
+    private fun getSvcIds() = GatewayEnv(beanFactory).run {
         properties.routes.mapNotNull { routeDefinition ->
             val appPredicate = routeDefinition.predicates.firstOrNull { it.name == "Svc" }
             if (appPredicate != null) {

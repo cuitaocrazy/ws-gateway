@@ -1,16 +1,10 @@
 package com.yada.web.handlers
 
-import com.nulabinc.zxcvbn.Zxcvbn
-import com.yada.security.JwtTokenUtil
-import com.yada.security.authInfo
-import com.yada.security.token
+import com.yada.security.*
 import com.yada.web.model.Res
 import com.yada.web.services.IAuthenticationService
 import com.yada.web.services.IAuthorizationService
-import com.yada.web.services.IRecaptchaService
-import org.springframework.beans.factory.BeanFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.validation.BeanPropertyBindingResult
@@ -28,12 +22,10 @@ class AuthHandler @Autowired constructor(
         private val jwtUtil: JwtTokenUtil,
         private val authService: IAuthenticationService,
         private val authorServer: IAuthorizationService,
-        @Value("\${yada.recaptcha}") recaptchaName: String,
-        @Value("\${yada.password.strength.score:1}") private val score: Int,
-        beans: BeanFactory) {
-    private val recaptchaService: IRecaptchaService = beans.getBean(recaptchaName) as IRecaptchaService
+        private val recaptchaService: IRecaptchaService,
+        private val pwdStrengthService: IPwdStrengthService
+) {
     private val formBeanName = "loginForm"
-    private val zxcvbn = Zxcvbn()
 
     @Suppress("UNUSED_PARAMETER")
     fun getLoginForm(req: ServerRequest): Mono<ServerResponse> =
@@ -107,8 +99,8 @@ class AuthHandler @Autowired constructor(
                     }
                     .map {
                         it.apply {
-                            if (zxcvbn.measure(newPwd).score < score) {
-                                throw ResponseStatusException(HttpStatus.CONFLICT, "密码强度需要${score}")
+                            if (!pwdStrengthService.checkStrength(newPwd)) {
+                                throw ResponseStatusException(HttpStatus.CONFLICT, "密码强度不足")
                             }
                         }
                     }.flatMap { data ->

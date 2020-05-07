@@ -1,5 +1,6 @@
 package com.yada.web.services
 
+import com.yada.security.IPwdDigestService
 import com.yada.web.model.User
 import com.yada.web.repository.UserRepository
 import org.springframework.beans.factory.annotation.Autowired

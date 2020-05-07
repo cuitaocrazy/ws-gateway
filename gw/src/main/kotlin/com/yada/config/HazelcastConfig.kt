@@ -1,4 +1,4 @@
-package com.yada.security
+package com.yada.config
 
 import com.hazelcast.client.HazelcastClient
 import com.hazelcast.core.Hazelcast

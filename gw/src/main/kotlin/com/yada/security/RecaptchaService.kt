@@ -1,6 +1,5 @@
-package com.yada.web.services
+package com.yada.security
 
-import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Mono
@@ -26,16 +25,13 @@ abstract class AbsGoogleRecaptchaService(private val url: String) : IRecaptchaSe
 /**
  * 墙外验证码
  */
-@Service("recaptcha.Google")
 open class GoogleRecaptchaService : AbsGoogleRecaptchaService("https://www.google.com/recaptcha/api/siteverify?secret=6Leu2NsUAAAAAKbXdSjLz6_c1cf8qX2bL4xfn1mN&response=")
 
 /**
  * 墙内验证码
  */
-@Service("recaptcha.GoogleCN")
 open class GoogleCnRecaptchaService : AbsGoogleRecaptchaService("https://recaptcha.net/recaptcha/api/siteverify?secret=6Leu2NsUAAAAAKbXdSjLz6_c1cf8qX2bL4xfn1mN&response=")
 
-@Service("recaptcha.None")
 open class NoneRecaptchaService : IRecaptchaService {
     override fun check(code: String): Mono<Boolean> = Mono.just(true)
     override fun getCode(data: Map<String, String>): String? = "none"

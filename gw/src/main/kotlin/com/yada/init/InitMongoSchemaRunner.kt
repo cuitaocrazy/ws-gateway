@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 @Component
 class InitMongoSchemaRunner @Autowired constructor(
         private val reactiveMongoTemplate: ReactiveMongoTemplate
-): ApplicationRunner {
+) : ApplicationRunner {
     override fun run(args: ApplicationArguments?) {
         initMongoDbCollection(reactiveMongoTemplate).block()
     }

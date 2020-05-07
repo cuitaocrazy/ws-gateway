@@ -1,11 +1,6 @@
 package com.yada.web.model
 
-import org.springframework.data.annotation.CreatedDate
-import org.springframework.data.annotation.LastModifiedDate
-import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
-import java.time.Instant
-import java.util.*
 
 enum class Operator(val op: String) {
     READ("READ"),

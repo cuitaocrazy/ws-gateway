@@ -9,8 +9,6 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.data.mongodb.ReactiveMongoDatabaseFactory
 import org.springframework.data.mongodb.ReactiveMongoTransactionManager
 import org.springframework.data.mongodb.config.AbstractReactiveMongoConfiguration
-import org.springframework.data.mongodb.config.EnableMongoAuditing
-import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories
 
 /**
  * # MongoDb自动配置
@@ -32,14 +30,13 @@ import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRep
  */
 @Configuration
 open class MongoConfig constructor(
-        @Value("\${yada.db.mongo.db:yada_auth}")
-        private val dbName: String,
-        @Value("\${yada.db.mongo.url:mongodb://localhost/?replicaSet=rs}")
-        private val url: String
+        @Value("\${yada.db.mongo.uri:mongodb://localhost/yada_auth?replicaSet=rs}")
+        private val uri: String
 ) : AbstractReactiveMongoConfiguration() {
-    override fun reactiveMongoClient(): MongoClient = MongoClients.create(ConnectionString(url))
+    private val connectionString = ConnectionString(uri)
+    override fun reactiveMongoClient(): MongoClient = MongoClients.create(connectionString)
 
-    override fun getDatabaseName() = dbName
+    override fun getDatabaseName(): String = connectionString.database!!
 
     @Bean
     open fun transactionManager(factory: ReactiveMongoDatabaseFactory) = ReactiveMongoTransactionManager(factory)

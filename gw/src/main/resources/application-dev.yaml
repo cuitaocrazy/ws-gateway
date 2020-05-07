@@ -1,5 +1,5 @@
-logging.level:
-    org.springframework.data.mongodb.core.ReactiveMongoTemplate: TRACE
+#logging.level:
+#    org.springframework: TRACE
 server:
   error:
     includeStacktrace: ALWAYS
@@ -20,7 +20,14 @@ management.endpoints:
   web.exposure.include: metrics,gateway
   health.show-details: always
 
-yada:
-  recaptcha: recaptcha.GoogleCN
+#yada.security:
+#  defaultPwd: changepwd
+#  recaptcha: recaptcha.None
+#  pwdStrength: 1
+#  token:
+#    secret: yadajwt
+#    expire: 3600
+
+#yada.db.mongo.uri: 'mongodb://localhost/yada_auth?replicaSet=rs'
 
 

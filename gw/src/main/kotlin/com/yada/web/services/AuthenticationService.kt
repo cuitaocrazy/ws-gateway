@@ -1,6 +1,7 @@
 package com.yada.web.services
 
 import com.yada.security.AuthInfo
+import com.yada.security.IPwdDigestService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

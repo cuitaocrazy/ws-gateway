@@ -1,7 +1,7 @@
 import React from 'react';
 import { Dispatch } from 'redux';
 import { GridContent } from '@ant-design/pro-layout';
-import { Row, Col, Button, Menu, Empty, Icon } from 'antd';
+import { Row, Col, Button, Menu, Empty, Icon, Modal } from 'antd';
 import { connect } from 'dva';
 import { UserData, KeyData } from './data';
 import { ModelState } from './model';
@@ -10,6 +10,7 @@ import UserUpdate from './UserUpdate';
 import styles from './style.less';
 
 const { Item } = Menu;
+const { confirm } = Modal;
 
 interface UserProps {
   dispatch: Dispatch<any>;
@@ -40,9 +41,17 @@ const User: React.FC<UserProps> = props => {
   }
 
   const handleRemoveUser = (user: UserData) => {
-    dispatch({
-      type: 'org/fetchDeleteUser',
-      payload: user,
+    confirm({
+      title: `确定要删除【${user.id}】用户?`,
+      okText: '确定',
+      okType: 'danger',
+      cancelText: '取消',
+      onOk() {
+        dispatch({
+          type: 'org/fetchDeleteUser',
+          payload: user,
+        });
+      },
     });
   }
 
@@ -61,7 +70,7 @@ const User: React.FC<UserProps> = props => {
                 <Row>
                   <Col span={20}>{user.id}</Col>
                   <Col span={4}>
-                    <Button shape="circle" size="small"
+                    <Button type="link" shape="circle" size="small"
                       onClick={e => {
                         e.stopPropagation();
                         handleRemoveUser(user);

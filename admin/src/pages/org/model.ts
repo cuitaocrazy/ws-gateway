@@ -45,56 +45,70 @@ const Model: ModelType = {
   state: defaulState,
   effects: {
     *fetchOrgTree({ callback }, { call, put }) {
-      const orgTree = yield call(getOrgTree);
-      yield put({
-        type: 'setOrgTree',
-        payload: orgTree,
-      });
-      if (callback) callback(orgTree);
+      try {
+        const orgTree = yield call(getOrgTree);
+        yield put({
+          type: 'setOrgTree',
+          payload: orgTree,
+        });
+        if (callback) callback(orgTree);
+      } catch (error) { }
     },
     *fetchUserByOrgId({ callback, payload }, { call, put }) {
-      const users = yield call(getUserByOrgId, payload);
-      yield put({
-        type: 'setUsers',
-        payload: users,
-      });
-      if (callback) callback(users);
+      try {
+        const users = yield call(getUserByOrgId, payload);
+        yield put({
+          type: 'setUsers',
+          payload: users,
+        });
+        if (callback) callback(users);
+      } catch (error) { }
     },
     *fetchRoles({ callback }, { call, put }) {
-      const roles = yield call(getRoles);
-      yield put({ type: 'setRoles', payload: roles || [] });
-      if (callback) callback(roles || []);
+      try {
+        const roles = yield call(getRoles);
+        yield put({ type: 'setRoles', payload: roles || [] });
+        if (callback) callback(roles || []);
+      } catch (error) { }
     },
     *fetchCreateOrUpdateOrg({ callback, payload }, { call, put }) {
-      yield call(createAndUpdataOrg, payload)
-      yield put({
-        type: 'fetchOrgTree'
-      })
-      if (callback) callback();
+      try {
+        yield call(createAndUpdataOrg, payload)
+        yield put({
+          type: 'fetchOrgTree'
+        })
+        if (callback) callback();
+      } catch (error) { }
     },
     *fetchDeleteOrg({ callback, payload }, { call, put }) {
-      yield call(deleteOrg, payload)
-      yield put({
-        type: 'fetchOrgTree'
-      })
-      if (callback) callback();
+      try {
+        yield call(deleteOrg, payload)
+        yield put({
+          type: 'fetchOrgTree'
+        })
+        if (callback) callback();
+      } catch (error) { }
     },
     *fetchCreateOrUpdateUser({ callback, payload }, { call, put }) {
-      yield call(createAndUpdataUser, payload)
-      yield put({
-        type: 'fetchUserByOrgId',
-        payload: payload.orgId,
-      })
-      if (callback) callback();
+      try {
+        yield call(createAndUpdataUser, payload)
+        yield put({
+          type: 'fetchUserByOrgId',
+          payload: payload.orgId,
+        })
+        if (callback) callback();
+      } catch (error) { }
     },
     *fetchDeleteUser({ callback, payload }, { call, put }) {
-      const { id, orgId } = payload;
-      yield call(deleteUser, id)
-      yield put({
-        type: 'fetchUserByOrgId',
-        payload: orgId,
-      })
-      if (callback) callback();
+      try {
+        const { id, orgId } = payload;
+        yield call(deleteUser, id)
+        yield put({
+          type: 'fetchUserByOrgId',
+          payload: orgId,
+        })
+        if (callback) callback();
+      } catch (error) { }
     },
   },
   reducers: {

@@ -41,13 +41,20 @@ const RoleRes: React.FC<RoleResProps> = props => {
   }
 
   const handleSubmit = () => {
-    dispatch({
-      type: 'role/fetchCreateOrUpdateRole',
-      payload: {
-        id,
-        svcs: roleSvcs,
-      },
-    });
+    if (id === 'default') {
+      dispatch({
+        type: 'role/fetchUpdateDefaultRole',
+        payload: roleSvcs,
+      });
+    } else {
+      dispatch({
+        type: 'role/fetchCreateOrUpdateRole',
+        payload: {
+          id,
+          svcs: roleSvcs,
+        },
+      });
+    }
   }
 
   return (

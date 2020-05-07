@@ -68,17 +68,6 @@ const RoleView: React.FC<RoleProps> = props => {
                   </Menu.Item>
                 ))}
               </Menu>
-              {/* <Tree
-                onSelect={handleSelect}
-                selectedKeys={[id]}
-              >
-                {roles.map(role => (
-                  <TreeNode
-                    key={role.id}
-                    title={<TreeMenu role={role} />}
-                  />
-                ))}
-              </Tree> */}
             </div>
             <div className={styles.right}>
               <div className={styles.title}>{renderRes()}</div>

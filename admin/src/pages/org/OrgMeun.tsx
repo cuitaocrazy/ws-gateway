@@ -1,11 +1,13 @@
 import React from 'react';
 import { Dispatch } from 'redux';
-import { Dropdown, Menu } from 'antd';
+import { Dropdown, Menu, Modal } from 'antd';
 import { connect } from 'dva';
 import { OrgTreeData, OrgData, RoleData, UserData } from './data';
 import { ModelState } from './model';
 import OrgForm from './OrgForm';
 import UserForm from './UserForm';
+
+const { confirm } = Modal;
 
 interface TreeMenuProps {
   dispatch: Dispatch<any>;
@@ -36,9 +38,17 @@ const TreeMenu: React.FC<TreeMenuProps> = props => {
   }
 
   const handleRemoveOrg = (orgId: string) => {
-    dispatch({
-      type: 'org/fetchDeleteOrg',
-      payload: orgId,
+    confirm({
+      title: `确定要删除【${orgId}】机构?`,
+      okText: '确定',
+      okType: 'danger',
+      cancelText: '取消',
+      onOk() {
+        dispatch({
+          type: 'org/fetchDeleteOrg',
+          payload: orgId,
+        });
+      },
     });
   }
 

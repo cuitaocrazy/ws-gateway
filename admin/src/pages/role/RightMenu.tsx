@@ -39,7 +39,7 @@ const RightMenu: React.FC<RightMenuProps> = props => {
     });
   }
 
-  return (
+  return role.id === 'default' ? (<>default</>) : (
     <Row>
       <Col span={16}>{role.id}</Col>
       <Col span={4}>

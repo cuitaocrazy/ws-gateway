@@ -1,6 +1,6 @@
 import { Effect } from 'dva';
 import { Reducer } from 'redux';
-import { getRoles, getSvcs, createAndUpdataRole, deleteRole } from './service';
+import { getRoles, getSvcs, createAndUpdataRole, deleteRole, getDefaultRole, putDefaultRole } from './service';
 import { RoleData, SvcData, KeyData } from './data';
 
 export interface ModelState {
@@ -18,6 +18,7 @@ export interface ModelType {
     fetchSvcs: Effect;
     fetchCreateOrUpdateRole: Effect;
     fetchDeleteRole: Effect;
+    fetchUpdateDefaultRole: Effect;
   };
   reducers: {
     setRoles: Reducer<ModelState>;
@@ -40,12 +41,13 @@ const Model: ModelType = {
   effects: {
     *fetchRoles({ callback }, { call, put }) {
       try {
-        const apps = yield call(getRoles);
+        const roles = yield call(getRoles);
+        const defaultRoleRes = yield call(getDefaultRole);
         yield put({
           type: 'setRoles',
-          payload: apps,
+          payload: [{ id: 'default', svcs: defaultRoleRes }, ...roles],
         });
-        if (callback) callback(apps);
+        if (callback) callback([{ id: 'default', svcs: defaultRoleRes }, ...roles]);
       } catch (error) { }
     },
     *fetchSvcs({ callback }, { call, put }) {
@@ -70,6 +72,15 @@ const Model: ModelType = {
     *fetchDeleteRole({ callback, payload }, { call, put }) {
       try {
         yield call(deleteRole, payload)
+        yield put({
+          type: 'fetchRoles'
+        })
+        if (callback) callback();
+      } catch (error) { }
+    },
+    *fetchUpdateDefaultRole({ callback, payload }, { call, put }) {
+      try {
+        yield call(putDefaultRole, payload)
         yield put({
           type: 'fetchRoles'
         })

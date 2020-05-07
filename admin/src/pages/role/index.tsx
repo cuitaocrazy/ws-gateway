@@ -1,17 +1,15 @@
 import React from 'react';
 import { Dispatch } from 'redux';
 import { PageHeaderWrapper, GridContent } from '@ant-design/pro-layout';
-import { Spin, Button, Icon, Tree, Card, Empty } from 'antd';
+import { Spin, Button, Menu, Card, Empty } from 'antd';
 import { connect } from 'dva';
 import { RoleData, KeyData } from './data';
 import { ModelState } from './model';
-import TreeMenu from './TreeMeun';
+import RightMenu from './RightMenu';
 import RoleRes from './RoleRes';
 import RoleForm from './RoleForm';
 
 import styles from './style.less';
-
-const { TreeNode } = Tree;
 
 interface RoleProps {
   dispatch: Dispatch<any>;
@@ -30,13 +28,11 @@ const RoleView: React.FC<RoleProps> = props => {
     dispatch({ type: 'role/fetchRoles' });
   }, []);
 
-  const handleSelect = (selectedKeys: string[]) => {
-    if (selectedKeys.length > 0) {
-      dispatch({
-        type: 'role/setId',
-        payload: selectedKeys[0],
-      });
-    }
+  const handleSelect = (selectedKey: string) => {
+    dispatch({
+      type: 'role/setId',
+      payload: selectedKey,
+    });
   }
 
   const handleCreateRole = (role: RoleData) => {
@@ -56,15 +52,23 @@ const RoleView: React.FC<RoleProps> = props => {
   }
 
   return (
-    <PageHeaderWrapper>
+    <PageHeaderWrapper extra={<Button type="link" onClick={() => setIsCreateRole(true)}>新增</Button>}>
       <Spin spinning={loading}>
         <GridContent>
           <div className={styles.main} >
             <div className={styles.leftMenu}>
-              <Button type="dashed" onClick={() => setIsCreateRole(true)}>
-                <Icon type="plus" />
-              </Button>
-              <Tree
+              <Menu
+                mode="inline"
+                selectedKeys={[id]}
+                onClick={({ key }) => handleSelect(key)}
+              >
+                {roles.map(role => (
+                  <Menu.Item key={role.id} >
+                    <RightMenu role={role} />
+                  </Menu.Item>
+                ))}
+              </Menu>
+              {/* <Tree
                 onSelect={handleSelect}
                 selectedKeys={[id]}
               >
@@ -74,7 +78,7 @@ const RoleView: React.FC<RoleProps> = props => {
                     title={<TreeMenu role={role} />}
                   />
                 ))}
-              </Tree>
+              </Tree> */}
             </div>
             <div className={styles.right}>
               <div className={styles.title}>{renderRes()}</div>

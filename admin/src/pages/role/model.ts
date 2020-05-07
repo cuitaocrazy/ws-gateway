@@ -39,34 +39,42 @@ const Model: ModelType = {
   state: defaulState,
   effects: {
     *fetchRoles({ callback }, { call, put }) {
-      const apps = yield call(getRoles);
-      yield put({
-        type: 'setRoles',
-        payload: apps,
-      });
-      if (callback) callback(apps);
+      try {
+        const apps = yield call(getRoles);
+        yield put({
+          type: 'setRoles',
+          payload: apps,
+        });
+        if (callback) callback(apps);
+      } catch (error) { }
     },
     *fetchSvcs({ callback }, { call, put }) {
-      const svcs = yield call(getSvcs);
-      yield put({
-        type: 'setSvcs',
-        payload: svcs,
-      });
-      if (callback) callback(svcs);
+      try {
+        const svcs = yield call(getSvcs);
+        yield put({
+          type: 'setSvcs',
+          payload: svcs,
+        });
+        if (callback) callback(svcs);
+      } catch (error) { }
     },
     *fetchCreateOrUpdateRole({ callback, payload }, { call, put }) {
-      yield call(createAndUpdataRole, payload)
-      yield put({
-        type: 'fetchRoles'
-      })
-      if (callback) callback();
+      try {
+        yield call(createAndUpdataRole, payload)
+        yield put({
+          type: 'fetchRoles'
+        })
+        if (callback) callback();
+      } catch (error) { }
     },
     *fetchDeleteRole({ callback, payload }, { call, put }) {
-      yield call(deleteRole, payload)
-      yield put({
-        type: 'fetchRoles'
-      })
-      if (callback) callback();
+      try {
+        yield call(deleteRole, payload)
+        yield put({
+          type: 'fetchRoles'
+        })
+        if (callback) callback();
+      } catch (error) { }
     },
   },
   reducers: {

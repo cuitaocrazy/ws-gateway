@@ -80,7 +80,7 @@ const SvcView: React.FC<SvcProps> = props => {
                       <Row>
                         <Col span={20}>{svc.id}</Col>
                         <Col span={4}>
-                          <Button shape="circle" size="small"
+                          <Button type="link" shape="circle" size="small"
                             onClick={e => {
                               e.stopPropagation();
                               handleRemove(svc.id);

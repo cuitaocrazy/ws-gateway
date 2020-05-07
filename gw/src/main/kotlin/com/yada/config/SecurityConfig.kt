@@ -1,5 +1,6 @@
 package com.yada.config
 
+import com.hazelcast.core.IMap
 import com.yada.TimeUtil
 import com.yada.security.*
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -25,4 +26,7 @@ open class SecurityConfig(private val config: SecurityConfigProperties) {
 
     @Bean
     open fun pwdStrengthService(): IPwdStrengthService = PwdStrengthService(config.pwdStrength)
+
+    @Bean
+    open fun tokenManager(map: IMap<String, String>): TokenManager = TokenManager(map, config.token.expire)
 }

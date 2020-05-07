@@ -2,6 +2,7 @@ package com.yada.web.services
 
 import com.yada.security.AuthInfo
 import com.yada.security.IPwdDigestService
+import com.yada.security.TokenManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -20,7 +21,8 @@ interface IAuthenticationService {
 open class AuthenticationService @Autowired constructor(
         private val userService: IUserService,
         private val pwdDigestService: IPwdDigestService,
-        private val author: IAuthorizationService
+        private val author: IAuthorizationService,
+        private val tokenManager: TokenManager
 ) : IAuthenticationService {
     override fun login(username: String, password: String): Mono<AuthInfo> =
             userService.getPwd(username)
@@ -31,7 +33,7 @@ open class AuthenticationService @Autowired constructor(
                         author.getUserResList(user).map { resList -> AuthInfo.create(user, resList) }
                     }
 
-    override fun logout(token: String): Mono<Void> = Mono.empty()
+    override fun logout(token: String): Mono<Void> = tokenManager.delete(token).then()
 
     @Transactional
     override fun changePassword(username: String, oldPassword: String, newPassword: String): Mono<Boolean> =

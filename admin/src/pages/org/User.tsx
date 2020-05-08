@@ -1,7 +1,7 @@
 import React from 'react';
 import { Dispatch } from 'redux';
 import { GridContent } from '@ant-design/pro-layout';
-import { Row, Col, Button, Menu, Empty, Icon, Modal, notification } from 'antd';
+import { Row, Col, Tooltip, Button, Menu, Empty, Icon, Modal, notification } from 'antd';
 import { connect } from 'dva';
 import { UserData, KeyData } from './data';
 import { ModelState } from './model';
@@ -74,15 +74,28 @@ const User: React.FC<UserProps> = props => {
             {users.map(user => (
               <Item key={user.id}>
                 <Row>
-                  <Col span={20}>{user.id}</Col>
+                  <Col span={16}>{user.id}</Col>
                   <Col span={4}>
-                    <Button type="link" shape="circle" size="small"
-                      onClick={e => {
-                        e.stopPropagation();
-                        handleRemoveUser(user);
-                      }} >
-                      <Icon type="close" style={{ marginRight: 0 }} />
-                    </Button>
+                    <Tooltip title="重置密码">
+                      <Button type="link" shape="circle" size="small"
+                        onClick={e => {
+                          e.stopPropagation();
+                          handleRemoveUser(user);
+                        }} >
+                        <Icon type="unlock" style={{ marginRight: 0 }} />
+                      </Button>
+                    </Tooltip>
+                  </Col>
+                  <Col span={4}>
+                    <Tooltip title="删除用户">
+                      <Button type="link" shape="circle" size="small"
+                        onClick={e => {
+                          e.stopPropagation();
+                          handleRemoveUser(user);
+                        }} >
+                        <Icon type="close" style={{ marginRight: 0 }} />
+                      </Button>
+                    </Tooltip>
                   </Col>
                 </Row>
               </Item>

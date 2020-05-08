@@ -1,52 +1,36 @@
 import React from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { FormattedMessage } from 'umi-plugin-react/locale';
 import { Card, Typography } from 'antd';
+import Link from 'umi/link';
 
 import styles from './Welcome.less';
-
-const CodePreview: React.FC<{}> = ({ children }) => (
-  <pre className={styles.pre}>
-    <code>
-      <Typography.Text copyable>{children}</Typography.Text>
-    </code>
-  </pre>
-);
 
 export default (): React.ReactNode => (
   <PageHeaderWrapper>
     <Card>
       <Typography.Text strong>
-        <a target="_blank" rel="noopener noreferrer" href="https://pro.ant.design/docs/block">
-          <FormattedMessage
-            id="app.welcome.link.block-list"
-            defaultMessage="基于 block 开发，快速构建标准页面"
-          />
-        </a>
+        <Link to="/svc">服务管理</Link>
       </Typography.Text>
-      <CodePreview> npm run ui</CodePreview>
+      <pre className={styles.pre}>
+        服务管理
+      </pre>
+      <Typography.Text strong>
+        <Link to="/role">角色管理</Link>
+      </Typography.Text>
+      <pre className={styles.pre}>
+        角色管理
+      </pre>
       <Typography.Text
         strong
         style={{
           marginBottom: 12,
         }}
       >
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://pro.ant.design/docs/available-script#npm-run-fetchblocks"
-        >
-          <FormattedMessage id="app.welcome.link.fetch-blocks" defaultMessage="获取全部区块" />
-        </a>
+        <Link to="/org">用户管理</Link>
       </Typography.Text>
-      <CodePreview> npm run fetch:blocks</CodePreview>
+      <pre className={styles.pre}>
+        用户管理
+      </pre>
     </Card>
-    <p style={{ textAlign: 'center', marginTop: 24 }}>
-      Want to add more pages? Please refer to{' '}
-      <a href="https://pro.ant.design/docs/block-cn" target="_blank" rel="noopener noreferrer">
-        use block
-      </a>
-      。
-    </p>
   </PageHeaderWrapper>
 );

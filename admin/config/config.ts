@@ -106,6 +106,7 @@ export default {
               name: 'welcome',
               icon: 'home',
               component: './Welcome',
+              hideInMenu: true,
             },
             {
               name: 'svc',

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Dispatch } from 'redux';
-import { Row, Col, Button, Icon, Modal, notification } from 'antd';
+import { Row, Col, Tooltip, Button, Icon, Modal, notification } from 'antd';
 import { connect } from 'dva';
 import RoleForm from './RoleForm';
 import { RoleData } from './data';
@@ -15,16 +15,16 @@ interface RightMenuProps {
 const RightMenu: React.FC<RightMenuProps> = props => {
   const { dispatch, role } = props;
 
-  const [isUpdateRole, setIsUpdateRole] = React.useState<boolean>(false);
+  const [isCopyRole, setIsCopyRole] = React.useState<boolean>(false);
 
-  const handleUpdateRole = (role: RoleData) => {
+  const handleCopyRole = (role: RoleData) => {
     dispatch({
       type: 'role/fetchCreateOrUpdateRole',
       payload: role,
       callback: () => {
         notification.success({
-          message: '修改操作成功',
-          description: `角色【${role.id}】已修改成功!`,
+          message: '拷贝操作成功',
+          description: `角色【${role.id}】已创建成功!`,
         });
       },
     });
@@ -55,25 +55,29 @@ const RightMenu: React.FC<RightMenuProps> = props => {
     <Row>
       <Col span={16}>{role.id}</Col>
       <Col span={4}>
-        <Button type="link" shape="circle" size="small"
-          onClick={e => {
-            e.stopPropagation();
-            setIsUpdateRole(true);
-          }} >
-          <Icon type="edit" style={{ marginRight: 0 }} />
-        </Button>
+        <Tooltip title="拷贝角色">
+          <Button type="link" shape="circle" size="small"
+            onClick={e => {
+              e.stopPropagation();
+              setIsCopyRole(true);
+            }} >
+            <Icon type="copy" style={{ marginRight: 0 }} />
+          </Button>
+        </Tooltip>
       </Col>
       <Col span={4}>
-        <Button type="link" shape="circle" size="small"
-          onClick={e => {
-            e.stopPropagation();
-            handleRemoveRole(role.id);
-          }} >
-          <Icon type="close" style={{ marginRight: 0 }} />
-        </Button>
+        <Tooltip title="删除角色">
+          <Button type="link" shape="circle" size="small"
+            onClick={e => {
+              e.stopPropagation();
+              handleRemoveRole(role.id);
+            }} >
+            <Icon type="close" style={{ marginRight: 0 }} />
+          </Button>
+        </Tooltip>
       </Col>
-      <RoleForm title="修改角色" visible={isUpdateRole} onCancel={() => setIsUpdateRole(false)}
-        info={role || { svcs: [] }} onSubmit={handleUpdateRole} />
+      <RoleForm title={`拷贝【${role.id}】角色`} visible={isCopyRole} onCancel={() => setIsCopyRole(false)}
+        info={{ id: '', svcs: role.svcs }} onSubmit={handleCopyRole} />
     </Row>
   );
 }

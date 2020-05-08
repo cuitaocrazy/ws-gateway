@@ -2,7 +2,7 @@ import React from 'react';
 import { Dispatch } from 'redux';
 import { GridContent } from '@ant-design/pro-layout';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Spin, Menu, Modal, Card, List, Row, Col, Icon, Button, notification } from 'antd';
+import { Spin, Menu, Modal, Card, List, Row, Col, Icon, Tooltip, Button, notification } from 'antd';
 import { connect } from 'dva';
 import { SvcData, ResData } from './data.d';
 import { ModelState } from './model';
@@ -91,13 +91,15 @@ const SvcView: React.FC<SvcProps> = props => {
                       <Row>
                         <Col span={20}>{svc.id}</Col>
                         <Col span={4}>
-                          <Button type="link" shape="circle" size="small"
-                            onClick={e => {
-                              e.stopPropagation();
-                              handleRemove(svc.id);
-                            }} >
-                            <Icon type="close" style={{ marginRight: 0 }} />
-                          </Button>
+                          <Tooltip title="删除服务">
+                            <Button type="link" shape="circle" size="small"
+                              onClick={e => {
+                                e.stopPropagation();
+                                handleRemove(svc.id);
+                              }} >
+                              <Icon type="close" style={{ marginRight: 0 }} />
+                            </Button>
+                          </Tooltip>
                         </Col>
                       </Row>
                     )}

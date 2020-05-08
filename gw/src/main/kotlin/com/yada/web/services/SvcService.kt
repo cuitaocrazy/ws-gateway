@@ -18,8 +18,7 @@ interface ISvcService {
 
 @Service
 open class SvcService @Autowired constructor(
-        private val repo: SvcRepository,
-        private val roleSvc: IRoleService
+        private val repo: SvcRepository
 ) : ISvcService {
     val log by LoggerDelegate()
 
@@ -37,14 +36,5 @@ open class SvcService @Autowired constructor(
                     .flatMap { repo.deleteById(oldId).then(Mono.just(it)) }
 
     @Transactional
-    override fun delete(id: String): Mono<Void> =
-            roleSvc.getAll()
-                    .flatMapIterable { it }
-                    .flatMap { role ->
-                        val set = role.svcs.filter { it.id != id }.toSet()
-                        if (set.size != role.svcs.size)
-                            roleSvc.createOrUpdate(role.copy(svcs = set))
-                        else
-                            Mono.empty()
-                    }.then(repo.deleteById(id))
+    override fun delete(id: String): Mono<Void> = repo.deleteById(id)
 }

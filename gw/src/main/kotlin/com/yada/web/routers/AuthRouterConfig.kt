@@ -23,14 +23,12 @@ open class AuthRouterConfig @Autowired constructor(
                 GET("", authHandler::getLoginForm)
                 POST("", authHandler::login)
             }
-            filter(whitelistFilter)
         }
 
         "".nest {
             GET("/") { _ ->
                 ServerResponse.ok().render("/index")
             }
-            filter(whitelistFilter)
             filter { request, next -> authFilter.invoke(request, next) }
         }
 
@@ -39,7 +37,6 @@ open class AuthRouterConfig @Autowired constructor(
             POST("/change_pwd", authHandler::changePwd)
             GET("/refresh_token", authHandler::refreshToken)
             GET("/filter_apis", authHandler::filterApis)
-            filter(whitelistFilter)
             filter(authApiFilter)
         }
     }

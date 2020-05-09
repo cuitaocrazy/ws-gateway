@@ -4,7 +4,9 @@ import { connect } from 'dva';
 import { Card, Button, Collapse, notification } from 'antd';
 import { RoleData, SvcData, KeyData } from './data';
 import { ModelState } from './model';
+import ErrorRes from './ErrorRes';
 import ResOps from './ResOps';
+import { getExistRes } from './utils';
 
 const { Panel } = Collapse;
 
@@ -44,11 +46,11 @@ const RoleRes: React.FC<RoleResProps> = props => {
     if (id === 'default') {
       dispatch({
         type: 'role/fetchUpdateDefaultRole',
-        payload: roleSvcs,
+        payload: getExistRes(roleSvcs, svcs),
         callback: () => {
           notification.success({
-            message: '保存操作成功',
-            description: `角色【${id}】的资源已保存成功!`,
+            message: '更新操作成功',
+            description: `角色【${id}】的资源已更新成功!`,
           });
         },
       });
@@ -57,12 +59,12 @@ const RoleRes: React.FC<RoleResProps> = props => {
         type: 'role/fetchCreateOrUpdateRole',
         payload: {
           id,
-          svcs: roleSvcs,
+          svcs: getExistRes(roleSvcs, svcs),
         },
         callback: () => {
           notification.success({
-            message: '保存操作成功',
-            description: `角色【${id}】的资源已保存成功!`,
+            message: '更新操作成功',
+            description: `角色【${id}】的资源已更新成功!`,
           });
         },
       });
@@ -70,7 +72,8 @@ const RoleRes: React.FC<RoleResProps> = props => {
   }
 
   return (
-    <Card title={`角色【${id}】资源管理`} extra={<Button type="link" onClick={handleSubmit}>保存</Button>}>
+    <Card title={`角色【${id}】资源管理`} extra={<Button type="link" onClick={handleSubmit}>更新</Button>}>
+      <ErrorRes role={roles.filter(role => role.id === id)[0]} svcs={svcs} />
       <Collapse key={id} onChange={handleChange}
         activeKey={keys.filter(key => key.id === id)[0]?.activeKey}
       >

@@ -1,10 +1,9 @@
 package com.yada.web.services
 
-import com.yada.security.AuthInfo
+import com.yada.security.AdminInfo
 import com.yada.security.IPwdDigestService
 import com.yada.security.JwtTokenUtil
 import com.yada.web.model.Admin
-import com.yada.web.model.Operator
 import com.yada.web.repository.AdminRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -12,10 +11,9 @@ import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Mono
 
 interface IAdminAuthService {
-    fun login(username: String, password: String): Mono<AuthInfo>
+    fun login(username: String, password: String): Mono<AdminInfo>
     fun logout(token: String): Mono<Void>
     fun changePassword(username: String, oldPassword: String, newPassword: String): Mono<Boolean>
-    fun authorize(token: String, uri: String, opt: Operator): Mono<Boolean>
 }
 
 private const val adminStr = "admin"
@@ -27,19 +25,16 @@ open class AdminAuthService @Autowired constructor(
         private val pwdDigestService: IPwdDigestService,
         private val jwtUtil: JwtTokenUtil
 ) : IAdminAuthService {
-    override fun login(username: String, password: String): Mono<AuthInfo> {
+    override fun login(username: String, password: String): Mono<AdminInfo> {
         var monoPwd = adminRepo.findPwdById(username)
         if (username == adminStr)
             monoPwd = monoPwd.defaultIfEmpty(pwdDigestService.getDefaultPwdDigest(adminStr))
         return monoPwd.filter { pwdDigestService.getPwdDigest(username, password) == it }
-                .map { AuthInfo.create(username) }
+                .map { AdminInfo(it) }
     }
 
     // 看以后是否管理token，在实现
     override fun logout(token: String): Mono<Void> = Mono.empty()
-
-    override fun authorize(token: String, uri: String, opt: Operator): Mono<Boolean> =
-            Mono.just(jwtUtil.getEntity(token) != null)
 
     @Transactional
     override fun changePassword(username: String, oldPassword: String, newPassword: String): Mono<Boolean> {

@@ -1,7 +1,8 @@
 package com.yada.web.handlers
 
-import com.yada.security.JwtTokenUtil
-import com.yada.security.authInfo
+import com.yada.adminPath
+import com.yada.security.ResponseWithCookies
+import com.yada.security.adminInfo
 import com.yada.web.services.IAdminAuthService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -13,7 +14,7 @@ import org.springframework.web.server.ResponseStatusException
 import reactor.core.publisher.Mono
 
 @Component
-class AdminAuthHandler @Autowired constructor(private val authSvc: IAdminAuthService, private val jwtUtil: JwtTokenUtil) {
+class AdminAuthHandler @Autowired constructor(private val authSvc: IAdminAuthService) {
 
     @Suppress("UNUSED_PARAMETER")
     fun index(req: ServerRequest): Mono<ServerResponse> = ServerResponse.ok().render("/admin/index")
@@ -23,18 +24,19 @@ class AdminAuthHandler @Autowired constructor(private val authSvc: IAdminAuthSer
         return dataMono.flatMap {
             authSvc.login(it.username!!, it.password!!)
         }.flatMap {
-            ServerResponse.ok().cookie(jwtUtil.generateCookie(it)).build()
+            ResponseWithCookies.createAdminServerResponse(it, adminPath, ServerResponse.ok())
         }.switchIfEmpty(Mono.error { ResponseStatusException(HttpStatus.CONFLICT, "登录失败") })
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun logout(req: ServerRequest): Mono<ServerResponse> =
-            ServerResponse.ok().cookie(jwtUtil.getEmptyCookie(req.authInfo)).build()
+            ResponseWithCookies.createAdminLogoutServerResponse(adminPath, ServerResponse.ok())
 
     fun changePwd(req: ServerRequest): Mono<ServerResponse> {
         val dataMono: Mono<ChangePwdData> = req.bodyToMono()
         return dataMono.flatMap { data ->
             if (data.oldPwd != null && data.newPwd != null) {
-                authSvc.changePassword(req.authInfo.username!!, data.oldPwd, data.newPwd)
+                authSvc.changePassword(req.adminInfo.id, data.oldPwd, data.newPwd)
                         .flatMap { flag ->
                             if (flag)
                                 ServerResponse.ok().build()
@@ -47,5 +49,5 @@ class AdminAuthHandler @Autowired constructor(private val authSvc: IAdminAuthSer
     }
 
     fun refreshToken(req: ServerRequest): Mono<ServerResponse> =
-            ServerResponse.ok().cookie(jwtUtil.renewCookie(req.authInfo)).build()
+            ResponseWithCookies.createAdminServerResponse(req.adminInfo, adminPath, ServerResponse.ok())
 }

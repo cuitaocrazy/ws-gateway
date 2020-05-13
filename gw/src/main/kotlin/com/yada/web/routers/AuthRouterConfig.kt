@@ -1,5 +1,6 @@
 package com.yada.web.routers
 
+import com.yada.security.WebFluxAuthFilter
 import com.yada.web.filters.AuthApiHandlerFilter
 import com.yada.web.filters.AuthHandlerFilter
 import com.yada.web.handlers.AuthHandler
@@ -13,7 +14,9 @@ import org.springframework.web.reactive.function.server.router
 open class AuthRouterConfig @Autowired constructor(
         private val authHandler: AuthHandler,
         private val authFilter: AuthHandlerFilter,
-        private val authApiFilter: AuthApiHandlerFilter) {
+        private val authApiFilter: AuthApiHandlerFilter,
+        private val webFluxAuthFilter: WebFluxAuthFilter
+) {
     @Bean
     open fun authRouter() = router {
         "".nest {
@@ -35,6 +38,7 @@ open class AuthRouterConfig @Autowired constructor(
             POST("/change_pwd", authHandler::changePwd)
             GET("/refresh_token", authHandler::refreshToken)
             GET("/filter_apis", authHandler::filterApis)
+            filter(webFluxAuthFilter)
             filter(authApiFilter)
         }
     }

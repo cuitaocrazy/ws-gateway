@@ -1,7 +1,6 @@
 package com.yada.gateways
 
-import com.yada.security.JwtTokenUtil
-import com.yada.security.token
+import com.yada.security.AuthInfoParser
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.gateway.filter.GatewayFilter
 import org.springframework.cloud.gateway.filter.GatewayFilterChain
@@ -14,7 +13,7 @@ import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
 
 @Component
-class AuthGatewayFilterFactory @Autowired constructor(private val jwtTokenUtil: JwtTokenUtil)
+class AuthGatewayFilterFactory @Autowired constructor(private val authInfoParser: AuthInfoParser)
     : AbstractGatewayFilterFactory<AuthGatewayFilterFactory.Config>(Config::class.java) {
 
     /**
@@ -23,24 +22,21 @@ class AuthGatewayFilterFactory @Autowired constructor(private val jwtTokenUtil: 
     override fun apply(config: Config): GatewayFilter {
         return object : GatewayFilter {
             override fun filter(exchange: ServerWebExchange, chain: GatewayFilterChain): Mono<Void> {
-                val authInfo = exchange.token?.run {
-                    jwtTokenUtil.getEntity(this)
-                }
 
                 return if ((exchange.request.uri.path == exchange.attributes["index"] || exchange.request.uri.path == (exchange.attributes["index"] as String + "/")) && !exchange.response.isCommitted) {
-                    if (authInfo == null) {
+                    authInfoParser.getAuthInfo(authInfoParser.getToken(exchange)).flatMap {
+                        val req = exchange.request.mutate()
+                                .header("X-YADA-ORG-ID", it.user.orgId)
+                                .header("X-YADA-USER-ID", it.user.id)
+                                .header("COOKIE", null)
+                                .build()
+                        chain.filter(exchange.mutate().request(req).build())
+                    }.switchIfEmpty(run {
                         val res = exchange.response
                         res.statusCode = HttpStatus.SEE_OTHER
                         res.headers.set(HttpHeaders.LOCATION, getLoginPath(exchange))
                         exchange.response.setComplete()
-                    } else {
-                        val req = exchange.request.mutate()
-                                .header("X-YADA-ORG-ID", authInfo.user?.orgId)
-                                .header("X-YADA-USER-ID", authInfo.user?.id)
-                                .header("COOKIE", null)
-                                .build()
-                        chain.filter(exchange.mutate().request(req).build())
-                    }
+                    })
                 } else {
                     if (exchange.response.isCommitted) Mono.empty() else chain.filter(exchange)
                 }

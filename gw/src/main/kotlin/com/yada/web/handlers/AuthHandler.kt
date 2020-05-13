@@ -1,5 +1,6 @@
 package com.yada.web.handlers
 
+import com.yada.generalPath
 import com.yada.security.*
 import com.yada.web.model.Res
 import com.yada.web.services.IAuthenticationService
@@ -19,7 +20,6 @@ import java.net.URI
 
 @Component
 class AuthHandler @Autowired constructor(
-        private val jwtUtil: JwtTokenUtil,
         private val authService: IAuthenticationService,
         private val authorServer: IAuthorizationService,
         private val recaptchaService: IRecaptchaService,
@@ -69,16 +69,17 @@ class AuthHandler @Autowired constructor(
                             }
                         }
                         .flatMap {
-                            ServerResponse.seeOther(URI(redirect.orElse("/")))
-                                    .cookie(jwtUtil.generateCookie(it))
-                                    .build()
+                            ResponseWithCookies.createServerResponse(
+                                    it,
+                                    generalPath,
+                                    ServerResponse.seeOther(URI(redirect.orElse("/"))))
                         }
                         .switchIfEmpty(Mono.defer { ServerResponse.ok().render("/auth/index", model) })
             }
 
     fun logout(req: ServerRequest): Mono<ServerResponse> =
-            authService.logout(req.token!!)
-                    .then(ServerResponse.ok().cookie(jwtUtil.getEmptyCookie(req.authInfo)).build())
+            authService.logout(req.token.get())
+                    .then(ResponseWithCookies.createLogoutServerResponse(req, generalPath, ServerResponse.ok()))
 
 
     data class ChangePwdData(val oldPwd: String?, val newPwd: String?)
@@ -104,20 +105,22 @@ class AuthHandler @Autowired constructor(
                             }
                         }
                     }.flatMap { data ->
-                        authService.changePassword(req.authInfo.username!!, data.oldPwd, data.newPwd)
+                        authService.changePassword(req.authInfo.get().user.id, data.oldPwd, data.newPwd)
                                 .filter { it }
                                 .switchIfEmpty(Mono.error { ResponseStatusException(HttpStatus.CONFLICT, "修改密码时出错") })
                                 .then(ServerResponse.ok().build())
                     }
 
     fun refreshToken(req: ServerRequest): Mono<ServerResponse> =
-            ServerResponse.ok().cookie(jwtUtil.renewCookie(req.authInfo)).build()
+            authService.refreshToken(req.token.get()).then(
+                    ResponseWithCookies.createServerResponse(req.token.get(), generalPath, ServerResponse.ok())
+            )
 
     fun filterApis(req: ServerRequest): Mono<ServerResponse> =
             ServerResponse.ok()
                     .bodyValue(
                             req.bodyToMono<List<Res>>().flatMap {
-                                authorServer.filterApis(it, req.authInfo.resList!!)
+                                authorServer.filterApis(it, req.authInfo.get().resList)
                             }
                     )
 }

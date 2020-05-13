@@ -1,6 +1,6 @@
 package com.yada.web.services
 
-import com.yada.security.JwtTokenUtil
+import com.yada.security.TokenManager
 import com.yada.web.model.Operator
 import com.yada.web.model.Res
 import com.yada.web.model.Svc
@@ -25,12 +25,14 @@ private fun svcUri(svcId: String, uri: String) = "/${svcId}${uri}"
 @Service
 class AuthorizationService @Autowired constructor(
         private val roleService: IRoleService,
-        private val jwtUtil: JwtTokenUtil,
+        private val tokenManager: TokenManager,
         private val defaultRoleSvcResService: DefaultRoleSvcResService
 ) : IAuthorizationService {
 
     override fun authorize(token: String, uri: String, opt: Operator): Mono<Boolean> =
-            Mono.just(jwtUtil.getEntity(token)!!.resList!!.any { it.uri == uri && opt in it.ops })
+            tokenManager.get(token).map { authInfo ->
+                authInfo.resList.any { it.uri == uri && opt in it.ops }
+            }
 
     override fun getUserResList(user: User): Mono<List<Res>> =
             roleService.getAll()

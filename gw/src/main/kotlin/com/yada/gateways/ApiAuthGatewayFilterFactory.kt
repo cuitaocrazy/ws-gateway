@@ -1,7 +1,6 @@
 package com.yada.gateways
 
-import com.yada.security.JwtTokenUtil
-import com.yada.security.token
+import com.yada.security.AuthInfoParser
 import com.yada.web.model.Operator
 import com.yada.web.model.Res
 import com.yada.web.pathPatternParser
@@ -19,18 +18,15 @@ import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
 
 @Component
-class ApiAuthGatewayFilterFactory @Autowired constructor(private val jwtTokenUtil: JwtTokenUtil)
-    : AbstractGatewayFilterFactory<ApiAuthGatewayFilterFactory.Config>(Config::class.java) {
+class ApiAuthGatewayFilterFactory @Autowired constructor(
+        private val authInfoParser: AuthInfoParser
+) : AbstractGatewayFilterFactory<ApiAuthGatewayFilterFactory.Config>(Config::class.java) {
 
     override fun shortcutFieldOrder(): MutableList<String> = mutableListOf("checkPower")
 
     override fun apply(config: Config): GatewayFilter {
         return object : GatewayFilter {
             override fun filter(exchange: ServerWebExchange, chain: GatewayFilterChain): Mono<Void> {
-                val authInfo = exchange.token?.run {
-                    jwtTokenUtil.getEntity(this)
-                }
-
                 return if (!exchange.response.isCommitted) {
                     val op = convertOp(exchange.request.method!!)
                     val svcId = exchange.attributes["svcId"]!! as String
@@ -45,15 +41,17 @@ class ApiAuthGatewayFilterFactory @Autowired constructor(private val jwtTokenUti
 
                     if (exchange.request.uri.host == "localhost" && exchange.request.uri.path == resListUri) {
                         chain.filter(exchange)
-                    } else if (authInfo == null || (config.checkPower == "checkPower" && !hasPower(authInfo.resList!!, op, subUri))) {
-                        Mono.error(ResponseStatusException(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED"))
                     } else {
-                        val req = exchange.request.mutate()
-                                .header("X-YADA-ORG-ID", authInfo.user?.orgId)
-                                .header("X-YADA-USER-ID", authInfo.user?.id)
-                                .header("COOKIE", null)
-                                .build()
-                        chain.filter(exchange.mutate().request(req).build())
+                        authInfoParser.getAuthInfo(authInfoParser.getToken(exchange)).filter {
+                            config.checkPower == "checkPower" && hasPower(it.resList, op, subUri) || config.checkPower != "checkPower"
+                        }.flatMap {
+                            val req = exchange.request.mutate()
+                                    .header("X-YADA-ORG-ID", it.user.orgId)
+                                    .header("X-YADA-USER-ID", it.user.id)
+                                    .header("COOKIE", null)
+                                    .build()
+                            chain.filter(exchange.mutate().request(req).build())
+                        }.switchIfEmpty(Mono.error(ResponseStatusException(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED")))
                     }
                 } else {
                     Mono.empty()

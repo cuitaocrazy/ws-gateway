@@ -1,7 +1,8 @@
 package com.yada.web.filters
 
-import com.yada.security.JwtTokenUtil
-import org.springframework.beans.factory.annotation.Autowired
+import com.yada.Filter
+import com.yada.Next
+import com.yada.security.isAdmin
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -10,14 +11,13 @@ import org.springframework.web.server.ResponseStatusException
 import reactor.core.publisher.Mono
 
 @Component
-class AuthAdminApiHandlerFilter @Autowired constructor(jwtUtil: JwtTokenUtil) : Filter {
-    private val filter = commonAuthHandlerFilter(
-            jwtUtil,
-            { authInfo -> authInfo != null && authInfo.isAdmin },
-            { _, _ -> Mono.error(ResponseStatusException(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED")) }
-    )
+class AuthAdminApiHandlerFilter : Filter {
 
     override fun invoke(request: ServerRequest, next: Next): Mono<ServerResponse> =
-            filter(request, next)
+            if (request.isAdmin) {
+                next(request)
+            } else {
+                Mono.error(ResponseStatusException(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED"))
+            }
 
 }

@@ -6,6 +6,9 @@ import java.util.*
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
+const val adminPath = "/admin"
+const val generalPath = "/"
+
 /**
  * 网上抄的一个kotlin通用logger实现
  * 用的是第三种方法，属性委托

@@ -1,13 +1,14 @@
 package com.yada.web.model
 
+import com.yada.sc2.Operator
 import org.springframework.data.mongodb.core.mapping.Document
 
-enum class Operator(val op: String) {
-    READ("READ"),
-    CREATE("CREATE"),
-    UPDATE("UPDATE"),
-    DELETE("DELETE")
-}
+//enum class Operator(val op: String) {
+//    READ("READ"),
+//    CREATE("CREATE"),
+//    UPDATE("UPDATE"),
+//    DELETE("DELETE")
+//}
 
 @Document
 data class Org(

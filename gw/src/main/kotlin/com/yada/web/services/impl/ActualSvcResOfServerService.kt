@@ -1,7 +1,8 @@
-package com.yada.web.services
+package com.yada.web.services.impl
 
 import com.yada.gateways.SvcRoutePredicateFactory
 import com.yada.web.model.Res
+import com.yada.web.services.IActualSvcResOfServerService
 import org.springframework.beans.factory.BeanFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.gateway.config.GatewayProperties
@@ -14,11 +15,6 @@ import org.springframework.web.reactive.function.client.bodyToMono
 import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
 import java.util.*
-
-interface IActualSvcResOfServerService {
-    fun get(svcId: String): Mono<List<Res>>
-    fun getAllSvcId(): List<String>
-}
 
 /**
  *
@@ -72,8 +68,7 @@ class ActualSvcResOfServerService @Autowired constructor(
                                 .bind()
                                 as SvcRoutePredicateFactory.Config
                         val url = "$schema://localhost:$port" +
-                                UriComponentsBuilder
-                                        .fromPath(config.pathPrefix)
+                                UriComponentsBuilder.fromPath(config.pathPrefix)
                                         .pathSegment(config.svcId)
                                         .pathSegment("res_list")
                                         .encode()

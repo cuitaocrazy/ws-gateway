@@ -1,8 +1,6 @@
 package com.yada.web.routers
 
 import com.yada.adminPath
-import com.yada.security.WebFluxAdminAuthFilter
-import com.yada.web.filters.AuthAdminApiHandlerFilter
 import com.yada.web.filters.WhitelistHandlerFilter
 import com.yada.web.handlers.apis.*
 import org.springframework.beans.factory.annotation.Autowired
@@ -16,9 +14,7 @@ open class AdminApiRouterConfig @Autowired constructor(
         private val orgHandler: OrgHandler,
         private val svcHandler: SvcHandler,
         private val userHandler: UserHandler,
-        private val authAdminApiFilter: AuthAdminApiHandlerFilter,
         private val whitelistFilter: WhitelistHandlerFilter,
-        private val webFluxAdminAuthFilter: WebFluxAdminAuthFilter,
         private val defaultRoleSvcResHandler: DefaultRoleSvcResHandler) {
     @Bean
     open fun adminApiRouter() = router {
@@ -58,7 +54,7 @@ open class AdminApiRouterConfig @Autowired constructor(
             }
         }
         filter(whitelistFilter)
-        filter(webFluxAdminAuthFilter)
-        filter(authAdminApiFilter)
+//        filter(webFluxAdminAuthFilter)
+//        filter(authAdminApiFilter)
     }
 }

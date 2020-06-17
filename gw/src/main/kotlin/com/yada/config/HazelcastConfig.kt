@@ -4,7 +4,6 @@ import com.hazelcast.client.HazelcastClient
 import com.hazelcast.core.Hazelcast
 import com.hazelcast.core.HazelcastInstance
 import com.hazelcast.core.IMap
-import com.yada.security.AuthInfo
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import javax.annotation.PostConstruct
@@ -31,7 +30,7 @@ open class HazelcastConfig {
     open fun client(): HazelcastInstance = HazelcastClient.newHazelcastClient()
 
     @Bean
-    open fun tokenMap(): IMap<String, AuthInfo> = client().getMap("tokens")
+    open fun tokenMap(): IMap<String, String> = client().getMap("tokens")
 
     @PreDestroy
     open fun destroy() {

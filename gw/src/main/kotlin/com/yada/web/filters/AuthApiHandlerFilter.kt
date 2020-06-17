@@ -2,7 +2,7 @@ package com.yada.web.filters
 
 import com.yada.Filter
 import com.yada.Next
-import com.yada.security.authInfo
+import com.yada.sc2.AuthHolder
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -14,8 +14,8 @@ import reactor.core.publisher.Mono
 class AuthApiHandlerFilter : Filter {
 
     override fun invoke(request: ServerRequest, next: Next): Mono<ServerResponse> =
-            request.authInfo
-                    .map { next(request) }
-                    .orElse(Mono.error(ResponseStatusException(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED")))
+            AuthHolder.getUserInfo()
+                    .flatMap { next(request) }
+                    .switchIfEmpty(Mono.error(ResponseStatusException(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED")))
 
 }

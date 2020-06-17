@@ -2,7 +2,7 @@ package com.yada.web.filters
 
 import com.yada.Filter
 import com.yada.Next
-import com.yada.security.authInfo
+import com.yada.sc2.AuthHolder
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono
 class AuthHandlerFilter : Filter {
 
     override fun invoke(request: ServerRequest, next: Next): Mono<ServerResponse> =
-            request.authInfo.map { next(request) }.orElse(
+            AuthHolder.getUserInfo().flatMap { next(request) }.switchIfEmpty(
                     ServerResponse.seeOther(
                             UriComponentsBuilder.fromPath("/login")
                                     .queryParam("redirect", request.uri().path)

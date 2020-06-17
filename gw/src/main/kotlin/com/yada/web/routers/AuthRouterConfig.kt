@@ -1,9 +1,10 @@
 package com.yada.web.routers
 
-import com.yada.security.WebFluxAuthFilter
+import com.yada.sc2.web.FilterContextBuilder
 import com.yada.web.filters.AuthApiHandlerFilter
 import com.yada.web.filters.AuthHandlerFilter
 import com.yada.web.handlers.AuthHandler
+import com.yada.web.security.GeneralAuth
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -15,7 +16,7 @@ open class AuthRouterConfig @Autowired constructor(
         private val authHandler: AuthHandler,
         private val authFilter: AuthHandlerFilter,
         private val authApiFilter: AuthApiHandlerFilter,
-        private val webFluxAuthFilter: WebFluxAuthFilter
+        private val auth: GeneralAuth
 ) {
     @Bean
     open fun authRouter() = router {
@@ -38,8 +39,9 @@ open class AuthRouterConfig @Autowired constructor(
             POST("/change_pwd", authHandler::changePwd)
             GET("/refresh_token", authHandler::refreshToken)
             GET("/filter_apis", authHandler::filterApis)
-            filter(webFluxAuthFilter)
-            filter(authApiFilter)
+            filter(FilterContextBuilder.buildFluxFilter(auth, authApiFilter))
         }
+
+        filter(FilterContextBuilder.buildDefaultFluxFilter(auth))
     }
 }

@@ -1,16 +1,12 @@
-package com.yada.web.services
+package com.yada.web.services.impl
 
 import com.yada.web.model.DefaultRoleSvcRes
 import com.yada.web.repository.DefaultRoleSvcResRepository
+import com.yada.web.services.IDefaultRoleSvcResService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Mono
-
-interface IDefaultRoleSvcResService {
-    fun get(): Mono<List<DefaultRoleSvcRes>>
-    fun createOrUpdate(defaultRoleSvcRes: List<DefaultRoleSvcRes>): Mono<List<DefaultRoleSvcRes>>
-}
 
 @Service
 open class DefaultRoleSvcResService @Autowired constructor(

@@ -1,25 +1,18 @@
-package com.yada.web.services
+package com.yada.web.services.impl
 
+import com.yada.sc2.Power
 import com.yada.security.IPwdDigestService
+import com.yada.web.model.Res
 import com.yada.web.model.User
+import com.yada.web.pathPatternParser
 import com.yada.web.repository.UserRepository
+import com.yada.web.services.IUserService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.server.PathContainer
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-
-interface IUserService {
-    fun get(id: String): Mono<User>
-    fun getByOrgId(orgId: String): Flux<User>
-    fun createOrUpdate(user: User): Mono<User>
-    fun delete(id: String): Mono<Void>
-    fun deleteByOrgId(orgId: String): Mono<Void>
-    fun exist(id: String): Mono<Boolean>
-    fun getPwd(id: String): Mono<String>
-    fun changePwd(id: String, pwd: String): Mono<Void>
-    fun getAll(): Flux<User>
-}
 
 @Service
 open class UserService @Autowired constructor(
@@ -56,5 +49,35 @@ open class UserService @Autowired constructor(
     @Transactional
     override fun changePwd(id: String, pwd: String): Mono<Void> = userRepo.changePwd(id, pwd)
 
+    @Transactional
+    override fun changePwd(id: String, oldPwd: String, newPwd: String): Mono<Boolean> {
+        val nct = pwdDigestService.getPwdDigest(id, newPwd)
+        val oct = pwdDigestService.getPwdDigest(id, oldPwd)
+
+        return getPwd(id).map { oct == it }
+                .filter { it }
+                .flatMap { changePwd(id, nct).then(Mono.just(true)) }
+                .defaultIfEmpty(false)
+    }
+
     override fun getAll(): Flux<User> = userRepo.findAll()
+
+    override fun filterApis(apiList: List<Res>, userResList: List<Power>): Mono<List<Res>> {
+        val resParsers = userResList
+                .map { p ->
+                    object {
+                        val parser = pathPatternParser.parse(p.res)
+                        val ops = p.opts
+                    }
+                }
+        val retList = apiList.mapNotNull { apiRes ->
+            resParsers.firstOrNull {
+                it.parser.matches(PathContainer.parsePath(apiRes.uri))
+            }?.run {
+                apiRes.copy(ops = apiRes.ops.filter { it in ops }.toSet())
+            }
+        }
+
+        return Mono.just(retList)
+    }
 }

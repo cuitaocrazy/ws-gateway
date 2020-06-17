@@ -1,20 +1,13 @@
-package com.yada.web.services
+package com.yada.web.services.impl
 
 import com.yada.LoggerDelegate
 import com.yada.web.model.Svc
 import com.yada.web.repository.SvcRepository
+import com.yada.web.services.ISvcService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Mono
-
-interface ISvcService {
-    fun getAll(): Mono<List<Svc>>
-    fun get(id: String): Mono<Svc>
-    fun createOrUpdate(svc: Svc): Mono<Svc>
-    fun changeId(oldId: String, newId: String): Mono<Svc>
-    fun delete(id: String): Mono<Void>
-}
 
 @Service
 open class SvcService @Autowired constructor(

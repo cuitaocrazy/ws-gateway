@@ -1,8 +1,6 @@
 package com.yada.web.routers
 
 import com.yada.adminPath
-import com.yada.security.WebFluxAdminAuthFilter
-import com.yada.web.filters.AuthAdminApiHandlerFilter
 import com.yada.web.filters.WhitelistHandlerFilter
 import com.yada.web.handlers.AdminAuthHandler
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,9 +11,7 @@ import org.springframework.web.reactive.function.server.router
 @Configuration
 open class AdminAuthRouterConfig @Autowired constructor(
         private val adminAuthHandler: AdminAuthHandler,
-        private val authAdminApiFilter: AuthAdminApiHandlerFilter,
-        private val whitelistFilter: WhitelistHandlerFilter,
-        private val webFluxAdminAuthFilter: WebFluxAdminAuthFilter
+        private val whitelistFilter: WhitelistHandlerFilter
 ) {
     @Bean
     open fun adminAuthRouter() = router {
@@ -30,8 +26,8 @@ open class AdminAuthRouterConfig @Autowired constructor(
             POST("/apis/change_pwd", adminAuthHandler::changePwd)
             GET("/apis/refresh_token", adminAuthHandler::refreshToken)
             filter(whitelistFilter)
-            filter(webFluxAdminAuthFilter)
-            filter(authAdminApiFilter)
+//            filter(webFluxAdminAuthFilter)
+//            filter(authAdminApiFilter)
         }
     }
 }

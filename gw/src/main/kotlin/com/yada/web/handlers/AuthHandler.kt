@@ -1,10 +1,10 @@
 package com.yada.web.handlers
 
-import com.yada.generalPath
-import com.yada.security.*
+import com.yada.sc2.AuthHolder
+import com.yada.security.IPwdStrengthService
+import com.yada.security.IRecaptchaService
 import com.yada.web.model.Res
-import com.yada.web.services.IAuthenticationService
-import com.yada.web.services.IAuthorizationService
+import com.yada.web.services.IUserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
@@ -18,10 +18,10 @@ import org.springframework.web.server.ResponseStatusException
 import reactor.core.publisher.Mono
 import java.net.URI
 
+
 @Component
 class AuthHandler @Autowired constructor(
-        private val authService: IAuthenticationService,
-        private val authorServer: IAuthorizationService,
+        private val userService: IUserService,
         private val recaptchaService: IRecaptchaService,
         private val pwdStrengthService: IPwdStrengthService
 ) {
@@ -62,24 +62,21 @@ class AuthHandler @Autowired constructor(
                         }
                         .filter { it }
                         .flatMap {
-                            authService.login(form.username!!, form.password!!).doOnEach {
+                            AuthHolder.login(form.username!!, form.password!!).doOnEach {
                                 if (!it.hasValue()) {
                                     bindingResult.reject("login.fail")
                                 }
                             }
                         }
                         .flatMap {
-                            ResponseWithCookies.createServerResponse(
-                                    it,
-                                    generalPath,
-                                    ServerResponse.seeOther(URI(redirect.orElse("/"))))
+                            ServerResponse.seeOther(URI(redirect.orElse("/"))).build()
                         }
                         .switchIfEmpty(Mono.defer { ServerResponse.ok().render("/auth/index", model) })
             }
 
+    @Suppress("UNUSED_PARAMETER")
     fun logout(req: ServerRequest): Mono<ServerResponse> =
-            authService.logout(req.token.get())
-                    .then(ResponseWithCookies.createLogoutServerResponse(req, generalPath, ServerResponse.ok()))
+            AuthHolder.logout().then(ServerResponse.ok().build())
 
 
     data class ChangePwdData(val oldPwd: String?, val newPwd: String?)
@@ -105,22 +102,27 @@ class AuthHandler @Autowired constructor(
                             }
                         }
                     }.flatMap { data ->
-                        authService.changePassword(req.authInfo.get().user.id, data.oldPwd, data.newPwd)
+                        AuthHolder.getUserInfo()
+                                .flatMap {
+                                    userService.changePwd(it.userId, data.oldPwd, data.newPwd)
+                                }
                                 .filter { it }
                                 .switchIfEmpty(Mono.error { ResponseStatusException(HttpStatus.CONFLICT, "修改密码时出错") })
                                 .then(ServerResponse.ok().build())
                     }
 
-    fun refreshToken(req: ServerRequest): Mono<ServerResponse> =
-            authService.refreshToken(req.token.get()).then(
-                    ResponseWithCookies.createServerResponse(req.token.get(), generalPath, ServerResponse.ok())
-            )
+    @Suppress("UNUSED_PARAMETER")
+    fun refreshToken(req: ServerRequest): Mono<ServerResponse> = ServerResponse.ok().build()
 
     fun filterApis(req: ServerRequest): Mono<ServerResponse> =
             ServerResponse.ok()
                     .bodyValue(
-                            req.bodyToMono<List<Res>>().flatMap {
-                                authorServer.filterApis(it, req.authInfo.get().resList)
+                            req.bodyToMono<List<Res>>().flatMap { resList ->
+                                AuthHolder.getUserInfo().flatMap {
+                                    userService.filterApis(resList, it.powers)
+                                }
                             }
                     )
+
+
 }

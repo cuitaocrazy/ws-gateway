@@ -2,14 +2,8 @@ package com.yada.init
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.yada.web.model.Org
-import com.yada.web.model.Role
-import com.yada.web.model.Svc
-import com.yada.web.model.User
-import com.yada.web.services.IOrgService
-import com.yada.web.services.IRoleService
-import com.yada.web.services.ISvcService
-import com.yada.web.services.IUserService
+import com.yada.web.model.*
+import com.yada.web.services.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
@@ -62,6 +56,12 @@ private val userJson = """
       "role1"
     ]
   }
+]
+""".trimIndent()
+
+private val adminJson = """
+[
+  "admin"
 ]
 """.trimIndent()
 
@@ -236,6 +236,7 @@ open class InitDevDataRunner @Autowired constructor(
         private val usrSvc: IUserService,
         private val roleSvc: IRoleService,
         private val svcSvc: ISvcService,
+        private val adminSvc: IAdminUserService,
         private val reactiveMongoTemplate: ReactiveMongoTemplate
 ) : ApplicationRunner {
     override fun run(args: ApplicationArguments?) {
@@ -243,6 +244,7 @@ open class InitDevDataRunner @Autowired constructor(
         val svcs = jacksonObjectMapper().readValue<List<Svc>>(svcJson)
         val apps = jacksonObjectMapper().readValue<List<Role>>(roleJson)
         val usrs = jacksonObjectMapper().readValue<List<User>>(userJson)
+        val adms = jacksonObjectMapper().readValue<List<String>>(adminJson)
 
         Mono.from(reactiveMongoTemplate.mongoDatabase.drop())
                 .then(initMongoDbCollection(reactiveMongoTemplate))
@@ -250,6 +252,7 @@ open class InitDevDataRunner @Autowired constructor(
                 .thenMany(Flux.mergeSequential(svcs.map { svcSvc.createOrUpdate(it) }))
                 .thenMany(Flux.mergeSequential(apps.map { roleSvc.createOrUpdate(it) }))
                 .thenMany(Flux.mergeSequential(usrs.map { usrSvc.createOrUpdate(it) }))
+                .thenMany(Flux.mergeSequential(adms.map { adminSvc.createUser(it) }))
                 .collectList().block()
     }
 }

@@ -1,7 +1,9 @@
 package com.yada.web.security
 
 import com.yada.config.TokenManagerCreator
-import com.yada.sc2.*
+import com.yada.sc2.AuthWithTokenManager
+import com.yada.sc2.Power
+import com.yada.sc2.UserInfo
 import com.yada.security.IPwdDigestService
 import com.yada.web.model.Res
 import com.yada.web.model.Svc
@@ -20,7 +22,7 @@ class GeneralAuth @Autowired constructor(
         private val defaultRoleSvcResService: IDefaultRoleSvcResService,
         private val pwdDigestService: IPwdDigestService,
         creator: TokenManagerCreator
-) : AuthWithTokenManager( { creator("general") }) {
+) : AuthWithTokenManager({ creator("general") }) {
 
     override fun checkAndGet(username: String, password: String): Mono<UserInfo> =
             userService.getPwd(username)
@@ -29,7 +31,7 @@ class GeneralAuth @Autowired constructor(
                     .flatMap { userService.get(username) }
                     .flatMap { user ->
                         getUserResList(user).map {
-                            UserInfo(user.orgId, user.id, it.map { res -> Power(res.uri, res.ops) }, "/")
+                            UserInfo(user.id, it.map { res -> Power(res.uri, res.ops) }, mapOf("orgId" to user.orgId))
                         }
                     }
 

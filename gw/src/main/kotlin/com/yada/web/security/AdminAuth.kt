@@ -20,6 +20,6 @@ class AdminAuth @Autowired constructor(
             adminRepo.findPwdById(username).filter {
                 pwdDigestService.getPwdDigest(username, password) == it
             }.map {
-                UserInfo("", username, listOf(), "/admin")
+                UserInfo(username, listOf(), mapOf())
             }
 }

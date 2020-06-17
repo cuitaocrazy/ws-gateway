@@ -58,8 +58,6 @@ interface RoleRepository : ReactiveCrudRepository<Role, String> {
 
 interface DefaultRoleSvcResRepository : ReactiveCrudRepository<DefaultRoleSvcRes, String>
 
-data class AdminUser(val id: String, val pwd: String)
-
 interface IAdminRepository : IUserRepository
 
 class AdminRepositoryImpl @Autowired constructor(

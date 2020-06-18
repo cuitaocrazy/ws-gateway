@@ -40,6 +40,27 @@ const User: React.FC<UserProps> = props => {
     });
   }
 
+  const handleResetUserPwd = (user: UserData) => {
+    confirm({
+      title: `确定要重置【${user.id}】用户密码?`,
+      okText: '确定',
+      okType: 'danger',
+      cancelText: '取消',
+      onOk() {
+        dispatch({
+          type: 'org/fetchResetUserPwd',
+          payload: user,
+          callback: () => {
+            notification.success({
+              message: '重置密码操作成功',
+              description: `用户【${user.id}】已重置密码成功!`,
+            });
+          },
+        });
+      },
+    });
+  }
+
   const handleRemoveUser = (user: UserData) => {
     confirm({
       title: `确定要删除【${user.id}】用户?`,
@@ -80,7 +101,7 @@ const User: React.FC<UserProps> = props => {
                       <Button type="link" shape="circle" size="small"
                         onClick={e => {
                           e.stopPropagation();
-                          handleRemoveUser(user);
+                          handleResetUserPwd(user);
                         }} >
                         <Icon type="unlock" style={{ marginRight: 0 }} />
                       </Button>

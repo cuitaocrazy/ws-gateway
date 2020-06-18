@@ -31,7 +31,7 @@ const ErrorRes: React.FC<ErrorResProps> = props => {
         footer={null}
       >
         {errorSvcs.map((svc: SvcData) => (
-          <Card title={svc.id} size="small" style={{ marginTop: 16 }}>
+          <Card key={svc.id} title={svc.id} size="small" style={{ marginTop: 16 }}>
             <List
               key={svc.id}
               itemLayout="horizontal"

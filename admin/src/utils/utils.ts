@@ -78,7 +78,7 @@ export const getCookie = (cname: string) => {
 
 export const isAdmin = () => {
   const value = "; " + document.cookie;
-  const tokens: string[] = value.split("; token=");
+  const tokens: string[] = value.split("; AUTH_ID=");
   tokens.shift();
   return tokens.filter(token => {
     if (token && token !== "") {

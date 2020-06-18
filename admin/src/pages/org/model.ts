@@ -1,7 +1,10 @@
 import { Effect } from 'dva';
 import { Reducer } from 'redux';
 import { OrgTreeData, UserData, RoleData, KeyData } from './data';
-import { getOrgTree, getUserByOrgId, getRoles, createAndUpdataOrg, deleteOrg, createAndUpdataUser, deleteUser } from './service';
+import {
+  getOrgTree, getUserByOrgId, getRoles, createAndUpdataOrg,
+  deleteOrg, createAndUpdataUser, deleteUser, resetUserPwd
+} from './service';
 
 export interface ModelState {
   orgTree: OrgTreeData[];
@@ -22,6 +25,7 @@ export interface ModelType {
     fetchDeleteOrg: Effect;
     fetchCreateOrUpdateUser: Effect;
     fetchDeleteUser: Effect;
+    fetchResetUserPwd: Effect;
   };
   reducers: {
     setOrgTree: Reducer<ModelState>;
@@ -103,6 +107,17 @@ const Model: ModelType = {
       try {
         const { id, orgId } = payload;
         yield call(deleteUser, id)
+        yield put({
+          type: 'fetchUserByOrgId',
+          payload: orgId,
+        })
+        if (callback) callback();
+      } catch (error) { }
+    },
+    *fetchResetUserPwd({ callback, payload }, { call, put }) {
+      try {
+        const { id, orgId } = payload;
+        yield call(resetUserPwd, id)
         yield put({
           type: 'fetchUserByOrgId',
           payload: orgId,

@@ -46,3 +46,7 @@ export async function deleteUser(userId: string) {
     method: 'DELETE',
   });
 }
+
+export async function resetUserPwd(userId: string) {
+  return request(`/admin/apis/user/${encodeURIComponent(userId)}/reset_pwd`);
+}

@@ -15,4 +15,6 @@ interface Auth {
     fun refreshToken(token: String): Mono<Void>
 
     fun getUserInfo(token: String): Mono<UserInfo>
+
+    fun getPath(): String
 }

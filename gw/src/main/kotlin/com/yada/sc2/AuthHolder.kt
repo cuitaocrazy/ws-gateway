@@ -1,27 +1,27 @@
 package com.yada.sc2
 
 import reactor.core.publisher.Mono
+import reactor.util.context.Context
+import java.util.*
 
 object AuthHolder {
     const val authKey = "AuthKey"
     const val tokenKey = "TokenKey"
-    const val sendTokenFnKey = "sendTokenFnKey"
+
+    private operator fun <T, R, V> ((T) -> R).rangeTo(other: (R) -> V): ((T) -> V) {
+        return {
+            other(this(it))
+        }
+    }
 
     fun login(username: String, password: String): Mono<String> =
             Mono.subscriberContext().flatMap { ctx ->
                 val oAuth = ctx.getOrEmpty<Auth>(authKey)
-                val oLoginCallback = ctx.getOrEmpty<(String) -> Unit>(sendTokenFnKey)
-                oAuth.flatMap { auth ->
-                    oLoginCallback.map { sendToken ->
-                        object {
-                            val auth = auth
-                            val sendToken = sendToken
+                oAuth.map { auth ->
+                    auth.login(username, password).flatMap {
+                        Mono.just(it).subscriberContext { ctx ->
+                            ctx.put(tokenKey, it)
                         }
-                    }
-                }.map { authContext ->
-                    authContext.auth.login(username, password).map {
-                        authContext.sendToken(it)
-                        it
                     }
                 }.orElse(Mono.empty())
             }
@@ -43,4 +43,26 @@ object AuthHolder {
                     }
                 }.orElse(Mono.empty())
             }
+
+    fun <T> initContext(filterMono: Mono<T>, auth: Auth, token: String?): Mono<T> =
+            checkAndRefreshUi(auth, token).flatMap { filterMono.subscriberContext(putToken(it)..putAuth(auth)) }
+
+    fun getToken(): Mono<String> = Mono.subscriberContext().map { it.get<String>(tokenKey) }
+
+    private fun newToken() = UUID.randomUUID().toString()
+
+    private fun checkAndRefreshUi(auth: Auth, token: String?): Mono<String> = if (token != null) {
+        val t: String = token
+        auth.getUserInfo(t).map { auth.refreshToken(t) }.map { t }.defaultIfEmpty(newToken())
+    } else {
+        Mono.just(newToken())
+    }
+
+    private fun putToken(token: String) = { ctx: Context ->
+        ctx.put(tokenKey, token)
+    }
+
+    private fun putAuth(auth: Auth) = { ctx: Context ->
+        ctx.put(authKey, auth)
+    }
 }

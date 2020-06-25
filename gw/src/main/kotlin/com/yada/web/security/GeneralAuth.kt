@@ -35,6 +35,8 @@ class GeneralAuth @Autowired constructor(
                         }
                     }
 
+    override fun getPath(): String = "/"
+
     private fun getUserResList(user: User): Mono<List<Res>> =
             roleService.getAll()
                     .map { roles ->

@@ -67,5 +67,4 @@ class HazelcastTokenManager(private val map: IMap<String, String>, private val d
     override fun put(token: String, value: UserInfo) = put(token, value, defaultTTL)
     override fun get(token: String) = map.getValue(token)
     override fun delete(token: String) = map.deleteToken(token)
-    override fun generateToken(userInfo: UserInfo) = UUID.randomUUID().toString()
 }

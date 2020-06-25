@@ -8,5 +8,4 @@ interface TokenManager {
     fun put(token: String, value: UserInfo): Mono<UserInfo>
     fun get(token: String): Mono<UserInfo>
     fun delete(token: String): Mono<UserInfo>
-    fun generateToken(userInfo: UserInfo): String
 }

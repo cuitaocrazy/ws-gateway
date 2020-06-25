@@ -31,7 +31,7 @@ open class AuthRouterConfig @Autowired constructor(
             GET("/") { _ ->
                 ServerResponse.ok().render("/index")
             }
-            filter { request, next -> authFilter.invoke(request, next) }
+            filter(authFilter)
         }
 
         "".nest {
@@ -39,7 +39,7 @@ open class AuthRouterConfig @Autowired constructor(
             POST("/change_pwd", authHandler::changePwd)
             GET("/refresh_token", authHandler::refreshToken)
             GET("/filter_apis", authHandler::filterApis)
-            filter(FilterContextBuilder.buildFluxFilter(auth, authApiFilter))
+            filter(authApiFilter)
         }
 
         filter(FilterContextBuilder.buildDefaultFluxFilter(auth))

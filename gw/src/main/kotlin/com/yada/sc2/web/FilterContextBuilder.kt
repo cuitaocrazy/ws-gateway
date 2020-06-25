@@ -5,6 +5,7 @@ import com.yada.sc2.AuthHolder
 import org.springframework.cloud.gateway.filter.GatewayFilter
 import org.springframework.cloud.gateway.filter.GatewayFilterChain
 import org.springframework.http.ResponseCookie
+import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Mono
 
@@ -13,29 +14,18 @@ object FilterContextBuilder {
         override fun filter(exchange: ServerWebExchange, chain: GatewayFilterChain): Mono<Void>? {
             val token = exchange.request.cookies[authCookiesKey]?.run { this[0]?.value }
 
-            val setCookies = { _token: String ->
-                val cookie = ResponseCookie.from(authCookiesKey, _token).build()
-                exchange.response.addCookie(cookie)
-            }
-
             exchange.response.beforeCommit {
-                Mono.subscriberContext().flatMap { ctx ->
-                    ctx.getOrEmpty<String>(AuthHolder.tokenKey).map { token ->
-                        setCookies(token)
-                        auth.refreshToken(token)
-                    }.orElse(Mono.empty())
-                }
+                AuthHolder.getUserInfo()
+                        .flatMap { AuthHolder.getToken() }
+                        .defaultIfEmpty("").map {
+                            if (it == "")
+                                exchange.response.addCookie(ResponseCookie.from(authCookiesKey, it).maxAge(0).path(auth.getPath()).build())
+                            else
+                                exchange.response.addCookie(ResponseCookie.from(authCookiesKey, it).path(auth.getPath()).build())
+                        }.then()
             }
 
-            return handle(exchange, chain).subscriberContext { ctx ->
-                ctx.apply {
-                    put(AuthHolder.authKey, auth)
-                    if (token != null) {
-                        put(AuthHolder.tokenKey, token)
-                    }
-                    put(AuthHolder.sendTokenFnKey, setCookies)
-                }
-            }
+            return AuthHolder.initContext(handle(exchange, chain), auth, token)
         }
 
         override fun toString(): String {
@@ -43,54 +33,17 @@ object FilterContextBuilder {
         }
     }
 
-    fun buildFluxFilter(auth: Auth, handle: FluxFilterFunction): FluxFilterFunction = { req, next ->
-        val token = req.cookies()[authCookiesKey]?.run { this[0]?.value }
-
-        var tmp: String? = token
-
-        val setToken = { _token: String ->
-            tmp = _token
-        }
-
-        handle(req, next).flatMap {
-            if (tmp != null)
-                auth.refreshToken(tmp!!).then(Mono.just(ServerResponseWithAuthCookies.from(it, tmp!!)))
-            else
-                Mono.just(it)
-        }.subscriberContext { ctx ->
-            ctx.apply {
-                put(AuthHolder.authKey, auth)
-                if (token != null) {
-                    put(AuthHolder.tokenKey, token)
-                }
-                put(AuthHolder.sendTokenFnKey, setToken)
-            }
-        }
-    }
-
     fun buildDefaultFluxFilter(auth: Auth): FluxFilterFunction = { req, next ->
 
         val token = req.cookies()[authCookiesKey]?.run { this[0]?.value }
 
-        var tmp: String? = token
-
-        val setToken = { _token: String ->
-            tmp = _token
+        val filter: Mono<ServerResponse> = next(req).flatMap { resp ->
+            AuthHolder.getUserInfo()
+                    .flatMap { AuthHolder.getToken() }
+                    .defaultIfEmpty("")
+                    .map { ServerResponseWithAuthCookies(resp, it, auth.getPath()) }
         }
 
-        next(req).flatMap {
-            if (tmp != null)
-                auth.refreshToken(tmp!!).then(Mono.just(ServerResponseWithAuthCookies.from(it, tmp!!)))
-            else
-                Mono.just(it)
-        }.subscriberContext { ctx ->
-            ctx.put(AuthHolder.authKey, auth)
-                    .put(AuthHolder.sendTokenFnKey, setToken).run {
-                        if (token != null)
-                            put(AuthHolder.tokenKey, token)
-                        else
-                            this
-                    }
-        }
+        AuthHolder.initContext(filter, auth, token)
     }
 }

@@ -8,10 +8,17 @@ import reactor.core.publisher.Mono
 abstract class AuthWithTokenManager(creator: () -> TokenManager) : Auth {
     private var tokenManager = creator()
     override fun login(username: String, password: String): Mono<String> =
-            checkAndGet(username, password).flatMap { ui ->
-                val token = tokenManager.generateToken(ui)
-                tokenManager.put(token, ui).map { token }
+            Mono.subscriberContext().map { ctx ->
+                ctx.get<String>(AuthHolder.tokenKey)
+            }.flatMap { token ->
+                checkAndGet(username, password).flatMap { ui ->
+                    tokenManager.put(token, ui).map { token }
+                }
             }
+//            checkAndGet(username, password).flatMap { ui ->
+//                val token = tokenManager.generateToken(ui)
+//                tokenManager.put(token, ui).map { token }
+//            }
 
     override fun logout(token: String): Mono<Void> = tokenManager.delete(token).then()
 

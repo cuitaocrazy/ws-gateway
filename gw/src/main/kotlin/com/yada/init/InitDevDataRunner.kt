@@ -246,7 +246,7 @@ open class InitDevDataRunner @Autowired constructor(
         val usrs = jacksonObjectMapper().readValue<List<User>>(userJson)
         val adms = jacksonObjectMapper().readValue<List<String>>(adminJson)
 
-        Mono.from(reactiveMongoTemplate.mongoDatabase.drop())
+        reactiveMongoTemplate.mongoDatabase.flatMap { Mono.from(it.drop()) }
                 .then(initMongoDbCollection(reactiveMongoTemplate))
                 .thenMany(Flux.mergeSequential(orgs.map { orgSvc.createOrUpdate(it) }))
                 .thenMany(Flux.mergeSequential(svcs.map { svcSvc.createOrUpdate(it) }))

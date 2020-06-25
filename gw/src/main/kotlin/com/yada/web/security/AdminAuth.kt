@@ -22,4 +22,7 @@ class AdminAuth @Autowired constructor(
             }.map {
                 UserInfo(username, listOf(), mapOf())
             }
+
+    override fun getPath(): String = "/admin"
+
 }

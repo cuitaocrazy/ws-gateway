@@ -1,4 +1,4 @@
-package com.yada.sc2
+package com.yada.security
 
 enum class Operator(val op: String) {
     READ("READ"),

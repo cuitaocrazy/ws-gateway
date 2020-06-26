@@ -1,9 +1,9 @@
 package com.yada.gateways
 
-import com.yada.sc2.AuthHolder
-import com.yada.sc2.Operator
-import com.yada.sc2.Power
-import com.yada.sc2.web.FilterContextBuilder
+import com.yada.security.AuthHolder
+import com.yada.security.Operator
+import com.yada.security.Power
+import com.yada.security.web.FilterContextBuilder
 import com.yada.web.pathPatternParser
 import com.yada.web.security.GeneralAuth
 import org.springframework.cloud.gateway.filter.GatewayFilter
@@ -15,7 +15,7 @@ import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
 
-class ApiAuthGatewayFilterFactory (
+class ApiAuthGatewayFilterFactory(
         private val auth: GeneralAuth
 ) : AbstractGatewayFilterFactory<ApiAuthGatewayFilterFactory.Config>(Config::class.java) {
 

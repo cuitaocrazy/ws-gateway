@@ -2,7 +2,7 @@ package com.yada.web.filters
 
 import com.yada.Filter
 import com.yada.Next
-import com.yada.sc2.AuthHolder
+import com.yada.security.AuthHolder
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest

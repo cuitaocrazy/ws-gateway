@@ -1,7 +1,7 @@
-package com.yada.sc2.web
+package com.yada.security.web
 
-import com.yada.sc2.Auth
-import com.yada.sc2.AuthHolder
+import com.yada.security.Auth
+import com.yada.security.AuthHolder
 import org.springframework.cloud.gateway.filter.GatewayFilter
 import org.springframework.cloud.gateway.filter.GatewayFilterChain
 import org.springframework.http.ResponseCookie
@@ -40,7 +40,6 @@ object FilterContextBuilder {
         val filter: Mono<ServerResponse> = next(req).flatMap { resp ->
             AuthHolder.getUserInfo()
                     .flatMap { AuthHolder.getToken() }
-                    .defaultIfEmpty("")
                     .map { ServerResponseWithAuthCookies(resp, it, auth.getPath()) }
         }
 

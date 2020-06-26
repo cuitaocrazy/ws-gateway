@@ -1,4 +1,4 @@
-package com.yada.sc2.web
+package com.yada.security.web
 
 import org.springframework.http.ResponseCookie
 import org.springframework.web.reactive.function.server.ServerResponse
@@ -11,10 +11,10 @@ class ServerResponseWithAuthCookies(private val req: ServerResponse, private val
     }
 
     override fun writeTo(exchange: ServerWebExchange, context: ServerResponse.Context): Mono<Void> {
-        if(token == "")
-            exchange.response.addCookie(ResponseCookie.from(authCookiesKey, token ).maxAge(0).path(cookiePath).build())
+        if (token == "")
+            exchange.response.addCookie(ResponseCookie.from(authCookiesKey, token).maxAge(0).path(cookiePath).build())
         else
-            exchange.response.addCookie(ResponseCookie.from(authCookiesKey, token ).path(cookiePath).build())
+            exchange.response.addCookie(ResponseCookie.from(authCookiesKey, token).path(cookiePath).build())
         return req.writeTo(exchange, context)
     }
 }

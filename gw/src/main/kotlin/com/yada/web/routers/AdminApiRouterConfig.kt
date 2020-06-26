@@ -1,7 +1,7 @@
 package com.yada.web.routers
 
 import com.yada.adminPath
-import com.yada.sc2.web.FilterContextBuilder
+import com.yada.security.web.FilterContextBuilder
 import com.yada.web.filters.AuthApiHandlerFilter
 import com.yada.web.filters.WhitelistHandlerFilter
 import com.yada.web.handlers.apis.*

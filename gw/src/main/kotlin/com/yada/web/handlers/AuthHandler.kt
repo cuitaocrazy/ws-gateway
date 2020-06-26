@@ -1,6 +1,6 @@
 package com.yada.web.handlers
 
-import com.yada.sc2.AuthHolder
+import com.yada.security.AuthHolder
 import com.yada.security.IPwdStrengthService
 import com.yada.security.IRecaptchaService
 import com.yada.web.model.Res

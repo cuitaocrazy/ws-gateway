@@ -1,10 +1,10 @@
 package com.yada.web.security
 
 import com.yada.config.TokenManagerCreator
-import com.yada.sc2.AuthWithTokenManager
-import com.yada.sc2.Power
-import com.yada.sc2.UserInfo
+import com.yada.security.AuthWithTokenManager
 import com.yada.security.IPwdDigestService
+import com.yada.security.Power
+import com.yada.security.UserInfo
 import com.yada.web.model.Res
 import com.yada.web.model.Svc
 import com.yada.web.model.User

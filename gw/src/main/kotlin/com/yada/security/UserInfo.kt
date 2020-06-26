@@ -1,4 +1,4 @@
-package com.yada.sc2
+package com.yada.security
 
 data class UserInfo(
         val userId: String,

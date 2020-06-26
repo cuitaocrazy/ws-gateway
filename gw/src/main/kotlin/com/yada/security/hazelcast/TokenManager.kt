@@ -1,13 +1,12 @@
-package com.yada.sc2.hazelcast
+package com.yada.security.hazelcast
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.hazelcast.core.ExecutionCallback
 import com.hazelcast.core.IMap
-import com.yada.sc2.TokenManager
-import com.yada.sc2.UserInfo
+import com.yada.security.TokenManager
+import com.yada.security.UserInfo
 import reactor.core.publisher.Mono
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 typealias TokenMap<T> = IMap<String, T>
@@ -20,7 +19,7 @@ fun TokenMap<String>.getValue(token: String): Mono<UserInfo> =
                 }
 
                 override fun onResponse(response: String?) {
-                    if(response == null) {
+                    if (response == null) {
                         sink.success(null)
                     } else {
                         sink.success(jacksonObjectMapper().readValue<UserInfo>(response))
@@ -52,7 +51,7 @@ fun TokenMap<String>.deleteToken(token: String): Mono<UserInfo> =
                 }
 
                 override fun onResponse(response: String?) {
-                    if(response == null) {
+                    if (response == null) {
                         it.success(null)
                     } else {
                         it.success(jacksonObjectMapper().readValue<UserInfo>(response))

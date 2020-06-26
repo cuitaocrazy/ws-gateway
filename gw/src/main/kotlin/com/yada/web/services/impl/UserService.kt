@@ -1,7 +1,7 @@
 package com.yada.web.services.impl
 
-import com.yada.sc2.Power
 import com.yada.security.IPwdDigestService
+import com.yada.security.Power
 import com.yada.web.model.Res
 import com.yada.web.model.User
 import com.yada.web.pathPatternParser

@@ -1,4 +1,4 @@
-package com.yada.sc2.web
+package com.yada.security.web
 
 import org.springframework.cloud.gateway.filter.GatewayFilterChain
 import org.springframework.web.reactive.function.server.ServerRequest

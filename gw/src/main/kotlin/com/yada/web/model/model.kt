@@ -1,6 +1,6 @@
 package com.yada.web.model
 
-import com.yada.sc2.Operator
+import com.yada.security.Operator
 import org.springframework.data.mongodb.core.mapping.Document
 
 //enum class Operator(val op: String) {

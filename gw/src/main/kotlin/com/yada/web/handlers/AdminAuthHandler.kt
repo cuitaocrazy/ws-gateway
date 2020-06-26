@@ -1,6 +1,6 @@
 package com.yada.web.handlers
 
-import com.yada.sc2.AuthHolder
+import com.yada.security.AuthHolder
 import com.yada.web.services.IAdminUserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus

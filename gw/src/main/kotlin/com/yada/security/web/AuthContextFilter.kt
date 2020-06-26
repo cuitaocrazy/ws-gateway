@@ -1,13 +1,4 @@
-package com.yada.sc2.web
-
-import com.yada.sc2.Auth
-import com.yada.sc2.AuthHolder.authKey
-import com.yada.sc2.AuthHolder.tokenKey
-import org.springframework.http.ResponseCookie
-import org.springframework.web.server.ServerWebExchange
-import org.springframework.web.server.WebFilter
-import org.springframework.web.server.WebFilterChain
-import reactor.core.publisher.Mono
+package com.yada.security.web
 
 //class AuthContextFilter(private val auth: Auth) : WebFilter {
 //    companion object {

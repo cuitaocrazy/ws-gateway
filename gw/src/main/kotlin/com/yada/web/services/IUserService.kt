@@ -1,6 +1,6 @@
 package com.yada.web.services
 
-import com.yada.sc2.Power
+import com.yada.security.Power
 import com.yada.web.model.Res
 import com.yada.web.model.User
 import reactor.core.publisher.Flux

@@ -4,15 +4,14 @@ import com.hazelcast.core.HazelcastInstance
 import com.hazelcast.core.IMap
 import com.yada.gateways.ApiAuthGatewayFilterFactory
 import com.yada.gateways.AuthGatewayFilterFactory
-import com.yada.sc2.TokenManager
-import com.yada.sc2.hazelcast.HazelcastTokenManager
 import com.yada.security.*
+import com.yada.security.hazelcast.HazelcastTokenManager
 import com.yada.web.security.GeneralAuth
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
-typealias TokenManagerCreator =  (String) -> TokenManager
+typealias TokenManagerCreator = (String) -> TokenManager
 
 @Configuration
 @EnableConfigurationProperties(SecurityConfigProperties::class)

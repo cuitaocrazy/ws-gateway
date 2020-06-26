@@ -2,7 +2,10 @@ package com.yada.init
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.yada.web.model.*
+import com.yada.web.model.Org
+import com.yada.web.model.Role
+import com.yada.web.model.Svc
+import com.yada.web.model.User
 import com.yada.web.services.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.ApplicationArguments

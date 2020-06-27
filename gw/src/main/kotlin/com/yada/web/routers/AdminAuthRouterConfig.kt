@@ -1,6 +1,7 @@
 package com.yada.web.routers
 
 import com.yada.adminPath
+import com.yada.security.AuthHolder
 import com.yada.security.web.FilterContextBuilder
 import com.yada.web.filters.AuthApiHandlerFilter
 import com.yada.web.filters.WhitelistHandlerFilter
@@ -9,6 +10,7 @@ import com.yada.web.security.AdminAuth
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.web.reactive.function.server.body
 import org.springframework.web.reactive.function.server.router
 
 @Configuration
@@ -30,6 +32,9 @@ open class AdminAuthRouterConfig @Autowired constructor(
             POST("/apis/logout", adminAuthHandler::logout)
             POST("/apis/change_pwd", adminAuthHandler::changePwd)
             GET("/apis/refresh_token", adminAuthHandler::refreshToken)
+            GET("/ui") {
+                ok().body(AuthHolder.getUserInfo())
+            }
             filter(whitelistFilter)
             filter(authApiHandlerFilter)
         }

@@ -40,7 +40,8 @@ object FilterContextBuilder {
         val filter: Mono<ServerResponse> = next(req).flatMap { resp ->
             AuthHolder.getUserInfo()
                     .flatMap { AuthHolder.getToken() }
-                    .map { ServerResponseWithAuthCookies(resp, it, auth.getPath()) }
+                    .map { ServerResponseWithAuthCookies(resp, it, auth.getPath()) as ServerResponse }
+                    .defaultIfEmpty(resp)
         }
 
         AuthHolder.initContext(filter, auth, token)

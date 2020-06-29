@@ -38,9 +38,11 @@ class ApiAuthGatewayFilterFactory(
                 chain.filter(exchange)
             } else {
                 AuthHolder.getUserInfo()
+                        .switchIfEmpty(Mono.error(ResponseStatusException(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED")))
                         .filter {
                             config.checkPower == "checkPower" && hasPower(it.powers, op, subUri) || config.checkPower != "checkPower"
-                        }.flatMap {
+                        }
+                        .flatMap {
                             val req = exchange.request.mutate()
                                     .header("X-YADA-ORG-ID", it.orgId)
                                     .header("X-YADA-USER-ID", it.userId)
@@ -48,7 +50,7 @@ class ApiAuthGatewayFilterFactory(
                                     .build()
                             chain.filter(exchange.mutate().request(req).build())
                         }
-                        .switchIfEmpty(Mono.error(ResponseStatusException(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED")))
+
 
             }
         } else {

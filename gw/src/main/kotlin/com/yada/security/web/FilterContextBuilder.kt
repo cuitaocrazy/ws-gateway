@@ -14,7 +14,9 @@ object FilterContextBuilder {
         override fun filter(exchange: ServerWebExchange, chain: GatewayFilterChain): Mono<Void>? {
             val token = exchange.request.cookies[authCookiesKey]?.run { this[0]?.value }
 
-            exchange.response.beforeCommit {
+
+
+            val hookCtx = Mono.subscriberContext().map { ctx -> exchange.response.beforeCommit {
                 AuthHolder.getUserInfo()
                         .flatMap { AuthHolder.getToken() }
                         .defaultIfEmpty("").map {
@@ -22,10 +24,9 @@ object FilterContextBuilder {
                                 exchange.response.addCookie(ResponseCookie.from(authCookiesKey, it).maxAge(0).path(auth.getPath()).build())
                             else
                                 exchange.response.addCookie(ResponseCookie.from(authCookiesKey, it).path(auth.getPath()).build())
-                        }.then()
-            }
-
-            return AuthHolder.initContext(handle(exchange, chain), auth, token)
+                        }.then().subscriberContext(ctx)
+            } }
+            return AuthHolder.initContext(hookCtx.then(handle(exchange, chain)), auth, token)
         }
 
         override fun toString(): String {

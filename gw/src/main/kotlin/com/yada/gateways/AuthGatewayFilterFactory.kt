@@ -1,6 +1,7 @@
 package com.yada.gateways
 
 import com.yada.security.AuthHolder
+import com.yada.security.UserInfo
 import com.yada.security.web.FilterContextBuilder
 import com.yada.web.security.GeneralAuth
 import org.springframework.cloud.gateway.filter.GatewayFilter
@@ -15,30 +16,38 @@ class AuthGatewayFilterFactory(
         private val auth: GeneralAuth
 ) : AbstractGatewayFilterFactory<AuthGatewayFilterFactory.Config>(Config::class.java) {
 
+    private var gf: GatewayFilter? = null
+
     /**
      * 一个配置可能出现两次初始化，是两个线程同时执行的，可能是spring的问题，因此在这个函数里不能做副作用操作，以免出现不可预测的错误
      */
-    override fun apply(config: Config): GatewayFilter = FilterContextBuilder.buildGatewayFilter(auth, "Auth") { exchange, chain ->
-        val isEntryPath = exchange.request.uri.path == exchange.attributes["index"]
-                || exchange.request.uri.path == (exchange.attributes["index"] as String + "/")
+    override fun apply(config: Config): GatewayFilter {
+        println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+        if (gf == null) {
+            gf = FilterContextBuilder.buildGatewayFilter(auth, "Auth") { exchange, chain ->
+                val isEntryPath = exchange.request.uri.path == exchange.attributes["index"]
+                        || exchange.request.uri.path == (exchange.attributes["index"] as String + "/")
 
-        if (isEntryPath && !exchange.response.isCommitted) {
-            AuthHolder.getUserInfo().flatMap {
-                val req = exchange.request.mutate()
-                        .header("X-YADA-ORG-ID", it.orgId)
-                        .header("X-YADA-USER-ID", it.userId)
-                        .header("COOKIE", null)
-                        .build()
-                chain.filter(exchange.mutate().request(req).build())
-            }.switchIfEmpty(run {
-                val res = exchange.response
-                res.statusCode = HttpStatus.SEE_OTHER
-                res.headers.set(HttpHeaders.LOCATION, getLoginPath(exchange))
-                exchange.response.setComplete()
-            })
-        } else {
-            if (exchange.response.isCommitted) Mono.empty() else chain.filter(exchange)
+                if (isEntryPath && !exchange.response.isCommitted) {
+                    AuthHolder.getUserInfo().switchIfEmpty(Mono.defer {
+                        val res = exchange.response
+                        res.statusCode = HttpStatus.SEE_OTHER
+                        res.headers.set(HttpHeaders.LOCATION, getLoginPath(exchange))
+                        exchange.response.setComplete().then(Mono.empty<UserInfo>())
+                    }).flatMap {
+                        val req = exchange.request.mutate()
+                                .header("X-YADA-ORG-ID", it.orgId)
+                                .header("X-YADA-USER-ID", it.userId)
+                                .header("COOKIE", null)
+                                .build()
+                        chain.filter(exchange.mutate().request(req).build())
+                    }
+                } else {
+                    if (exchange.response.isCommitted) Mono.empty() else chain.filter(exchange)
+                }
+            }
         }
+        return gf!!
     }
 
     private fun getLoginPath(exchange: ServerWebExchange) =

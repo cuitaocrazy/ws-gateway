@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono
 class AdminAuthHandler @Autowired constructor(private val adminUserService: IAdminUserService) {
 
     @Suppress("UNUSED_PARAMETER")
-    fun index(req: ServerRequest): Mono<ServerResponse> = ServerResponse.ok().render("/admin/index")
+    fun index(req: ServerRequest): Mono<ServerResponse> = ServerResponse.ok().render("admin/index")
 
     fun login(req: ServerRequest): Mono<ServerResponse> {
         val dataMono: Mono<LoginData> = req.bodyToMono()

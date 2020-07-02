@@ -29,7 +29,7 @@ class AuthHandler @Autowired constructor(
 
     @Suppress("UNUSED_PARAMETER")
     fun getLoginForm(req: ServerRequest): Mono<ServerResponse> =
-            ServerResponse.ok().render("/auth/index", mapOf(formBeanName to LoginData("", "")))
+            ServerResponse.ok().render("auth/index", mapOf(formBeanName to LoginData("", "")))
 
     fun login(req: ServerRequest): Mono<ServerResponse> = req.formData()
             .flatMap { it ->
@@ -71,7 +71,7 @@ class AuthHandler @Autowired constructor(
                         .flatMap {
                             ServerResponse.seeOther(URI(redirect.orElse("/"))).build()
                         }
-                        .switchIfEmpty(Mono.defer { ServerResponse.ok().render("/auth/index", model) })
+                        .switchIfEmpty(Mono.defer { ServerResponse.ok().render("auth/index", model) })
             }
 
     @Suppress("UNUSED_PARAMETER")

@@ -32,7 +32,7 @@ open class AuthRouterConfig @Autowired constructor(
 
         "".nest {
             GET("/") { _ ->
-                ServerResponse.ok().render("/index")
+                ServerResponse.ok().render("index")
             }
             filter(authFilter)
         }

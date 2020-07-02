@@ -42,6 +42,7 @@ class ApiAuthGatewayFilterFactory(
                         .filter {
                             config.checkPower == "checkPower" && hasPower(it.powers, op, subUri) || config.checkPower != "checkPower"
                         }
+                        .switchIfEmpty(Mono.error(ResponseStatusException(HttpStatus.FORBIDDEN, "FORBIDDEN")))
                         .flatMap {
                             val req = exchange.request.mutate()
                                     .header("X-YADA-ORG-ID", it.orgId)

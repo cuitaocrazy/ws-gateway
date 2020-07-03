@@ -45,7 +45,7 @@ class AuthGatewayFilterFactory(
 
     private fun getLoginPath(exchange: ServerWebExchange, contextPath: String) =
             UriComponentsBuilder.fromPath("$contextPath/login")
-                    .queryParam("redirect", contextPath + exchange.request.uri.path)
+                    .queryParam("redirect", exchange.request.uri.path)
                     .build()
                     .encode()
                     .toUriString()

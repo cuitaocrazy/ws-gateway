@@ -13,7 +13,8 @@ import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
 
 class AuthGatewayFilterFactory(
-        private val auth: GeneralAuth
+        private val auth: GeneralAuth,
+        private val contextPath: String
 ) : AbstractGatewayFilterFactory<AuthGatewayFilterFactory.Config>(Config::class.java) {
 
     /**
@@ -27,7 +28,7 @@ class AuthGatewayFilterFactory(
             AuthHolder.getUserInfo().switchIfEmpty(Mono.defer {
                 val res = exchange.response
                 res.statusCode = HttpStatus.SEE_OTHER
-                res.headers.set(HttpHeaders.LOCATION, getLoginPath(exchange))
+                res.headers.set(HttpHeaders.LOCATION, getLoginPath(exchange, contextPath))
                 exchange.response.setComplete().then(Mono.empty<UserInfo>())
             }).flatMap {
                 val req = exchange.request.mutate()
@@ -42,9 +43,9 @@ class AuthGatewayFilterFactory(
         }
     }
 
-    private fun getLoginPath(exchange: ServerWebExchange) =
-            UriComponentsBuilder.fromPath("/login")
-                    .queryParam("redirect", exchange.request.uri.path)
+    private fun getLoginPath(exchange: ServerWebExchange, contextPath: String) =
+            UriComponentsBuilder.fromPath("$contextPath/login")
+                    .queryParam("redirect", contextPath + exchange.request.uri.path)
                     .build()
                     .encode()
                     .toUriString()

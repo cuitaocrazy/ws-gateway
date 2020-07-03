@@ -7,6 +7,7 @@ import com.yada.gateways.AuthGatewayFilterFactory
 import com.yada.security.*
 import com.yada.security.hazelcast.HazelcastTokenManager
 import com.yada.web.security.GeneralAuth
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -15,7 +16,11 @@ typealias TokenManagerCreator = (String) -> TokenManager
 
 @Configuration
 @EnableConfigurationProperties(SecurityConfigProperties::class)
-open class SecurityConfig(private val config: SecurityConfigProperties) {
+open class SecurityConfig(
+        private val config: SecurityConfigProperties,
+        @Value("\${yada.contextPath:}")
+        private val contextPath: String
+) {
 
     @Bean
     open fun pwdDigestService(): IPwdDigestService = PwdDigestService(config.defaultPwd)
@@ -42,5 +47,5 @@ open class SecurityConfig(private val config: SecurityConfigProperties) {
     open fun apiAuthGatewayFilterFactory(generalAuth: GeneralAuth) = ApiAuthGatewayFilterFactory(generalAuth)
 
     @Bean
-    open fun authGatewayFilterFactory(generalAuth: GeneralAuth) = AuthGatewayFilterFactory(generalAuth)
+    open fun authGatewayFilterFactory(generalAuth: GeneralAuth) = AuthGatewayFilterFactory(generalAuth, contextPath)
 }

@@ -81,8 +81,8 @@
 
 
     </style>
-    <script th:src="@{/js/jquery-3.1.1.js}"></script>
-    <script th:src="@{/js/jquery.validate-1.19.1.js}"></script>
+    <script th:src="@{${@environment.getProperty('yada.contextPath', '')}+'/js/jquery-3.1.1.js'}"></script>
+    <script th:src="@{${@environment.getProperty('yada.contextPath', '')}+'/js/jquery.validate-1.19.1.js'}"></script>
     <script>
         $(document).ready(function() {
             $("#loginForm").validate({
@@ -137,7 +137,7 @@
             <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
         </div>
         <div th:if="${@environment.getProperty('yada.security.recaptcha') == 'recaptcha.GoogleCN' || @environment.getProperty('yada.security.recaptcha') == 'recaptcha.Google'}"
-             class="g-recaptcha" data-sitekey="6Leu2NsUAAAAAFttLaiyEKDu9yLgrYJhN77Ou1ge"></div>
+             class="g-recaptcha" th:data-sitekey="${@environment.getProperty('yada.security.recaptchaKey', '')}"></div>
         <div class="login-btn">
             <input type="submit" class="form-input form-btn" th:value="#{login.submit}">
         </div>

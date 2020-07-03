@@ -4,17 +4,24 @@ server:
   error:
     includeStacktrace: ALWAYS
 
+yada.contextPath: /gw
+
 spring.cloud.gateway.routes:
   - uri: http://localhost:3010
     predicates:
-      - App=/app/app-1
+      - App=${yada.contextPath:}/app/app-1
     filters:
       - Auth
   - uri: http://localhost:3011
     predicates:
-      - Svc=/svc,service-1
+      - Svc=${yada.contextPath:}/svc,service-1
     filters:
       - ApiAuth
+  - uri: http://localhost:8080
+    predicates:
+      - Path=${yada.contextPath:}/**
+    filters:
+      - RewritePath=${yada.contextPath:}(?<segment>/?.*),$\{segment}
 
 management.endpoints:
   web.exposure.include: metrics,gateway

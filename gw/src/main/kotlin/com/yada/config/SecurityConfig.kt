@@ -26,9 +26,9 @@ open class SecurityConfig(
     open fun pwdDigestService(): IPwdDigestService = PwdDigestService(config.defaultPwd)
 
     @Bean
-    open fun recaptchaService(): IRecaptchaService = when (config.recaptcha) {
-        "recaptcha.Google" -> GoogleRecaptchaService()
-        "recaptcha.GoogleCN" -> GoogleCnRecaptchaService()
+    open fun recaptchaService(): IRecaptchaService = when (config.recaptcha.type) {
+        SecurityConfigProperties.RecaptchaType.Google -> GoogleRecaptchaService(config.recaptcha)
+        SecurityConfigProperties.RecaptchaType.GoogleCN -> GoogleCnRecaptchaService(config.recaptcha)
         else -> NoneRecaptchaService()
     }
 

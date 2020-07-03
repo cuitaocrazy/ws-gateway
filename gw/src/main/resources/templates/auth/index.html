@@ -77,9 +77,6 @@
         .input-box:focus-within input {
             border-color: #007fff;
         }
-
-
-
     </style>
     <script th:src="@{${@environment.getProperty('yada.contextPath', '')}+'/js/jquery-3.1.1.js'}"></script>
     <script th:src="@{${@environment.getProperty('yada.contextPath', '')}+'/js/jquery.validate-1.19.1.js'}"></script>
@@ -118,9 +115,9 @@
 
 
     </script>
-    <script th:if="${@environment.getProperty('yada.security.recaptcha') == 'recaptcha.Google'}"
+    <script th:if="${@environment.getProperty('yada.security.recaptcha.type') == 'Google'}"
             src="https://www.google.com/recaptcha/api.js" async defer></script>
-    <script th:if="${@environment.getProperty('yada.security.recaptcha') == 'recaptcha.GoogleCN'}"
+    <script th:if="${@environment.getProperty('yada.security.recaptcha.type') == 'GoogleCN'}"
             src="https://recaptcha.net/recaptcha/api.js" async defer></script>
 </head>
 <body>
@@ -136,8 +133,8 @@
             <input type="password" id="password" th:field="*{password}" class="form-input" placeholder="请输入密码">
             <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
         </div>
-        <div th:if="${@environment.getProperty('yada.security.recaptcha') == 'recaptcha.GoogleCN' || @environment.getProperty('yada.security.recaptcha') == 'recaptcha.Google'}"
-             class="g-recaptcha" th:data-sitekey="${@environment.getProperty('yada.security.recaptchaKey', '')}"></div>
+        <div th:if="${@environment.getProperty('yada.security.recaptcha.type') == 'GoogleCN' || @environment.getProperty('yada.security.recaptcha.type') == 'Google'}"
+             class="input-box g-recaptcha" th:data-sitekey="${@environment.getProperty('yada.security.recaptcha.sitekey', '6Leu2NsUAAAAAFttLaiyEKDu9yLgrYJhN77Ou1ge')}"></div>
         <div class="login-btn">
             <input type="submit" class="form-input form-btn" th:value="#{login.submit}">
         </div>

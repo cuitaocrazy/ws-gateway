@@ -12,6 +12,7 @@ import com.yada.web.services.IDefaultRoleSvcResService
 import com.yada.web.services.IRoleService
 import com.yada.web.services.IUserService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 
@@ -21,7 +22,9 @@ class GeneralAuth @Autowired constructor(
         private val roleService: IRoleService,
         private val defaultRoleSvcResService: IDefaultRoleSvcResService,
         private val pwdDigestService: IPwdDigestService,
-        creator: TokenManagerCreator
+        creator: TokenManagerCreator,
+        @Value("\${yada.contextPath:/}")
+        private val contextPath: String
 ) : AuthWithTokenManager({ creator("general") }) {
 
     override fun checkAndGet(username: String, password: String): Mono<UserInfo> =
@@ -35,7 +38,7 @@ class GeneralAuth @Autowired constructor(
                         }
                     }
 
-    override fun getPath(): String = "/"
+    override fun getPath(): String = contextPath
 
     private fun getUserResList(user: User): Mono<List<Res>> =
             roleService.getAll()

@@ -82,34 +82,23 @@ class AuthHandler @Autowired constructor(
     data class ChangePwdData(val oldPwd: String?, val newPwd: String?)
 
     fun changePwd(req: ServerRequest): Mono<ServerResponse> =
-            req.bodyToMono<ChangePwdData>()
-                    .filter {
-                        it.oldPwd != null && it.newPwd != null
-                    }
-                    .map {
-                        if (it.oldPwd != null && it.newPwd != null)
-                            throw ResponseStatusException(HttpStatus.CONFLICT, "密码不能为空")
-                        else
-                            object {
-                                val oldPwd = it.oldPwd!!
-                                val newPwd = it.newPwd!!
-                            }
-                    }
-                    .map {
-                        it.apply {
-                            if (!pwdStrengthService.checkStrength(newPwd)) {
-                                throw ResponseStatusException(HttpStatus.CONFLICT, "密码强度不足")
+            req.bodyToMono<ChangePwdData>().flatMap { data ->
+                if (data.oldPwd != null && data.newPwd != null) {
+                    if (!pwdStrengthService.checkStrength(data.newPwd)) {
+                        Mono.error(ResponseStatusException(HttpStatus.CONFLICT, "密码强度不足"))
+                    } else {
+                        AuthHolder.getUserInfo().flatMap {
+                            userService.changePwd(it.userId, data.oldPwd, data.newPwd).flatMap { flag ->
+                                if (flag)
+                                    ServerResponse.ok().build()
+                                else
+                                    Mono.error(ResponseStatusException(HttpStatus.CONFLICT, "修改密码时出错"))
                             }
                         }
-                    }.flatMap { data ->
-                        AuthHolder.getUserInfo()
-                                .flatMap {
-                                    userService.changePwd(it.userId, data.oldPwd, data.newPwd)
-                                }
-                                .filter { it }
-                                .switchIfEmpty(Mono.error { ResponseStatusException(HttpStatus.CONFLICT, "修改密码时出错") })
-                                .then(ServerResponse.ok().build())
                     }
+                } else
+                    Mono.error(ResponseStatusException(HttpStatus.CONFLICT, "密码不能为空"))
+            }
 
     @Suppress("UNUSED_PARAMETER")
     fun refreshToken(req: ServerRequest): Mono<ServerResponse> = ServerResponse.ok().build()

@@ -14,7 +14,9 @@ class SecurityConfigProperties(
     data class RecaptchaProperties(
             var type: RecaptchaType = RecaptchaType.None,
             var secret: String = "6Leu2NsUAAAAAKbXdSjLz6_c1cf8qX2bL4xfn1mN&response=",
-            var sitekey: String = "6Leu2NsUAAAAAFttLaiyEKDu9yLgrYJhN77Ou1ge"
+            var sitekey: String = "6Leu2NsUAAAAAFttLaiyEKDu9yLgrYJhN77Ou1ge",
+            var proxyHost: String = "",
+            var proxyPort: Int = 80
     )
 
     data class TokenProperties(var secret: String = "yadajwt", var expire: Long = 3600)

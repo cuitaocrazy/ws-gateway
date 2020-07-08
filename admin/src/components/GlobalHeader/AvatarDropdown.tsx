@@ -29,7 +29,7 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
 
       return;
     }
-    router.push(`/account/${key}`);
+    router.push(`/${key}`);
   };
 
   render(): React.ReactNode {
@@ -50,7 +50,10 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
           </Menu.Item>
         )}
         {menu && <Menu.Divider />}
-
+        <Menu.Item key="changePwd">
+          <Icon type="lock" />
+          <FormattedMessage id="menu.account.changePwd" defaultMessage="changePwd" />
+        </Menu.Item>
         <Menu.Item key="logout">
           <Icon type="logout" />
           <FormattedMessage id="menu.account.logout" defaultMessage="logout" />

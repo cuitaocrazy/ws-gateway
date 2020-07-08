@@ -109,6 +109,12 @@ export default {
               hideInMenu: true,
             },
             {
+              path: '/changePwd',
+              name: 'changePwd',
+              component: './ChangePwd',
+              hideInMenu: true,
+            },
+            {
               name: 'svc',
               icon: 'database',
               path: '/svc',
@@ -189,18 +195,6 @@ export default {
   }, // chainWebpack: webpackPlugin,
   proxy: {
     '/admin/apis': {
-      target: 'http://localhost:8080/',
-      changeOrigin: true,
-      logLevel: 'debug',
-      onProxyRes(proxyRes: any) {
-        const key = 'set-cookie';
-        if (proxyRes.headers[key]) {
-          const cookies = proxyRes.headers[key].join('').split(' ');
-          proxyRes.headers[key] = [cookies[0], 'Path=/'].join(' ');
-        }
-      },
-    },
-    '/admin': {
       target: 'http://localhost:8080/',
       changeOrigin: true,
       logLevel: 'debug',

@@ -26,4 +26,7 @@ class UserHandler @Autowired constructor(private val userService: IUserService) 
 
     fun delete(req: ServerRequest): Mono<ServerResponse> =
             ok().body(userService.delete(req.pathVariable("id")))
+
+    fun resetPwd(req: ServerRequest): Mono<ServerResponse> =
+            ok().body(ok().body(userService.resetPwd(req.pathVariable("id"))))
 }

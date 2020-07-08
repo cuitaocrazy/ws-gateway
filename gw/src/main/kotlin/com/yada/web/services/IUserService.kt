@@ -14,6 +14,7 @@ interface IUserService {
     fun deleteByOrgId(orgId: String): Mono<Void>
     fun exist(id: String): Mono<Boolean>
     fun getPwd(id: String): Mono<String>
+    fun resetPwd(id: String): Mono<Void>
     fun changePwd(id: String, pwd: String): Mono<Void>
     fun changePwd(id: String, oldPwd: String, newPwd: String): Mono<Boolean>
     fun getAll(): Flux<User>

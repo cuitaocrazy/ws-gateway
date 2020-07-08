@@ -31,8 +31,7 @@ open class UserService @Autowired constructor(
                     .switchIfEmpty(
                             userRepo.save(user)
                                     .flatMap {
-                                        userRepo.changePwd(it.id, pwdDigestService.getDefaultPwdDigest(it.id))
-                                                .then(Mono.just(it))
+                                        resetPwd(it.id).then(Mono.just(it))
                                     }
                     )
 
@@ -45,6 +44,9 @@ open class UserService @Autowired constructor(
     override fun exist(id: String): Mono<Boolean> = userRepo.existsById(id)
 
     override fun getPwd(id: String): Mono<String> = userRepo.findPwdById(id)
+
+    @Transactional
+    override fun resetPwd(id: String): Mono<Void> = userRepo.changePwd(id, pwdDigestService.getDefaultPwdDigest(id))
 
     @Transactional
     override fun changePwd(id: String, pwd: String): Mono<Void> = userRepo.changePwd(id, pwd)

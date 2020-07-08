@@ -51,6 +51,7 @@ open class AdminApiRouterConfig @Autowired constructor(
                 GET("", userHandler::getUsersBy)
                 GET("/{id}", userHandler::get)
                 GET("/{id}/exist", userHandler::exist)
+                PUT("/{id}/reset_pwd", userHandler::resetPwd)
                 PUT("", userHandler::createOrUpdate)
                 DELETE("/{id}", userHandler::delete)
             }

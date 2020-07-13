@@ -13,8 +13,8 @@ class SecurityConfigProperties(
 
     data class RecaptchaProperties(
             var type: RecaptchaType = RecaptchaType.None,
-            var secret: String = "6Leu2NsUAAAAAKbXdSjLz6_c1cf8qX2bL4xfn1mN&response=",
-            var sitekey: String = "6Leu2NsUAAAAAFttLaiyEKDu9yLgrYJhN77Ou1ge",
+            var secret: String = "",
+            var sitekey: String = "",
             var proxyHost: String = "",
             var proxyPort: Int = 80
     )

@@ -50,14 +50,14 @@ abstract class AbsGoogleRecaptchaService(
  * 墙外验证码
  */
 open class GoogleRecaptchaService(config: SecurityConfigProperties.RecaptchaProperties) : AbsGoogleRecaptchaService(
-        "https://www.google.com/recaptcha/api/siteverify?secret=${config.secret}", config.proxyHost, config.proxyPort
+        "https://www.google.com/recaptcha/api/siteverify?secret=${config.secret}&response=", config.proxyHost, config.proxyPort
 )
 
 /**
  * 墙内验证码
  */
 open class GoogleCnRecaptchaService(config: SecurityConfigProperties.RecaptchaProperties) : AbsGoogleRecaptchaService(
-        "https://recaptcha.net/recaptcha/api/siteverify?secret=${config.secret}", config.proxyHost, config.proxyPort
+        "https://recaptcha.net/recaptcha/api/siteverify?secret=${config.secret}&response=", config.proxyHost, config.proxyPort
 )
 
 open class NoneRecaptchaService : IRecaptchaService {

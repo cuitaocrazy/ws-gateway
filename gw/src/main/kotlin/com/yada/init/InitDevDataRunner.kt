@@ -57,7 +57,8 @@ private val userJson = """
     "orgId": "00",
     "roles": [
       "role1"
-    ]
+    ],
+    "email": "email"
   }
 ]
 """.trimIndent()

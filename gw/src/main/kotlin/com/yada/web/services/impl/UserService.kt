@@ -25,9 +25,13 @@ open class UserService @Autowired constructor(
 
     @Transactional
     override fun createOrUpdate(user: User): Mono<User> =
-            userRepo
-                    .findById(user.id)
-                    .flatMap { userRepo.save(user) }
+            getPwd(user.id)
+                    .flatMap { pwd ->
+                        userRepo.save(user)
+                                .flatMap {
+                                    changePwd(user.id, pwd).then(Mono.just(it))
+                                }
+                    }
                     .switchIfEmpty(
                             userRepo.save(user)
                                     .flatMap {

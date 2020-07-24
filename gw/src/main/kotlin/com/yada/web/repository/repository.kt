@@ -11,7 +11,6 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import org.springframework.data.mongodb.core.query.Query as MonoQuery
 
-
 interface IUserRepository {
     fun changePwd(id: String, pwd: String): Mono<Void>
     fun findPwdById(id: String): Mono<String>
@@ -31,7 +30,9 @@ class UserRepositoryImpl @Autowired constructor(
         query.fields().include("pwd").exclude("_id")
         val colName = reactiveMongoTemplate.getCollectionName(User::class.java)
         return reactiveMongoTemplate.findOne(query, Document::class.java, colName)
+                .filter{ it.size > 0}
                 .map { it["pwd"] as String }
+                .switchIfEmpty(Mono.empty())
     }
 }
 

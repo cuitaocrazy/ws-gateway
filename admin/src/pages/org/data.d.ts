@@ -13,6 +13,7 @@ export interface UserData {
   pwd: string;
   orgId: string;
   roles: string[];
+  email: string;
 }
 
 export interface RoleData {

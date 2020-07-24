@@ -206,5 +206,17 @@ export default {
         }
       },
     },
+    '/admin/login': {
+      target: 'http://localhost:8080/',
+      changeOrigin: true,
+      logLevel: 'debug',
+      onProxyRes(proxyRes: any) {
+        const key = 'set-cookie';
+        if (proxyRes.headers[key]) {
+          const cookies = proxyRes.headers[key].join('').split(' ');
+          proxyRes.headers[key] = [cookies[0], 'Path=/'].join(' ');
+        }
+      },
+    },
   },
 } as IConfig;

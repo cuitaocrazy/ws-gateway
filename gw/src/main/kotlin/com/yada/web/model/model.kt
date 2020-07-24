@@ -21,7 +21,8 @@ data class Org(
 data class User(
         val id: String,
         val orgId: String,
-        val roles: Set<String>
+        val roles: Set<String>,
+        val email: String
 )
 
 @Document

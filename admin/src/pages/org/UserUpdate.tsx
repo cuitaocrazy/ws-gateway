@@ -94,6 +94,23 @@ const UserForm: React.SFC<UserUpdateProps> = props => {
             />
           )}
         </Form.Item>
+        <Form.Item {...formItemLayout} label="邮箱">
+          {getFieldDecorator('email', {
+            initialValue: info.email,
+            rules: [
+              {
+                required: true,
+                message: '请输入邮箱',
+              },
+              {
+                type: 'email',
+                message: '邮箱格式错误',
+              },
+            ],
+          })(
+            <Input placeholder="请输入" />
+          )}
+        </Form.Item>
         <Form.Item {...formItemLayout} label="角色">
           {getFieldDecorator('roles', {
             initialValue: info.roles,

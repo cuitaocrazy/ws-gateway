@@ -1,4 +1,4 @@
-import request from '@/utils/request';
+import { request } from 'umi';
 import { SvcData } from './data';
 
 export async function getSvcs() {

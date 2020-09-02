@@ -1,4 +1,4 @@
-import request from '@/utils/request';
+import { request } from 'umi';
 import { OrgData, UserData } from './data';
 
 export async function getOrgTree(idPrefix: string = '') {

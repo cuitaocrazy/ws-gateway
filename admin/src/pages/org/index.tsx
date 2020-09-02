@@ -3,10 +3,11 @@ import { Dispatch } from 'redux';
 import { PageHeaderWrapper, GridContent } from '@ant-design/pro-layout';
 import { Spin, Tree } from 'antd';
 import { connect } from 'dva';
+import { DataNode } from 'antd/lib/tree';
 import { OrgTreeData } from './data.d';
 import { ModelState } from './model';
-import OrgMenu from './OrgMeun';
-import User from './User';
+import OrgMenu from './components/OrgMeun';
+import User from './components/User';
 
 import styles from './style.less';
 
@@ -32,16 +33,11 @@ const OrgView: React.FC<OrgProps> = props => {
     });
   }
 
-  const loopTreeNode = (data: OrgTreeData[]) => data.map((item) => {
-    if (item.children && item.children.length) {
-      return (
-        <Tree.TreeNode key={item.org.id} title={<OrgMenu node={item} />} info={item.org}>
-          {loopTreeNode(item.children)}
-        </Tree.TreeNode>
-      );
-    }
-    return <Tree.TreeNode key={item.org.id} title={<OrgMenu node={item} />} info={item.org} />;
-  })
+  const makeTree = (orgTree: OrgTreeData[]): DataNode[] => orgTree.map(item => ({
+    key: item.org.id,
+    title: <OrgMenu node={item} />,
+    children: makeTree(item.children || []),
+  }));
 
   return (
     <PageHeaderWrapper>
@@ -53,9 +49,8 @@ const OrgView: React.FC<OrgProps> = props => {
                 defaultExpandedKeys={[orgId]}
                 onSelect={onTreeSelect}
                 selectedKeys={[orgId]}
-              >
-                {loopTreeNode(orgTree)}
-              </Tree>
+                treeData={makeTree(orgTree)}
+              />
             </div>
             <div className={styles.right}>
               <div className={styles.title}>
@@ -65,7 +60,7 @@ const OrgView: React.FC<OrgProps> = props => {
           </div>
         </GridContent>
       </Spin>
-    </PageHeaderWrapper>
+    </PageHeaderWrapper >
   )
 }
 

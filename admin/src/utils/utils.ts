@@ -1,7 +1,4 @@
 import { parse } from 'querystring';
-import pathRegexp from 'path-to-regexp';
-import { Route } from '@/models/connect';
-import jwt_decode from 'jwt-decode';
 
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
 const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
@@ -24,68 +21,18 @@ export const isAntDesignProOrDev = (): boolean => {
   return isAntDesignPro();
 };
 
-export const getPageQuery = () => parse(window.location.href.split('?')[1]);
+export const getPageQuery = () => {
+  const { href } = window.location;
+  const qsIndex = href.indexOf('?');
+  const sharpIndex = href.indexOf('#');
 
-/**
- * props.route.routes
- * @param router [{}]
- * @param pathname string
- */
-export const getAuthorityFromRouter = <T extends { path?: string }>(
-  router: T[] = [],
-  pathname: string,
-): T | undefined => {
-  const authority = router.find(({ path }) => path && pathRegexp(path).exec(pathname));
-  if (authority) return authority;
-  return undefined;
-};
+  if (qsIndex !== -1) {
+    if (qsIndex > sharpIndex) {
+      return parse(href.split('?')[1]);
+    }
 
-export const getRouteAuthority = (path: string, routeData: Route[]) => {
-  let authorities: string[] | string | undefined;
-  routeData.forEach(route => {
-    // match prefix
-    if (pathRegexp(`${route.path}/(.*)`).test(`${path}/`)) {
-      if (route.authority) {
-        authorities = route.authority;
-      }
-      // exact match
-      if (route.path === path) {
-        authorities = route.authority || authorities;
-      }
-      // get children authority recursively
-      if (route.routes) {
-        authorities = getRouteAuthority(path, route.routes) || authorities;
-      }
-    }
-  });
-  return authorities;
-};
-
-export const getCookie = (cname: string) => {
-  var name = cname + "=";
-  var ca = document.cookie.split(';');
-  for (var i = 0; i < ca.length; i++) {
-    var c = ca[i];
-    while (c.charAt(0) == ' ') {
-      c = c.substring(1);
-    }
-    if (c.indexOf(name) == 0) {
-      return c.substring(name.length, c.length);
-    }
+    return parse(href.slice(qsIndex + 1, sharpIndex));
   }
-  return undefined;
-}
 
-export const isAdmin = () => {
-  const value = "; " + document.cookie;
-  const tokens: string[] = value.split("; AUTH_ID=");
-  tokens.shift();
-  return tokens.filter(token => {
-    if (token && token !== "") {
-      const decoded: any = jwt_decode(token);
-      return decoded.isAdmin;
-    } else {
-      return false;
-    }
-  }).length > 0;
-}
+  return {};
+};

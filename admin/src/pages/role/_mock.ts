@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { RoleData } from './data';
+import { RoleData } from './data.d';
 
 const roleData: RoleData[] = [
   {

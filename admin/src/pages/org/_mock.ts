@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { OrgTreeData, OrgData, UserData } from './data';
+import { OrgTreeData, OrgData, UserData } from './data.d';
 
 const orgData: OrgData[] = [
   {
@@ -54,6 +54,7 @@ const userData: UserData[] = [
     pwd: "123456",
     orgId: "00",
     roles: ["admin", "user"],
+    email: "admin@example.com",
   }
 ]
 
@@ -67,7 +68,7 @@ export default {
   },
   'GET /admin/apis/user': (req: Request, resp: Response) => {
     const { orgId } = req.query;
-    resp.send(userData.filter(item => item.orgId === decodeURIComponent(orgId)));
+    resp.send(userData.filter(item => item.orgId === decodeURIComponent(orgId as string)));
   },
   'GET /admin/apis/user/:id/exist': (req: Request, resp: Response) => {
     const { id } = req.params;

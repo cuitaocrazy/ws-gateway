@@ -1,4 +1,4 @@
-import request from '@/utils/request';
+import { request } from 'umi';
 import { ModifyData } from './data';
 
 export async function changePwd(params: ModifyData) {

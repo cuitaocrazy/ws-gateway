@@ -5,9 +5,9 @@ import { Spin, Button, Menu, Card, Empty, notification } from 'antd';
 import { connect } from 'dva';
 import { RoleData, KeyData } from './data';
 import { ModelState } from './model';
-import RightMenu from './RightMenu';
-import RoleRes from './RoleRes';
-import RoleForm from './RoleForm';
+import RightMenu from './components/RightMenu';
+import RoleRes from './components/RoleRes';
+import RoleForm from './components/RoleForm';
 
 import styles from './style.less';
 
@@ -66,7 +66,7 @@ const RoleView: React.FC<RoleProps> = props => {
               <Menu
                 mode="inline"
                 selectedKeys={[id]}
-                onClick={({ key }) => handleSelect(key)}
+                onClick={({ key }) => handleSelect(key + '')}
               >
                 {roles.map(role => (
                   <Menu.Item key={role.id} >

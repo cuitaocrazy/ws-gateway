@@ -33,7 +33,7 @@ open class AdminAuthRouterConfig @Autowired constructor(
             POST("/apis/logout", adminAuthHandler::logout)
             POST("/apis/change_pwd", adminAuthHandler::changePwd)
             GET("/apis/refresh_token", adminAuthHandler::refreshToken)
-            GET("/ui") {
+            GET("/apis/ui") {
                 AuthHolder.getUserInfo().flatMap { ok().body(Mono.just(it)) }
             }
             filter(whitelistFilter)

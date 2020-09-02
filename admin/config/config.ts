@@ -73,9 +73,15 @@ export default defineConfig({
     },
     {
       name: 'org',
-      icon: 'user',
+      icon: 'apartment',
       path: '/org',
       component: './org',
+    },
+    {
+      name: 'user',
+      icon: 'user',
+      path: '/user',
+      component: './user',
     },
     {
       component: './404',

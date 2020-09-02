@@ -35,7 +35,6 @@ const Login: React.FC<{}> = () => {
       message.success('登录成功！');
       setTimeout(() => {
         refresh();
-        console.log('refresh();')
       }, 0);
       window.location.href = '/admin';
     } catch (error) {

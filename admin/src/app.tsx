@@ -3,6 +3,7 @@ import { BasicLayoutProps, Settings as LayoutSettings } from '@ant-design/pro-la
 import { notification } from 'antd';
 import { history, RequestConfig } from 'umi';
 import { stringify } from 'querystring';
+import { getPageQuery } from '@/utils/utils';
 import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
 import { ResponseError } from 'umi-request';
@@ -81,10 +82,22 @@ const errorHandler = (error: ResponseError) => {
     const errorText = codeMessage[response.status] || response.statusText;
     const { status, url } = response;
 
-    notification.error({
-      message: `请求错误 ${status}: ${url}`,
-      description: errorText,
-    });
+    if (status === 401) {
+      const { redirect } = getPageQuery();
+      if (window.location.pathname !== '/login' && !redirect) {
+        history.replace({
+          pathname: '/login',
+          search: stringify({
+            redirect: window.location.href,
+          }),
+        });
+      }
+    } else {
+      notification.error({
+        message: `请求错误 ${status}: ${url}`,
+        description: errorText,
+      });
+    }
   }
 
   if (!response) {

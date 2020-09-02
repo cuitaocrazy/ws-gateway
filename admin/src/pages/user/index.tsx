@@ -22,6 +22,7 @@ interface UserProps {
 const User: React.FC<UserProps> = props => {
   const { dispatch, orgTree, roles, users, loading } = props;
 
+  const [info, setInfo] = React.useState<Partial<UserData>>({});
   const [isCreate, setIsCreate] = React.useState<boolean>(false);
   const [isUpdate, setIsUpdate] = React.useState<boolean>(false);
 
@@ -54,6 +55,11 @@ const User: React.FC<UserProps> = props => {
         });
       },
     });
+  }
+
+  const handleUpdateShow = (record: UserData) => {
+    setInfo(record);
+    setIsUpdate(true);
   }
 
   const handleUpdateUser = (values: UserData) => {
@@ -117,7 +123,7 @@ const User: React.FC<UserProps> = props => {
       dataIndex: 'id',
       render: (_: string, record: UserData) => (
         <>
-          <a onClick={() => setIsUpdate(true)}>
+          <a onClick={() => handleUpdateShow(record)}>
             编辑
           </a>
           <Divider type="vertical" />
@@ -168,7 +174,7 @@ const User: React.FC<UserProps> = props => {
           info={{}} orgTree={orgTree} roles={roles} />
         <Form title="用户编辑" visible={isUpdate}
           onCancel={() => setIsUpdate(false)} onSubmit={handleUpdateUser}
-          info={{}} orgTree={orgTree} roles={roles} />
+          info={info} orgTree={orgTree} roles={roles} />
       </Card>
     </PageContainer>
   );

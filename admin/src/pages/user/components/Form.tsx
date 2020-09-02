@@ -31,8 +31,13 @@ const UserForm: React.SFC<UserFormProps> = props => {
   const [form] = Form.useForm();
   const { title, visible, onCancel, onSubmit, info, orgTree, roles } = props;
 
+  React.useEffect(() => {
+    form.resetFields();
+  }, [info]);
+
   const makeTree = (orgTree: OrgTreeData[]): DataNode[] => orgTree.map(orgTree => ({
     key: orgTree.org.id,
+    value: orgTree.org.id,
     title: orgTree.org.name,
     children: makeTree(orgTree.children || []),
   }));
@@ -49,6 +54,7 @@ const UserForm: React.SFC<UserFormProps> = props => {
   return (
     <Modal
       maskClosable={false}
+      getContainer={false}
       title={title}
       visible={visible}
       onOk={() => form.submit()}

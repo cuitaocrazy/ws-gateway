@@ -1,6 +1,6 @@
 import React from 'react';
 import { Dispatch } from 'redux';
-import { PageHeaderWrapper, GridContent } from '@ant-design/pro-layout';
+import { PageContainer, GridContent } from '@ant-design/pro-layout';
 import { Spin, Button, Menu, Card, Empty, notification } from 'antd';
 import { connect } from 'dva';
 import { RoleData, KeyData } from './data';
@@ -58,7 +58,7 @@ const RoleView: React.FC<RoleProps> = props => {
   }
 
   return (
-    <PageHeaderWrapper extra={<Button type="link" onClick={() => setIsCreateRole(true)}>新增</Button>}>
+    <PageContainer extra={<Button type="link" onClick={() => setIsCreateRole(true)}>新增</Button>}>
       <Spin spinning={loading}>
         <GridContent>
           <div className={styles.main} >
@@ -83,7 +83,7 @@ const RoleView: React.FC<RoleProps> = props => {
       </Spin>
       <RoleForm title="添加角色" visible={isCreateRole} onCancel={() => setIsCreateRole(false)}
         info={{ svcs: [] }} onSubmit={handleCreateRole} />
-    </PageHeaderWrapper>
+    </PageContainer>
   )
 }
 

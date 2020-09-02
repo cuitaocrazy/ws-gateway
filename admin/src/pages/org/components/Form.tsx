@@ -29,7 +29,7 @@ const OrgForm: React.SFC<OrgFormProps> = props => {
   const { title, visible, onCancel, onSubmit, info } = props;
 
   const handleSubmit = (values: OrgData) => {
-    onSubmit(values);
+    onSubmit({ ...info, ...values });
     form.resetFields();
     onCancel();
   }
@@ -46,28 +46,35 @@ const OrgForm: React.SFC<OrgFormProps> = props => {
       }}
     >
       <Form  {...formItemLayout} form={form} initialValues={info} onFinish={handleSubmit}>
-        <Form.Item label="机构ID" name="id"
-          rules={[
-            {
-              required: true,
-              whitespace: true,
-              message: '请输入机构ID',
-            },
-            {
-              validator: async (_, value) => {
-                if (value === "")
-                  return Promise.resolve();
-                if (value === info.id)
-                  return Promise.resolve();
-                if (value.includes(" "))
-                  return Promise.reject('机构ID不能包含空格');
-                return existOrgId(value).then((result: boolean) => result ? Promise.reject('机构ID已存在') : Promise.resolve())
-              },
-            },
-          ]}
-        >
-          <Input placeholder="请输入" />
-        </Form.Item>
+        {info.id ? (
+          <Form.Item label="机构号">
+            {info.id}
+          </Form.Item>
+        ) : (
+            <Form.Item label="机构号" name="id"
+              rules={[
+                {
+                  required: true,
+                  whitespace: true,
+                  message: '请输入机构号',
+                },
+                {
+                  validator: async (_, value) => {
+                    if (value === "")
+                      return Promise.resolve();
+                    if (value === info.id)
+                      return Promise.resolve();
+                    if (value.includes(" "))
+                      return Promise.reject('机构号不能包含空格');
+                    return existOrgId(value).then((result: boolean) => result ? Promise.reject('机构号已存在') : Promise.resolve())
+                  },
+                },
+              ]}
+            >
+              <Input placeholder="请输入" />
+            </Form.Item>
+          )
+        }
         <Form.Item label="机构名称" name="name"
           rules={[
             {
@@ -79,7 +86,7 @@ const OrgForm: React.SFC<OrgFormProps> = props => {
           <Input placeholder="请输入" />
         </Form.Item>
       </Form>
-    </Modal>
+    </Modal >
   );
 }
 

@@ -1,7 +1,6 @@
 import React from 'react';
 import { Dispatch } from 'redux';
 import { PageContainer } from '@ant-design/pro-layout';
-import { PlusOutlined } from '@ant-design/icons';
 import { Divider, Button, Modal, notification, Table, Card } from 'antd';
 import { connect } from 'dva';
 import { UserData, OrgTreeData, RoleData } from './data';
@@ -119,6 +118,23 @@ const User: React.FC<UserProps> = props => {
 
   const columns = [
     {
+      title: '机构',
+      dataIndex: 'orgId',
+    },
+    {
+      title: '用户名',
+      dataIndex: 'id',
+    },
+    {
+      title: '邮箱',
+      dataIndex: 'email',
+    },
+    {
+      title: '角色',
+      dataIndex: 'roles',
+      render: (value: string[]) => value.join(', ')
+    },
+    {
       title: '操作',
       dataIndex: 'id',
       render: (_: string, record: UserData) => (
@@ -137,32 +153,12 @@ const User: React.FC<UserProps> = props => {
         </>
       ),
     },
-    {
-      title: '机构',
-      dataIndex: 'orgId',
-    },
-    {
-      title: '用户名',
-      dataIndex: 'id',
-    },
-    {
-      title: '邮箱',
-      dataIndex: 'email',
-    },
-    {
-      title: '角色',
-      dataIndex: 'roles',
-      render: (value: string[]) => value.join(', ')
-    },
   ];
 
   return (
-    <PageContainer>
+    <PageContainer extra={<Button type="link" onClick={() => setIsCreate(true)}>新增</Button>}>
       <Card >
         <Search orgId="00" orgTree={orgTree} onSubmit={handleQueryUser} />
-        <Button onClick={() => setIsCreate(true)}>
-          <PlusOutlined />新增
-        </Button>
         <Table<UserData>
           rowKey="id"
           loading={loading}

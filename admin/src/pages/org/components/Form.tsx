@@ -28,6 +28,10 @@ const OrgForm: React.SFC<OrgFormProps> = props => {
   const [form] = Form.useForm();
   const { title, visible, onCancel, onSubmit, info } = props;
 
+  React.useEffect(() => {
+    form.resetFields();
+  }, [info]);
+
   const handleSubmit = (values: OrgData) => {
     onSubmit({ ...info, ...values });
     form.resetFields();
@@ -37,6 +41,7 @@ const OrgForm: React.SFC<OrgFormProps> = props => {
   return (
     <Modal
       maskClosable={false}
+      getContainer={false}
       title={title}
       visible={visible}
       onOk={() => form.submit()}

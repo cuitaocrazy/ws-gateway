@@ -23,32 +23,33 @@ const formItemLayout = {
   },
 };
 
-const RoleForm: React.SFC<RoleFormProps> = props => {
+const RoleForm: React.FC<RoleFormProps> = props => {
 
   const { title, visible, onCancel, onSubmit, info } = props;
   const [form] = Form.useForm();
+
+  React.useEffect(() => {
+    form.setFieldsValue(info);
+  }, [info])
 
   const handleSubmit = (values: RoleData) => {
     onSubmit({
       ...info,
       ...values,
     });
-    form.resetFields();
     onCancel();
   }
 
   return (
     <Modal
+      destroyOnClose
       maskClosable={false}
       title={title}
       visible={visible}
       onOk={() => form.submit()}
-      onCancel={() => {
-        form.resetFields();
-        onCancel();
-      }}
+      onCancel={() => onCancel()}
     >
-      <Form {...formItemLayout} form={form} initialValues={info} onFinish={handleSubmit}>
+      <Form {...formItemLayout} preserve={false} form={form} initialValues={info} onFinish={handleSubmit}>
         <Form.Item label="角色" name="id"
           rules={[
             {

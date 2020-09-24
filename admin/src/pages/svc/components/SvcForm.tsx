@@ -27,27 +27,28 @@ const SvcForm: React.SFC<SvcFormProps> = props => {
   const { title, visible, onCancel, onSubmit, info } = props;
   const [form] = Form.useForm();
 
+  React.useEffect(() => {
+    form.setFieldsValue(info);
+  }, [info])
+
   const handleSubmit = (values: SvcData) => {
     onSubmit({
       ...info,
       ...values,
     });
-    form.resetFields();
     onCancel();
   }
 
   return (
     <Modal
+      destroyOnClose
       maskClosable={false}
       title={title}
       visible={visible}
       onOk={() => form.submit()}
-      onCancel={() => {
-        form.resetFields();
-        onCancel();
-      }}
+      onCancel={() => onCancel()}
     >
-      <Form {...formItemLayout} form={form} initialValues={info} onFinish={handleSubmit}>
+      <Form {...formItemLayout} preserve={false} form={form} initialValues={info} onFinish={handleSubmit}>
         <Form.Item label="服务" name="id"
           rules={[
             {

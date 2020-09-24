@@ -29,28 +29,25 @@ const OrgForm: React.SFC<OrgFormProps> = props => {
   const { title, visible, onCancel, onSubmit, info } = props;
 
   React.useEffect(() => {
-    form.resetFields();
+    form.setFieldsValue(info);
   }, [info]);
 
   const handleSubmit = (values: OrgData) => {
     onSubmit({ ...info, ...values });
-    form.resetFields();
     onCancel();
   }
 
   return (
     <Modal
+      destroyOnClose
       maskClosable={false}
       getContainer={false}
       title={title}
       visible={visible}
       onOk={() => form.submit()}
-      onCancel={() => {
-        form.resetFields();
-        onCancel();
-      }}
+      onCancel={() => onCancel()}
     >
-      <Form  {...formItemLayout} form={form} initialValues={info} onFinish={handleSubmit}>
+      <Form  {...formItemLayout} preserve={false} form={form} initialValues={info} onFinish={handleSubmit}>
         {info.id ? (
           <Form.Item label="机构号">
             {info.id}

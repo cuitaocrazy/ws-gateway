@@ -32,7 +32,7 @@ const UserForm: React.SFC<UserFormProps> = props => {
   const { title, visible, onCancel, onSubmit, info, orgTree, roles } = props;
 
   React.useEffect(() => {
-    form.resetFields();
+    form.setFieldsValue(info);
   }, [info]);
 
   const makeTree = (orgTree: OrgTreeData[]): DataNode[] => orgTree.map(orgTree => ({
@@ -47,7 +47,6 @@ const UserForm: React.SFC<UserFormProps> = props => {
       ...info,
       ...values,
     });
-    form.resetFields();
     onCancel();
   }
 
@@ -58,10 +57,7 @@ const UserForm: React.SFC<UserFormProps> = props => {
       title={title}
       visible={visible}
       onOk={() => form.submit()}
-      onCancel={() => {
-        form.resetFields();
-        onCancel();
-      }}
+      onCancel={() => onCancel()}
     >
       <Form {...formItemLayout} form={form} initialValues={info} onFinish={handleSubmit}>
         {info.id ?

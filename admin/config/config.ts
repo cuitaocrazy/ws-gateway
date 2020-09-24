@@ -56,7 +56,7 @@ export default defineConfig({
     {
       path: '/changePwd',
       name: 'changePwd',
-      component: './ChangePwd',
+      component: './changePwd',
       hideInMenu: true,
     },
     {

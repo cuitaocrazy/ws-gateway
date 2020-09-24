@@ -16,15 +16,10 @@ class AdminUserService @Autowired constructor(private val adminRepository: Admin
 
     override fun deleteUser(id: String): Mono<Void> = adminRepository.deleteById(id)
 
-    override fun changePwd(id: String, oldPwd: String, newPwd: String): Mono<Boolean> {
-        val nct = pwdDigestService.getPwdDigest(id, newPwd)
-        val oct = pwdDigestService.getPwdDigest(id, oldPwd)
-
-        return adminRepository.findPwdById(id)
-                .map { oct == it }
-                .filter { it }
-                .flatMap { adminRepository.changePwd(id, nct).then(Mono.just(true)) }
-                .defaultIfEmpty(false)
-    }
-
+    override fun changePwd(id: String, oldPwd: String, newPwd: String): Mono<Boolean> = adminRepository.findPwdById(id)
+            .filter { pwdDigestService.checkPwdDigest(id, oldPwd, it) }
+            .flatMap {
+                adminRepository.changePwd(id, pwdDigestService.getPwdDigest(id, newPwd)).then(Mono.just(true))
+            }
+            .defaultIfEmpty(false)
 }

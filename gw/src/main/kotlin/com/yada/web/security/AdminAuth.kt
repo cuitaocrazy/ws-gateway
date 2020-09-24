@@ -18,7 +18,7 @@ class AdminAuth @Autowired constructor(
 
     override fun checkAndGet(username: String, password: String): Mono<UserInfo> =
             adminRepo.findPwdById(username).filter {
-                pwdDigestService.getPwdDigest(username, password) == it
+                pwdDigestService.checkPwdDigest(username, password, it)
             }.map {
                 UserInfo(username, listOf(), mapOf())
             }

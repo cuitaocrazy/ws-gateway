@@ -29,8 +29,7 @@ class GeneralAuth @Autowired constructor(
 
     override fun checkAndGet(username: String, password: String): Mono<UserInfo> =
             userService.getPwd(username)
-                    .map { it == pwdDigestService.getPwdDigest(username, password) }
-                    .filter { it }
+                    .filter { pwdDigestService.checkPwdDigest(username, password, it) }
                     .flatMap { userService.get(username) }
                     .flatMap { user ->
                         getUserResList(user).map {

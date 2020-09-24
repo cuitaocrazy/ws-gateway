@@ -56,15 +56,12 @@ open class UserService @Autowired constructor(
     override fun changePwd(id: String, pwd: String): Mono<Void> = userRepo.changePwd(id, pwd)
 
     @Transactional
-    override fun changePwd(id: String, oldPwd: String, newPwd: String): Mono<Boolean> {
-        val nct = pwdDigestService.getPwdDigest(id, newPwd)
-        val oct = pwdDigestService.getPwdDigest(id, oldPwd)
-
-        return getPwd(id).map { oct == it }
-                .filter { it }
-                .flatMap { changePwd(id, nct).then(Mono.just(true)) }
-                .defaultIfEmpty(false)
-    }
+    override fun changePwd(id: String, oldPwd: String, newPwd: String): Mono<Boolean> = getPwd(id)
+            .filter { pwdDigestService.checkPwdDigest(id, oldPwd, it) }
+            .flatMap {
+                changePwd(id, pwdDigestService.getPwdDigest(id, newPwd)).then(Mono.just(true))
+            }
+            .defaultIfEmpty(false)
 
     override fun getAll(): Flux<User> = userRepo.findAll()
 

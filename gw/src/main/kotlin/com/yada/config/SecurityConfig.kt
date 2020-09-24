@@ -7,6 +7,7 @@ import com.yada.gateways.AuthGatewayFilterFactory
 import com.yada.security.*
 import com.yada.security.hazelcast.HazelcastTokenManager
 import com.yada.web.security.GeneralAuth
+import org.jasypt.encryption.StringEncryptor
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
@@ -18,12 +19,13 @@ typealias TokenManagerCreator = (String) -> TokenManager
 @EnableConfigurationProperties(SecurityConfigProperties::class)
 open class SecurityConfig(
         private val config: SecurityConfigProperties,
+        private val stringEncryptor: StringEncryptor,
         @Value("\${yada.contextPath:}")
         private val contextPath: String
 ) {
 
     @Bean
-    open fun pwdDigestService(): IPwdDigestService = PwdDigestService(config.defaultPwd)
+    open fun pwdDigestService(): IPwdDigestService = PwdDigestService(config.defaultPwd, stringEncryptor)
 
     @Bean
     open fun recaptchaService(): IRecaptchaService = when (config.recaptcha.type) {

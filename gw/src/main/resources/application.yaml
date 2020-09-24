@@ -9,3 +9,7 @@ spring:
     gateway:
       metrics:
         enabled: true
+
+jasypt:
+  encryptor:
+    password: yada
